@@ -6,9 +6,7 @@ tags:
   - topic/learning
 ---
 
-## qwq
-
-
+## Define
 
 ---
-## **Related**：
+## **Related**

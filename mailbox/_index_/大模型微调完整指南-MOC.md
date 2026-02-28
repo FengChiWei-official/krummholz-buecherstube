@@ -7,28 +7,28 @@ tags:
 
 # 大模型微调完整指南 (MOC)
 
-这是关于 LLM 微调的知识索引与导航地图。详细内容见 [[LLM-fine-tuning]]。
+这是关于 LLM 微调的知识索引与导航地图。详细内容见 [[LLM Fine Tune]]。
 
 ## 快速导航
 
 ### 📌 核心微调方法（7 大技术）
 
 #### 全量微调
-- **[[SFT - 监督式微调|SFT]]**：最直接的方法，更新所有参数。性能最高，成本最高。见 [[LLM-fine-tuning#1-监督式微调-sft--supervised-fine-tuning]]
+- **[[SFT - 监督式微调|SFT]]**：最直接的方法，更新所有参数。性能最高，成本最高。见 [[LLM Fine Tune#1-监督式微调-sft--supervised-fine-tuning]]
 
 #### 参数高效微调 (PEFT)
 - **[[PEFT - 参数高效微调|PEFT]]**：总体框架与分类
-  - **[[LoRA - 低秩适配|LoRA]]**：添加低秩矩阵，最常用，易实现。见 [[LLM-fine-tuning#2-lora-low-rank-adaptation--低秩适配]]
-  - **[[OFT - 正交微调|OFT]]**：正交约束，数值稳定，参数更少。见 [[LLM-fine-tuning#3-oft-orthogonal-finetuning--正交微调]]
+  - **[[LoRA - 低秩适配|LoRA]]**：添加低秩矩阵，最常用，易实现。见 [[LLM Fine Tune#2-lora-low-rank-adaptation--低秩适配]]
+  - **[[OFT - 正交微调|OFT]]**：正交约束，数值稳定，参数更少。见 [[LLM Fine Tune#3-oft-orthogonal-finetuning--正交微调]]
 
 #### 优化与策略
-- **[[参数冻结策略|Freeze 参数冻结]]**：选择性冻结层，与各微调方法正交。与 SFT/LoRA/OFT 组合使用，防止灾难性遗忘。见 [[LLM-fine-tuning#4-冻结策略-freezing-strategy]]
+- **[[参数冻结策略|Freeze 参数冻结]]**：选择性冻结层，与各微调方法正交。与 SFT/LoRA/OFT 组合使用，防止灾难性遗忘。见 [[LLM Fine Tune#4-冻结策略-freezing-strategy]]
   - *场景*：预训练知识重要、任务特异性强、少样本学习
 
 #### 偏好对齐（3 大对齐方法）
-- **[[PPO - 近端策略优化|PPO]]**：工业标准，需要奖励模型，成本高。见 [[LLM-fine-tuning#5-ppo-proximal-policy-optimization--近端策略优化]]
-- **[[DPO - 直接偏好优化|DPO]]**：改进 PPO，无需奖励模型，开源流行。见 [[LLM-fine-tuning#6-dpo-direct-preference-optimization--直接偏好优化]]
-- **[[KTO - 卡尼曼特维斯基优化|KTO]]**：理论改进 DPO，处理不平衡数据更好。见 [[LLM-fine-tuning#7-kto-kahneman-tversky-optimization--卡尼曼-特维斯基优化]]
+- **[[PPO - 近端策略优化|PPO]]**：工业标准，需要奖励模型，成本高。见 [[LLM Fine Tune#5-ppo-proximal-policy-optimization--近端策略优化]]
+- **[[DPO - 直接偏好优化|DPO]]**：改进 PPO，无需奖励模型，开源流行。见 [[LLM Fine Tune#6-dpo-direct-preference-optimization--直接偏好优化]]
+- **[[KTO - 卡尼曼特维斯基优化|KTO]]**：理论改进 DPO，处理不平衡数据更好。见 [[LLM Fine Tune#7-kto-kahneman-tversky-optimization--卡尼曼-特维斯基优化]]
 
 ---
 
@@ -53,7 +53,7 @@ tags:
 
 ## 关键概念
 
-- **[[灾难性遗忘]]**：微调时遗忘原始知识的风险，各方法都需防范。防止策略见 [[LLM-fine-tuning#防止灾难性遗忘的完整策略]]
+- **[[灾难性遗忘]]**：微调时遗忘原始知识的风险，各方法都需防范。防止策略见 [[LLM Fine Tune#防止灾难性遗忘的完整策略]]
 - **[[PEFT - 参数高效微调|PEFT]]**：参数占比 0.5~3%，速度快 5-10 倍
 
 ---
@@ -103,13 +103,13 @@ tags:
 4. ✅ 混合通用数据训练
 5. ✅ 对齐时使用 KL 约束（PPO/DPO/KTO）
 
-**Freeze 冻结详见** [[LLM-fine-tuning#4-冻结策略-freezing-strategy]]
+**Freeze 冻结详见** [[LLM Fine Tune#4-冻结策略-freezing-strategy]]
 
 ---
 
 ## 常见问题快速查阅
 
-详见 [[LLM-fine-tuning#常见问题速查表]]
+详见 [[LLM Fine Tune#常见问题速查表]]
 
 **Q: 我只有 8GB GPU，怎么微调 7B 模型？**
 A: 使用 LoRA + QLoRA（量化）+ 梯度累积，成本可降低 10 倍。
@@ -153,8 +153,8 @@ A: 用 KTO，理论上比 DPO 更适合。
 ## 相关资源
 
 - **原子笔记库**：`mailbox/trivial-ml/content/` 中有单个技术的详细解析
-- **工具框架**：见 [[LLM-fine-tuning#实用工具与框架-tools--frameworks]]
-- **最佳实践**：见 [[LLM-fine-tuning#最佳实践总结-best-practices]]
+- **工具框架**：见 [[LLM Fine Tune#实用工具与框架-tools--frameworks]]
+- **最佳实践**：见 [[LLM Fine Tune#最佳实践总结-best-practices]]
 
 ---
 

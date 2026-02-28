@@ -24,7 +24,7 @@ can handle linux's [[soft link]]
 2. mount with param `exec`
 3. move the `SteamLibrary/steamapps/compatdata/` into any linux fs
 4. make a link from linux fs to ntfs for `compatdata`
-[[UMU set up]]
+[[Trick UMU set up]]
 
 ---
 ## **related**：
