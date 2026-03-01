@@ -24,4 +24,4 @@ It describes `having relationship`, if each elements have then same root, then t
 
 ---
 ## **related**：
-[[Code Implement of Disjint Set Union]]
+[[Code Implement of Disjoint Set Union]]
