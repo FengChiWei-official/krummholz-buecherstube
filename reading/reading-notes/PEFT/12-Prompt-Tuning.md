@@ -41,7 +41,7 @@
 ## 相关笔记
 - [[11-Prefix-Tuning]]
 - [[13-P-Tuning]]
-- [[01-LoRA-低秩适配]]
+- [[reading/reading-notes/PEFT/LoRA-低秩适配]]
 
 ## 关键公式
 $$ P(y|x) = P(y| [P; E(x)], \theta_{frozen}) $$

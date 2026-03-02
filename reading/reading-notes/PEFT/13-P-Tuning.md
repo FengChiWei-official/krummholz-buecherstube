@@ -59,7 +59,7 @@
 ## 相关笔记
 - [[11-Prefix-Tuning]]
 - [[12-Prompt-Tuning]]
-- [[01-LoRA-低秩适配]]
+- [[reading/reading-notes/PEFT/LoRA-低秩适配]]
 
 ## 个人总结
 P-Tuning 系列展示了 Soft Prompt 方法的进化。v1 解决了“怎么把 Prompt 变成可微的”，v2 解决了“怎么让 Soft Prompt 在小模型和难任务上也管用”。v2 本质上是 Prefix-Tuning 在 NLU 任务上的优化和验证，证明了 Deep Prompting 是提升参数高效微调上限的关键。

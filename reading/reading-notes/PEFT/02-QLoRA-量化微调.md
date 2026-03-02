@@ -916,7 +916,7 @@ QLoRA 发表后（2023 年 5 月后）：
 ## 🔗 相关笔记
 
 ### 相关论文
-- [[01-LoRA-低秩适配|LoRA]] — QLoRA 的基础
+- [[reading/reading-notes/PEFT/LoRA-低秩适配|LoRA]] — QLoRA 的基础
 - [[参数高效微调|PEFT 系列]] — 整个生态
 - [[灾难性遗忘]] — 量化会影响遗忘吗？
 

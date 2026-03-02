@@ -42,7 +42,7 @@ books/
 
 | # | 论文 | 作者 | 发表 | 笔记 | 状态 |
 |---|------|------|------|------|------|
-| 01 | [[LoRA-低秩适配]] | Hu et al. | ICLR 2021 | [已整理] | ✅ |
+| 01 | [[mailbox/trivial-ml/content/LoRA-低秩适配]] | Hu et al. | ICLR 2021 | [已整理] | ✅ |
 | 02 | [[QLoRA-量化LoRA]] | Dettmers et al. | ICLR 2023 | [已整理] | ✅ |
 | 03 | [[OFT-正交微调]] | Sun et al. | 2023 年 | [已整理] | ✅ |
 | 10 | [[PEFT-框架]] | HuggingFace | 2022 年 | [已整理] | ✅ |

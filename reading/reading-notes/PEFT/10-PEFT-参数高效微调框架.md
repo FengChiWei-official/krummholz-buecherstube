@@ -43,7 +43,7 @@
 - **资源优化**：节省训练成本和存储成本。
 
 ## 相关笔记
-- [[01-LoRA-低秩适配]]
+- [[reading/reading-notes/PEFT/LoRA-低秩适配]]
 - [[02-QLoRA-量化微调]]
 - [[11-Prefix-Tuning]]
 

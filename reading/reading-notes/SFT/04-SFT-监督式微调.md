@@ -36,7 +36,7 @@
 ## 相关笔记
 - [[05-InstructGPT]]
 - [[06-Llama-2]]
-- [[01-LoRA-低秩适配]]
+- [[reading/reading-notes/PEFT/LoRA-低秩适配]]
 
 ## 个人总结
 SFT 是将“读万卷书”的 Base 模型变成“行万里路”的 Chat 模型的关键一步。目前的趋势是追求更高质量、更少量的 SFT 数据（Data-Centric AI），以及使用合成数据（Synthetic Data）来提升 SFT 的效果。

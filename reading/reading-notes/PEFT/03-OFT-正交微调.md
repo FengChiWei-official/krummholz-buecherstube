@@ -722,7 +722,7 @@ DoRA 可以看作是 BOFT 的"补充"：
 ## 🔗 相关笔记与扩展
 
 ### 相关概念
-- [[01-LoRA-低秩适配|LoRA]] — BOFT 的"对标"方法
+- [[reading/reading-notes/PEFT/LoRA-低秩适配|LoRA]] — BOFT 的"对标"方法
 - [[02-QLoRA-量化微调|QLoRA]] — 量化 + LoRA（可结合 BOFT）
 - [[灾难性遗忘]] — BOFT 解决的核心问题
 - [[参数高效微调|PEFT 生态]] — BOFT 在生态中的位置
