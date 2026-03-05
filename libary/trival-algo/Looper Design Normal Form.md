@@ -22,7 +22,7 @@ And **ENSURE** end_point be **static**, to satisfy [[Loop Invariant Principle]].
     
 - Solution: Use `const`declarations (as in your code) and ensure `f`only alters the current `state`, not the initial or final values. This is analogous to state transitions in systems like Prefect, where states (e.g., `Pending`→ `Running`→ `Success`) are managed with explicit boundaries to avoid unintended side effects .
 
-## dummy node (`哨兵` or `虚拟头节点`)
+## ([[Sentinel Node]]`哨兵` or `虚拟头节点`)
 
 ---
 ## **Related**：

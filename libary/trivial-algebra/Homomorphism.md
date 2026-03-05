@@ -2,7 +2,6 @@
 tags:
   - type/permanent/index
   - status/evergreen
-  - attr/map
   - topic/math
 ---
 

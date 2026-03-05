@@ -5,9 +5,11 @@ tags:
   - status/archive
 source: 《卡片盒笔记法》 by Sönke Ahrens
 ---
-[70. Climbing Stairs](https://leetcode.com/problems/climbing-stairs/)
+[CodeForces-2205A](https://vjudge.net/problem/CodeForces-2205A/origin)
 ## Text
 
-## Thoughts
 
-It is a easy [[Dynamic Programming]]
+---
+
+## Thoughts
+注意审题，只能一次操作。

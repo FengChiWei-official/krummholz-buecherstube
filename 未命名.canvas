@@ -1,0 +1,9 @@
+{
+	"nodes":[
+		{"id":"e2a91a1d5c481c8d","x":-144,"y":40,"width":400,"height":400,"type":"file","file":"B - mpp.md"},
+		{"id":"7ad74558c7d47687","x":-144,"y":-540,"width":400,"height":360,"type":"file","file":"Lookup_Table_vs_Search.md"}
+	],
+	"edges":[
+		{"id":"d876dfcaee6d7d9d","fromNode":"7ad74558c7d47687","fromSide":"bottom","toNode":"e2a91a1d5c481c8d","toSide":"top"}
+	]
+}

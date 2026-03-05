@@ -1,0 +1,4 @@
+- [x] greedy
+- [ ] stack
+- [ ] 素数筛 vs 质因数分解
+- [ ] 暴力法识别 [[CodeForces-2205A]]
