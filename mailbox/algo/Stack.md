@@ -7,6 +7,9 @@ tags:
 ---
 
 ## Definition
+Pass
+
+## Techniques
 
 [[How to Use Stack]]
 [[Trick String for Stack]]
@@ -14,6 +17,8 @@ tags:
 ## Problem Type
 [[Parentheses Matching]]
 
+## Hyponym
+[[Monotonic Stack]]
 
 ---
 ## **Related**
