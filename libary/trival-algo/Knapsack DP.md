@@ -11,6 +11,8 @@ tags:
 ## Types
 [[01 Knapsack DP]]
 
+## Views
+[[View of Knapsack DP]]
 
 ---
 ## **Related**：

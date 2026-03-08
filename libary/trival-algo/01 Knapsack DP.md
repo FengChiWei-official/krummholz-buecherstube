@@ -8,10 +8,10 @@ tags:
 
 ## Definition
 ### Entities
-1. Item
+1. [[knapsack Item]]
 	1. weight
 	2. value
-2. knapsack
+2. [[knapsack]]
 	1. capacity
 	2. value
 ### State Space
@@ -30,11 +30,9 @@ dimension is `object * capacity(may be n dimension)`
 `dp[i] = max(dp[i], dp[i-w_cur]+v_cur)`
 Its logic is **Choice or not**.
 ## Type
-[[Partition Problem]]
-[[2D Cost Knapsack]]
-[[Counting Knapsack]]
-[[Group Knapsack]]
-[[Other Objective Knapsack]]
+
+[[01 Knapsack DP Classes]] 
+
 
 ---
 ## **Related**：

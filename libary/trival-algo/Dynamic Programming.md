@@ -10,14 +10,7 @@ aliases:
 ---
 
 ## Definition
-**IDN**
-
-## **attr**
-- 重叠子问题
-- 无后效性
-- 。。。
-
-## CORE
+### CORE
 dynamic programming has only 2 CORE Factors: [[State Space]] and [[Transition Logic]].
 
 ---
