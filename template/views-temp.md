@@ -3,7 +3,7 @@ tags:
   - type/permanent
   - status/evergreen
   - topic/learning
-  - attr
+  - attr/views
 ---
 
 ## Definition
