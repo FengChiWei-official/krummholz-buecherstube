@@ -2,17 +2,12 @@
 tags:
   - type/permanent
   - status/evergreen
-  - attr/principle
   - topic/learning
-aliases:
-  - Scalar Field
+  - attr/concept
 ---
 
 ## Definition
-$$
-\mathbb{R}^n \to \mathbb{R}
-$$
-
+$$\mathbb{R}^3 \to \mathbb{R}^3$$
 
 ---
 ## **Related**

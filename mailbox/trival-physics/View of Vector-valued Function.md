@@ -10,7 +10,7 @@ tags:
 [[Vector-valued Function]]
 
 ## Notation
-
+$<f_1(t), f_2(t), f_3(t)>$ 
 
 ## Related Concept
 [[Limit of Vector-valued Function]]

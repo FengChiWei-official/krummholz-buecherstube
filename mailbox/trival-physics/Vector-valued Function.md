@@ -5,8 +5,8 @@ tags:
   - attr/principle
   - topic/learning
 aliases:
-  - Vector Field
   - Vector Function
+  - Parametric Curve
 ---
 
 ## Definition
