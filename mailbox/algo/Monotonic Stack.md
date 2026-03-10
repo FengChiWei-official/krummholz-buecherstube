@@ -36,6 +36,13 @@ Nothing.
 - [ ] Pop marginal condition? 
 - [ ] Empty Check? 
 - [ ] Sentinels? no need.
+- [ ] Stack breaks order, so you should 
+
+> [!tip]
+> **Since a monotonic stack processes elements out of their original order, you should assign values to the answer array by index instead of using `push_back`.**
+
+
+
 
 ---
 ## **Related**
@@ -43,10 +50,11 @@ Nothing.
 ### Classic Problems
 
 
+- [[901. Online Stock Span]] todo
 - [[Next Greater Elements]]
 - [[84. Largest Rectangle in Histogram]]
 - [[42. Trapping Rain Water]]
-- [[Daily Temperatures]]
+- [[739. Daily Temperatures]]
 
 
 
