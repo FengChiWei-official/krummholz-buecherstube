@@ -8,7 +8,7 @@ aliases:
   - Make Hyprland Notification Properly Work
 ---
 
-## Symtom
+## Symptom
 
 ``` bash
 ❯ swaync
@@ -33,26 +33,21 @@ create a script `~/.config/hypr/scripts/notifications.sh`.
 ``` bash
 #!/bin/bash
 
-# 1. Identify if we are actually in Hyprland
-if [ "$XDG_CURRENT_DESKTOP" = "Hyprland" ]; then
-    
-    # 2. Kill KDE's notification listeners/daemons aggressively 
-    # This clears the path for SwayNC to grab the DBus name
-    pkill -9 -f org.kde.plasma.Notifications
-    pkill -9 -f plasma_waitforname
-    
-    # 3. If another swaync is stuck, clear it
-    pkill -9 swaync
-    
-    # 4. Give DBus a tiny moment to register the deaths
-    sleep 0.5
-    
-    # 5. Start SwayNC
-    swaync &
-else
-    echo "Not in Hyprland, skipping SwayNC startup."
-fi
+# 暴力清理所有潜在的冲突进程
+pkill -9 -x swaync
+pkill -9 -f "plasma-notification"
+pkill -9 -x dunst
+pkill -9 -x mako
 
+# 等待 DBus 释放名称
+timeout=5
+while busctl --user list | grep -q "org.freedesktop.Notifications" && [ $timeout -gt 0 ]; do
+    sleep 0.5
+    ((timeout--))
+done
+
+# 启动 swaync
+swaync > /dev/null 2>&1 &
 ```
 
 ### Step Two
