@@ -16,6 +16,9 @@ The following properties hold:
 2. $x^r = x^s, \text{ let r > s } \text{ if and only if } (r-s) \in \mathbf{S}$
 3. Suppose that $\mathbf{S}$ is not trivial, then let $\mathbf{S} = \mathbb{Z}n$, $1, x, x^2, \dots, x^{n-1}$ are distinct elements of $<x>$.
 4. we say n is the [[order of cyclic subgroup| order]] of $<x>$
+>[!note]
+>$x^r = x^s, \text{ let r > s } \text{ if and only if } x^{r-s} = 1_{\mathbf{G}}$, so in range $[1,n)$, it is impossible to find any element to be the same.
+
 
 
 ---

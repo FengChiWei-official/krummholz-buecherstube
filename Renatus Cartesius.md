@@ -4,11 +4,12 @@ tags:
   - status/evergreen
   - topic/learning
   - attr/concept
+aliases:
+  - René Descartes
+  - Cartesian
 ---
 
 ## Definition
-$$\mathbb{R}^3 \to \mathbb{R}^3$$
 
 ---
 ## **Related**
-[[]]

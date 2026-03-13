@@ -7,9 +7,8 @@ tags:
 ---
 
 ## define
-$\forall a \in N$, if $g$ is in $G$, then the [[Conjugate]] $gag^{-1} \in N$
-
-
+A [[Subgroup]] $\mathbf{N}$ of Group $mathbf{G}$ is a [[Normal Subgroup]],  if
+$\forall a \in N$, $\forall g \in \mathbf{G}$, then the [[Conjugate]] $gag^{-1} \in N$
 
 
 ---

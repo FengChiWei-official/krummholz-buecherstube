@@ -7,8 +7,8 @@ tags:
 ---
 
 ## Definition
-$$\mathbb{R}^3 \to \mathbb{R}^3$$
+
+[[Speed]] is a [[Scalar]] that equals to the magnitude of [[Tangential Velocity]]
 
 ---
 ## **Related**
-[[]]

@@ -8,8 +8,11 @@ tags:
 ## Definition 
 [[Definition of Homomprphism]]
 
+## Hyponym
+- [[Isomorphism]]
+	- [[Automorphism]]
 ## Property
-[[Properties of Homomorphism]]
+[[Basic Properties of Group Homomorphisms]]
 
 ## Theorem
 [[Theorem on kernel of Homomorphism]]
@@ -22,8 +25,14 @@ tags:
 [[Kernel of Homomorphism]]
 ### other
 [[Normal Subgroup]]
+#### recongization
+[[Attribution Theorem of Kernel - Kernel is Normal Subgroup]]
+[[Proposition of all Subgroup of Abelian Group is Normal]]
+[[Center of a Group Z| Center is always the Normal group]]
+
 ## related
 ### [[Functor]]:
 they are both arguing an relationship similar to [[Orthogonal]]
 ### usage
-based on [[Image of Homomorphism|Image]], we defined what is [[Class]]--[[Coset]] who shares the **same Image**, and the [[Kernel of Homomorphism|Kernel]] tell us [[Coset|how to get the Class]].
+based on [[Image of Homomorphism|Image]], we defined what is [[Class]]--[[Coset]] who shares the **same Image**, 
+and the [[Kernel of Homomorphism|Kernel]] tell us [[Coset|how to get the Class]].

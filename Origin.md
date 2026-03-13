@@ -4,11 +4,11 @@ tags:
   - status/evergreen
   - topic/learning
   - attr/concept
+aliases:
+  - Pole
 ---
 
 ## Definition
-$$\mathbb{R}^3 \to \mathbb{R}^3$$
 
 ---
 ## **Related**
-[[]]

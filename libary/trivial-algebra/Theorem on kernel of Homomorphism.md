@@ -9,7 +9,7 @@ tags:
 ## Let
 - $\phi: \mathbf{G} \to \mathbf{G^{\prime}}$ is a homomorphism of these groups
 - $a,b$ is element of $\mathbf{G}$
-- $K$ is the kernel of $\mathbf{G}$
+- $K$ is the [[Kernel of Homomorphism]] of $\mathbf{G}$
 
 ## conclusion
 The following are **equivalent**:

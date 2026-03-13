@@ -2,11 +2,13 @@
 tags:
   - type/permanent
   - status/evergreen
-  - attr/principle
   - topic/learning
+  - attr/concept
+aliases:
+  - Parametric Curve
 ---
 
-## Define
+## Definition
 
 ---
 ## **Related**

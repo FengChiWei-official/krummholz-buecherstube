@@ -28,7 +28,7 @@ Group is rather simple?
 	- Many **Properties**
 - [[Cyclic Group]]
 - [[General Linear Group]]
-- [[Symmetric Group]]
+- [[mailbox/algebra/Symmetric Group]]
 
 ---
 ## **Related**

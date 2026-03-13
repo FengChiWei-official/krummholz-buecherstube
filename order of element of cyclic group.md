@@ -7,8 +7,10 @@ tags:
 ---
 
 ## Definition
-$$\mathbb{R}^3 \to \mathbb{R}^3$$
+$$
+\mid x \mid = order (x)
+$$
+defined by [[Properties of Powers of Group Elements]]-conclusion3
 
 ---
 ## **Related**
-[[]]

@@ -7,8 +7,7 @@ tags:
 ---
 
 ## Definition
-$$\mathbb{R}^3 \to \mathbb{R}^3$$
+A kind of [[Vector-valued Function|Parametric Curve]].
 
 ---
 ## **Related**
-[[]]

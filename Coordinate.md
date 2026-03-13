@@ -7,8 +7,8 @@ tags:
 ---
 
 ## Definition
-$$\mathbb{R}^3 \to \mathbb{R}^3$$
+[[Polar Coordinate]]
+[[Cartesian Coordinate]]
 
 ---
 ## **Related**
-[[]]
