@@ -18,9 +18,18 @@ It give a **Lower Boundary** of the [[Hook Function]].
 
 ## Common Variant: Fraction
 $$
-\frac{bx^2 +k}{ax}
+\frac{a^2x^2 +k}{ax}
 $$
 > Where $b$ is $a^2$.
+
+$$
+\begin {align}
+& a(x+b) + \frac{k}{a(x+b)} &&\\
+& \to && \frac{b(x+c)^2 +k}{ax+ac}\\
+& \to && \frac{bx^2+2bcx + bc^2 + k}{ax+ac}
+
+\end {align}
+$$
 
 ---
 ## **Related**
