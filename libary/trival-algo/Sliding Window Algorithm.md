@@ -7,7 +7,7 @@ tags:
 ---
 ### Key Points
 - [[Contiguous]]:  Subarray,yes; subsequence, no.
-- [[Monotonicity]], when you expand your window, your state shift should be [[Monotonicity]].
+- [[Monotonicity in PC]], when you expand your window, your state shift should be [[Monotonicity in PC]].
 	- i.e.  for (array, max subarray), you get a **minus integer**, your algorithm will collapse.
 - [[Reversibility]]: operation for **in and out** should be low cost.
 

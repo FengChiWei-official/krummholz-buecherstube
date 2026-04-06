@@ -32,6 +32,7 @@ source: 《卡片盒笔记法》 by Sönke Ahrens
 3. [[Permutation & Combination]]
 4. [[双向BFS]]
 5. [[Hash Map]]
+	1. **[[Mathematical Modeling]]**
 
 ### 4. Graph Theory and Trees
 

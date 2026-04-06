@@ -5,7 +5,7 @@ tags:
   - status/archive
 source: 《卡片盒笔记法》 by Sönke Ahrens
 ---
-[[Hyprland Custom Config File]]
+n[[Hyprland Custom Config File]]
 ## Text
 >[!tip]
 >In path `/.config/hypr/conf/custom/default_workspace.conf`

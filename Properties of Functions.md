@@ -2,17 +2,15 @@
 tags:
   - type/permanent
   - status/evergreen
+  - attr/principle
   - topic/learning
-  - attr/concept
-aliases:
-  - BFS
 ---
 
 ## Definition
-
-
-## Implement
-[[BFS Implement Principle]]
+1. [[Monotonicity]]
+2. [[Parity]]
+3. [[Periodicity]]
+4. [[Boundedness]]
 
 ---
 ## **Related**

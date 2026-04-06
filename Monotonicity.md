@@ -2,17 +2,11 @@
 tags:
   - type/permanent
   - status/evergreen
+  - attr/principle
   - topic/learning
-  - attr/concept
-aliases:
-  - BFS
 ---
 
 ## Definition
-
-
-## Implement
-[[BFS Implement Principle]]
 
 ---
 ## **Related**

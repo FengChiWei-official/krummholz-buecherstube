@@ -4,15 +4,11 @@ tags:
   - status/evergreen
   - topic/learning
   - attr/concept
-aliases:
-  - BFS
 ---
 
 ## Definition
 
-
-## Implement
-[[BFS Implement Principle]]
+https://www.luogu.com.cn/article/3xow10rs
 
 ---
 ## **Related**

@@ -19,7 +19,7 @@ $$
 \end {align}
 $$
 
-## Structual Variations
+## Structural Variations
 1. [[Hook Function]]
 2. [[Product to Sum]]
 3. [[The Square Squeeze]]

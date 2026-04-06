@@ -42,6 +42,10 @@ And it have a Reciprocal Form $\frac {Dx + E} {Ax^2 + Bx + C}$, which need you t
 #### Exponential Form
 $$
 \begin {align}
+& && a(x+b) + \frac{k}{a(x+b)}\\
+& \to && \frac{b(x+c)^2 +k}{ax+ac}\\
+& \to && \frac{bx^2+2bcx + bc^2 + k}{ax+ac}
+
 & &&ae^x + be^{-x} + c \\
 & \to && a t + \frac{b}{t} + c, \\
 & && \quad \text{where }t = e^x, t\ge 0.

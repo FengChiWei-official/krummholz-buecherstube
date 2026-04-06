@@ -4,15 +4,13 @@ tags:
   - status/evergreen
   - topic/learning
   - attr/concept
-aliases:
-  - BFS
 ---
 
 ## Definition
+[[Definition of Function]]
+[[]]
 
 
-## Implement
-[[BFS Implement Principle]]
 
 ---
 ## **Related**
