@@ -2,8 +2,11 @@
 tags:
   - type/permanent
   - status/evergreen
-  - attr/principle
   - topic/learning
+  - attr/concept
+source: 
+aliases:
+  - 刚体
 ---
 
 ## Definition
