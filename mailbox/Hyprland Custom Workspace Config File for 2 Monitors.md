@@ -8,7 +8,7 @@ source: 《卡片盒笔记法》 by Sönke Ahrens
 
 ## Text
 >[!tip]
->In path `~/.config/hypr/conf/custom_workspace.conf
+>In path `/.config/hypr/conf/custom/default_workspace.conf`
 
 ```
 # ==========================================

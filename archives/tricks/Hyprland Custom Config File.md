@@ -12,6 +12,17 @@ The file is in that path `~/.config/hypr/conf/custom.conf`
 >[!note]
 >related config of workspace in [[Hyprland Custom Workspace Config File]]
 
+> [!tip] 
+> YOU SHOULD MANUALLY CREATE A SOFT LINK FOR `workspace.conf`!!!
+> With : `ln -s ~/.config/hypr/conf/custom/default_workspace.conf ~/.config/hypr/conf/custom_workspace.conf`
+
+
+> [!note]
+> You should create `~/.config/hypr/scripts/custom/to_headless.sh`, with
+> [[script toggle_workspace_conf]]
+> You should create `~/.config/hypr/scripts/custom/to_default.sh`, with
+> [[script toggle_workspace_conf]]
+
 ```
 # Add your additional Hyprland configurations here
 # Hook for Obsidian: [[Hyprland Config]]
