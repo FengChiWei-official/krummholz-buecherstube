@@ -8,7 +8,7 @@ aliases: []
 ---
 
 ## Definition
-the value of [[Tangential Acceleration]] equals to the [[Differential]] of [[mailbox/Speed]].
+the value of [[Tangential Acceleration]] equals to the [[Differential]] of [[Speed]].
 
 ---
 ## **Related**

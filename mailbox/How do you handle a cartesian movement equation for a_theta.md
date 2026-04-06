@@ -20,4 +20,4 @@ How do you calculate $a_n, a_t, \rho$?
 
 It is nothing to do with [[Circular Motion]], so you did better to calculate them in [[Cartesian Coordinate]].
 
-Tipically, [[Tangential Acceleration]] is easier to get (related to [[mailbox/Speed]]).And The [[Normal Acceleration]] can be calculated with [[Pythagorean Theorem]].
+Tipically, [[Tangential Acceleration]] is easier to get (related to [[Speed]]).And The [[Normal Acceleration]] can be calculated with [[Pythagorean Theorem]].
