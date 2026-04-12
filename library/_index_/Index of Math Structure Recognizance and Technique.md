@@ -5,15 +5,11 @@ tags:
   - attr/map
   - status/seed
 ---
-Based on your structure, here is the English version of your Zettelkasten framework. This is designed to be professional, concise, and optimized for "Cross-disciplinary Thinking."
-
----
-
 ## **Recognizance**
 *Visual triggers that signal which tool to pull from your arsenal.*
 
 ### **A. Special Identity (Formulaic Patterns)**
-1.  **[[Hook Function]]**: Recognizing the $x + \frac{a}{x}$ structure and its extrema.
+1.  [[Special Structure of Hook function]]: You can find it has no cross-term.
 2.  **[[Reciprocal Radical Symmetry]]**: Spotting $\sqrt{x^2+1} \pm x$ as a "Conjugate Pair" whose product is 1.
 3.  **[[Trig Disguise in Algebra]]**: Identifying $\frac{2x}{1+x^2}$ or $2x^2-1$ as hidden double-angle formulas.
 

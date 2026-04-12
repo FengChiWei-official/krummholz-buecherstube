@@ -23,6 +23,7 @@ aliases:
 *   **常见分母：**
     *   $\frac{1}{\sqrt{x+1} - \sqrt{x}} \Rightarrow$ 变为 $\sqrt{x+1} + \sqrt{x}$（分母变为1）。
     *   **[RADAR]：** 看到分母是两个连续根式的差，立刻想到**级数裂项相消**。
+[[Conjugate Radicals]]
 
 ---
 

@@ -19,7 +19,7 @@ $\phi: (\mathbf{C}^k)^m \to (\mathbf{C}^{k-1})^{m*n}$
 ## Spetial Operators
 1. for [[Scalar-valued Function]] or [[Scalar-valued Function|Scalar Field]]:
 	1. [[Gradient]]
-2. for [[mailbox/Vector-valued Function]] or [[mailbox/Vector-valued Function|Vector Field]]:
+2. for [[Vector-valued Function]] or [[Vector-valued Function|Vector Field]]:
 	1. [[Total Derivative]]
 	2. [[Partial Derivative]]
 	3. [[Divergence]]

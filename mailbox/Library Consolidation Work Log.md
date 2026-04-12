@@ -16,7 +16,7 @@ tags:
 
 **完成的操作**：
 1. ✅ **Index of Algorithm Problem Types.md** (library/trivial-algo/)
-   - 来源：迁移自 mailbox/algo/View of Algorithm.md（archive 文献笔记）
+   - 来源：迁移自 View of Algorithm.md（archive 文献笔记）
    - 结构：7 个主题类别（基础、线性、搜索数学、图论、优化、数论、位运算）
    - 标签：attr/map, status/evergreen
 

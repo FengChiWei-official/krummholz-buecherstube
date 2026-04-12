@@ -13,7 +13,7 @@ $$
 
 ## Variance
 
-- $\mathbb{R} \to \mathbb{R}^n$ : [[mailbox/Vector-valued Function|Parametric Curve]]
+- $\mathbb{R} \to \mathbb{R}^n$ : [[Vector-valued Function|Parametric Curve]]
 - $\mathbb{R}^2 \to \mathbb{R}^n$: [[Parametric Surface]]
 - $\mathbb{R}^n \to \mathbb{R}$: [[Scalar-valued Function|Scalar Field]]
 - $\mathbb{R}^n \to \mathbb{R}^n$: [[Vector Field]]

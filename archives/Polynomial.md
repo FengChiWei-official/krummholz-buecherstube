@@ -1,13 +1,14 @@
 ---
 tags:
   - type/permanent
+  - status/evergreen
   - topic/learning
   - attr/concept
-  - status/evergreen
 ---
 
 ## Definition
-A kind of [[Vector-valued Function|Parametric Curve]].
 
 ---
 ## **Related**
+[[Term Polynomial]]
+[[the Magic Polynomials]]

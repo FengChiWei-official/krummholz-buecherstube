@@ -7,7 +7,7 @@ tags:
 ---
 
 ## Definition
-[[mailbox/Vector-valued Function]]
+[[Vector-valued Function]]
 
 ## Notation
 $<f_1(t), f_2(t), f_3(t)>$ 

@@ -13,7 +13,7 @@ aliases:
 ## Text
 
 prefix: [[Hypo-]] means under
-root: [[-Onym]] means name
+root: [[Greek Root -Onym]] means name
 
 ## Related
 [[Term Hypernym]]
