@@ -1,18 +1,14 @@
 ---
 tags:
   - type/permanent
-  - topic/learning
-  - attr/views
   - status/in-progress
+  - topic/learning
+  - attr/concept
 ---
 
 ## Definition
 
-## Perspectives
-
-## Distinctions
-
-## Examples
+$u(x)^ {v(x)} = e^{v(x) \ln u(x)}$, if $u(x)> 0$. 
 
 ---
 ## **Related**

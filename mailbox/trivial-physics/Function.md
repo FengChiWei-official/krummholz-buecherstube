@@ -10,6 +10,10 @@ tags:
 [[Definition of Function]]
 [[Properties of Functions]]
 
+## For [[Composition]]
+
+[[View of All Important Function in Composition]]
+
 
 
 ---

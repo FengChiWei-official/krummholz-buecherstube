@@ -6,7 +6,8 @@ tags:
   - attr/views
 ---
 ## Definition
-Given $f(x)$, do you know what is the properties of $g(f(x))$?
+Given [[Function]] $f(x)$, do you know what is the properties of $g(f(x))$?
+
 
 ## Cases
 ### [[Monotonicity]]
@@ -16,6 +17,10 @@ Given $f(x)$, do you know what is the properties of $g(f(x))$?
 
 ### [[Parity]]
 [[View of Parity of Changed Function]]
+[[View of Parity Indetity]]
+
+## [[Periodicity]]
+[[View of Periodicity of Changed Function]]
 
 ---
 ## **Related**

@@ -12,5 +12,8 @@ tags:
 3. [[Periodicity]]
 4. [[Boundedness]]
 
+## View 
+[[Views of Function Properties]]
+
 ---
 ## **Related**

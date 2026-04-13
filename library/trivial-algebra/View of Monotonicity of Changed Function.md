@@ -15,7 +15,7 @@ Given $f(x)$, which is **increasing**, and you might know:
 2. Linear Operation
 	1. $-f(x)$ and $f(-x)$ is **decreasing**
 	2. $-f(-x)$ is **increasing**
-3. 
+3. $\frac{1}{f(x)}$: is **decreasing**
 
 ## Examples
 

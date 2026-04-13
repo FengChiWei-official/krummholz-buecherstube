@@ -1,18 +1,12 @@
 ---
 tags:
   - type/permanent
-  - topic/learning
-  - attr/views
   - status/in-progress
+  - topic/learning
+  - attr/concept
 ---
 
 ## Definition
-
-## Perspectives
-
-## Distinctions
-
-## Examples
 
 ---
 ## **Related**
