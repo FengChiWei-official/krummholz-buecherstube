@@ -14,56 +14,59 @@ void dfs(状态参数, vector<int>& path) {
     // 1. 【终点】：完成任务了吗？
     if (满足终止条件) {
         记录/输出答案;
-        return;
-    }
+```
+// DFS Templates (two modes)
 
-    // 2. 【剪枝】：这条路还有救吗？
-    if (不满足可行性) return;
+// 1) Connectivity DFS (global visited)
+void dfs_connectivity(int u) {
+    vis[u] = 1; // mark on entry
+    for (int v : adj[u]) if (!vis[v]) dfs_connectivity(v);
+}
 
-    // 3. 【分叉】：面前有几条路可以走？
-    for (各个备选选项) {
-        if (合法性检查) {
-            
-            // 4. 【做选择】：迈出一步
-            path.push_back(当前选项);
-            
-            // 5. 【递归】：去下一层看看
-            dfs(更新后的状态, path);
-            
-            // 6. 【撤销】：退回这一步（回溯）
-            path.pop_back(); 
-        }
+// 2) Backtracking / Full-path DFS (path-local visited / undo state)
+void backtrack(vector<int>& path) {
+    if (terminal_condition) { answers.push_back(path); return; }
+    for (choice : choices) {
+        if (!valid(choice)) continue;
+        // choose
+        apply(choice);
+        backtrack(path);
+        // undo
+        undo(choice);
     }
 }
 
-
 ```
 
-
-
---- 
+The examples below show practical uses: connectivity for `numIslands`, and backtracking for permutations/subset generation.
 
 ```
-
-/**
- * DFS 模板：进入前检查 (Check before recursion)
- * 特点：使用递归（系统栈），一路走到底再回溯
- */
-void dfs(int curr, const vector<vector<int>>& adj, vector<int>& vis, int& count) {
-    // 逻辑流派：在进入 dfs 之前已经由调用方标记了 vis[curr] 和 count++
-    
-    // 1. 遍历当前节点的所有邻居
-    for (const int& nxt : adj[curr]) {
-        // 2. 核心：递归前检查标记
-        if (!vis[nxt]) {
-            // 3. 标记并进入
-            vis[nxt] = 1;
-            count++;
-            dfs(nxt, adj, vis, count);
+// Example: iterative DFS (grid) used in numIslands
+class Solution {
+public:
+    vector<pair<int,int>> dirs = {{0,1},{1,0},{0,-1},{-1,0}};
+    void dfs_iterative(vector<vector<char>>& g, vector<vector<int>>& vis, pair<int,int> start) {
+        int rs = g.size(), cs = g[0].size();
+        stack<pair<int,int>> st;
+        st.push(start);
+        vis[start.first][start.second] = 1; // mark on push
+        while(!st.empty()) {
+            auto [x,y] = st.top(); st.pop();
+            for (auto [dx,dy] : dirs) {
+                int nx = x + dx, ny = y + dy;
+                if (nx>=0 && nx<rs && ny>=0 && ny<cs && g[nx][ny]=='1' && !vis[nx][ny]) {
+                    vis[nx][ny] = 1;
+                    st.push({nx,ny});
+                }
+            }
         }
     }
-}
+};
+```
 
+---
+
+## Thoughts
 // 调用方式：
 // vis[start] = 1; count = 1;
 // dfs(start, adj, vis, count);
