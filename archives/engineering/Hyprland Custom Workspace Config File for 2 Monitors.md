@@ -6,6 +6,14 @@ tags:
 source: 《卡片盒笔记法》 by Sönke Ahrens
 ---
 
+# Hyprland Custom Workspace Config File for 2 Monitors
+
+🌳 **导航**: [[Hyprland Workspace System - Tree Navigation]] > **配置管理** > **工作区配置中心** > **双显示器配置**
+
+← [[Hyprland Custom Workspace Config File]]
+
+模板参考：[[Hyprland Workspace Config Templates]]
+
 ## Text
 >[!tip]
 >In path `/.config/hypr/conf/custom/default_workspace.conf`
