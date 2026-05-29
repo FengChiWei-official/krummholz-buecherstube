@@ -10,6 +10,8 @@ tags:
 
 ## Perspectives
 
+[[Squeeze Theorem]]
+
 ## Distinctions
 
 ## Examples
