@@ -7,7 +7,7 @@ tags:
 ---
 
 ## Definition
-- [ ] [[Hyprland Custom Config File]]
+- [ ]
 - [ ] [[Kitty Config]]
 ## Fix
 - [ ] [[Trick keep hyprland and wayland plasma]]
