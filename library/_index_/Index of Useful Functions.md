@@ -14,12 +14,13 @@ tags:
 - [[Absolute Function]]
 - [[Flooring Function]]
 
+
+## Other
+
 $(1+x)^{\frac{1}{x}}$
 $e^{\frac{1}{x}}$
 
-## Key Methods
-
-## Applications
+[[Common Elementary Transcendental Functions]]
 
 ---
 ## **Related**
