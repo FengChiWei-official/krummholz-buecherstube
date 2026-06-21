@@ -5,3 +5,4 @@
 - [ ] [[Curvature]]
 - [ ] **数学分析中的典型问题与方法**
 - [ ] 求导 [[Int Cal]]
+- [ ] [[Manifold learning]]
