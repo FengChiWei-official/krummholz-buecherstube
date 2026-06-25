@@ -3,14 +3,19 @@ tags:
   - type/permanent
   - status/evergreen
   - topic/learning
-  - attr/technique
+  - attr/map
 ---
 
 ## Definition
-- [ ]
-- [ ] [[Kitty Config]]
-## Fix
-- [ ] [[Trick keep hyprland and wayland plasma]]
+
+## Core Concepts
+
+[[Map of Concepts of Data]]
+[[Algorithm]]
+
+## Key Methods
+
+## Applications
 
 ---
 ## **Related**
