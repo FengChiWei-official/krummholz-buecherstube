@@ -10,9 +10,9 @@ tags:
 
 ## Perspectives
 
-[[View of Monotonicity of Changed Function]]
-[[View of Parity of Changed Function]]
-[[View of Periodicity of Changed Function]]
+[[View of Monotonicity in Transformations]]
+[[View of Parity in Transformations]]
+[[View of Periodicity in Transformations]]
 
 
 ## Distinctions

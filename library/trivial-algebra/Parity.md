@@ -14,4 +14,4 @@ aliases:
 ## **Related**
 
 
-[[View of Parity of Changed Function]]
+[[View of Parity in Transformations]]

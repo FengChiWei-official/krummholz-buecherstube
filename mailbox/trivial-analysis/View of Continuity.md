@@ -9,7 +9,7 @@ tags:
 ## Definition
 
 [[Points of Discontinuity]]
-[[Continuous]]
+[[Continuity]]
 
 ## Perspectives
 

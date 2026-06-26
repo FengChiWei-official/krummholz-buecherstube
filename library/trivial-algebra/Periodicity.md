@@ -13,4 +13,4 @@ aliases:
 ---
 ## **Related**
 
-[[View of Periodicity of Changed Function]]
+[[View of Periodicity in Transformations]]

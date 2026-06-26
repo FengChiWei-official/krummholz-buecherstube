@@ -14,4 +14,4 @@ aliases:
 ---
 ## **Related**
 
-[[View of Monotonicity of Changed Function]]
+[[View of Monotonicity in Transformations]]

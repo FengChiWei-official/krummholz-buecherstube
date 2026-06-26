@@ -4,5 +4,10 @@
 - [ ] 对数求导法
 - [ ] [[Curvature]]
 - [ ] **数学分析中的典型问题与方法**
-- [ ] 求导 [[Int Cal]]
+- [ ] 求导 [[Table of Integrals]]
 - [ ] [[Manifold learning]]
+- [ ] [[Views of Tricks in Math]]
+- [ ] [[View of Formula Sheet]]
+- [ ] [[Views of Function Properties]]
+- [ ] [[Index of Math]]
+- [ ] [[Coordinate Frame]]
