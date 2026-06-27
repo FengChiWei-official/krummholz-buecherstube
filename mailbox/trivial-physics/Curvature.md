@@ -21,9 +21,9 @@ $$
 $$
 \begin {align}
 & \mathbf{a}  && = \frac{d(v \mathbf{\hat T})}{dt} \\
-&&& = a_T \mathbf{\hat T} + v \frac{d \mathbf{\hat T}}{ds} \frac{ds}{dt} \\
-&&& = a_T \mathbf{\hat T} + v^2 \kappa \mathbf{ \hat N}
-
+&&& = \frac{dv}{dt} \mathbf{\hat T} + v \frac{d \mathbf{\hat T}}{ds} \frac{ds}{dt} \\
+&&& = \frac{dv}{dt} \mathbf{\hat T} + v^2 \kappa \mathbf{ \hat N} \\
+&&& = a_T \mathbf{\hat T} + a_N \mathbf{ \hat N}
 \end {align}
 $$
  

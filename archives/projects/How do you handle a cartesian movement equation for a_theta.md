@@ -18,6 +18,6 @@ How do you calculate $a_n, a_t, \rho$?
 
 ## Thoughts
 
-It is nothing to do with [[Circular Motion]], so you did better to calculate them in [[Cartesian Coordinate]].
+It is nothing to do with [[Circular Motion]], so you did better to calculate them in [[Cartesian Coordinate System]].
 
 Tipically, [[Tangential Acceleration]] is easier to get (related to [[Speed]]).And The [[Normal Acceleration]] can be calculated with [[Pythagorean Theorem]].

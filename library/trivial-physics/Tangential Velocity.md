@@ -7,7 +7,7 @@ tags:
 ---
 
 ## Definition
-[[Tangential Velocity]] is the component of [[Acceleration]] that is [[Parallel]] to the [[Instantaneous Velocity]].
+[[Tangential Velocity]] is the component of [[mailbox/trivial-physics/Acceleration]] that is [[Parallel]] to the [[library/trivial-physics/Instantaneous Velocity]].
 
 Its notation is $\vec a _t$.
 It is response to [[Unit Tangential Vector]]

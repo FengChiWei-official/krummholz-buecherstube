@@ -15,7 +15,7 @@ tags:
 By differentiating the [[Trajectory Equation]] with respect to the parameter \(t\), we naturally define the fundamental kinematic vectors:
 1. **[[Displacement]]** : The change in the position vector.
 2. **[[Velocity]]** : The first derivative of position, representing the instantaneous rate of change and direction of motion.
-3. **[[Acceleration]]** : The second derivative of position.
+3. **[[mailbox/trivial-physics/Acceleration]]** : The second derivative of position.
 
 ### 3. Geometric Metric & Infinitesimal Elements
 For physical and geometric measurements, we require not only the linear distance ([[Displacement]]), but also the actual path length traveled along the curve ([[Arc Length]]).
