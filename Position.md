@@ -1,15 +1,12 @@
 ---
 tags:
   - type/permanent
+  - status/in-progress
   - topic/learning
   - attr/concept
-  - status/evergreen
 ---
 
 ## Definition
-
-[[Special Case of Inertia]]
-
 
 ---
 ## **Related**

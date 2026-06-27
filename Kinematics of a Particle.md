@@ -53,6 +53,8 @@ tags:
 
 ## Key Methods
 
+[[Kinematics problem of a fixed force]]
+
 [[Direct problem of kinematics]]
 [[Inverse problem of kinematics]]
 
