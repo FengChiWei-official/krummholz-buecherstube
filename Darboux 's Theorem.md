@@ -8,9 +8,6 @@ tags:
 
 ## Definition
 
-[[Points of Discontinuity]] that both Limitation exist.
-1. [[Removable Discontinuity]]
-2. [[Jump Discontinuity]]
 
 ---
 ## **Related**

@@ -25,7 +25,7 @@ Given [[Function]] $f(x)$, do you know what is the properties of $g(f(x))$?
 
 ## [[Continuity]]
 
-## [[Intermediate value property]]
+## [[Intermediate Value Property]]
 
 > [!todo]
 > 可积， 可导， 可微

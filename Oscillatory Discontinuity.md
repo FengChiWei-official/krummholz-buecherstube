@@ -4,13 +4,11 @@ tags:
   - status/in-progress
   - topic/learning
   - attr/concept
+aliases:
+  - 振荡间断点
 ---
 
 ## Definition
-
-[[Points of Discontinuity]] that both Limitation exist.
-1. [[Removable Discontinuity]]
-2. [[Jump Discontinuity]]
 
 ---
 ## **Related**
