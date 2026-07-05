@@ -4,13 +4,12 @@ tags:
   - status/in-progress
   - topic/learning
   - attr/concept
+aliases:
+  - 介值性
+  - Darboux Property
 ---
 
 ## Definition
-
-[[Points of Discontinuity]] that both Limitation exist.
-1. [[Removable Discontinuity]]
-2. [[Jump Discontinuity]]
 
 ---
 ## **Related**

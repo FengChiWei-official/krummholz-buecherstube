@@ -5,10 +5,12 @@ tags:
   - topic/learning
   - attr/concept
 aliases:
-  - 介值性
+  - Integral
 ---
 
 ## Definition
 
 ---
 ## **Related**
+
+[[Table of Integrals]]

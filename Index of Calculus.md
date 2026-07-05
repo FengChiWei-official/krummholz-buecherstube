@@ -13,7 +13,7 @@ tags:
 [[Function]]
 [[Limitation]]
 [[Differential]]
-[[Integral]]
+[[Integration]]
 ## Key Methods
 
 [[Views of Function Properties]]
