@@ -20,6 +20,7 @@ tags:
 [[Technique of Limitation of ln phi when phi is zero|$\ln (0)$]]
 $lim_{x \to \infty} \frac{1}{x} = \lim_{t \to 0} t$[[Reciprocal Substitution]]
 
+
 ---
 ## **Related**
 
