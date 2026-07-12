@@ -65,7 +65,7 @@ $\sqrt{x^2+1}$, $x$等等
 $\ln (1+\frac{1}{x}) = \ln (1+x) - \ln x$ 上下齐次的分式
 $\ln (x^2 -x) = ln(x-1) + \ln x$ 可因式分解的多项式
 
-$\lim_{x \to a} \lim_{x \to a} f(x) = \lim_{x \to a} f(x)$,在很多包含lim的表达式中构造目标结构经常遇到这种
+$\lim_{x \to a} \lim_{x \to a} f(x) = \lim_{x \to a} f(x)$,在很多包含$\lim$的表达式中构造目标结构经常遇到这种
 
 $\sum_i^n f(i, n)$ i的最高次数和n的一样。这是一个定积分的定义式
 
@@ -74,7 +74,7 @@ $\lim \frac{a_n}{a_{n-1}} = A$, 如果数列极限存在并且不是0,那么这�
 
 $\lim_{n \to \infty} (1-\frac{1}{n})^n = \frac{1}{e}$
 
-## 凑配法
+## 凑配法b b 
 
 凑倒数方程,分式函数凑倒数对称结构
 > [[Hook Function]]
