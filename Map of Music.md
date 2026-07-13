@@ -10,12 +10,9 @@ tags:
 
 ## Core Concepts
 
-Todos: technologically uncertainties. -- [[Index of Todos]]
-Knowledge:  [[Map of Knowledge]]
-Vocabulary: [[Raw Vocabularies Sheet]]
-Info: 
-
 ## Key Methods
+
+[[Rock and Roll Road Map]]
 
 ## Applications
 
