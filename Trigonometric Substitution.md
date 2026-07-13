@@ -1,12 +1,14 @@
 ---
 tags:
   - type/permanent
-  - status/evergreen
+  - status/in-progress
   - topic/learning
-  - attr/technique
+  - attr/concept
 ---
 
 ## Definition
+
+[[Trigonometric Functions]]
 
 ## Basis
 $1 - \sin^2 x = \cos^2 x$

@@ -1,3 +1,8 @@
+---
+tags:
+  - todo
+---
+
 This file indexes mailbox notes translated from Chinese to English.
 
 Each entry lists the original file and the English companion file created.
@@ -16,4 +21,5 @@ Translations will be appended here as they are created.
 - [ ] [[Lagecy View of Algorithm]]
 - [ ] [[mailbox/algo/Pre-condition Check]]
 - [ ] [[mailbox/trivial-data-structure/Map of Concepts of Data]]
+- [ ] [[Raw Map of Tricks in Math]]
 

@@ -5,7 +5,7 @@ tags:
   - attr/views
   - status/in-progress
 ---
-
+  
 ## Definition
 [[Math Todo]]
 ## Perspectives
@@ -13,35 +13,13 @@ tags:
 pattern based: [[Index of Math Expressions Pattern]]
 
 
-# 不知道
+# Toolkits
 
-## Property
+[[Raw Map Function Toolkits]]
 
-[[Function]]::[[Properties of Functions]]
-
-有界性 [[Boundedness]]
-提供了一个不等式，很粗糙
-是[[Integrability]]的基础
-有界性是数列极限的存在性充分判据的一部分
-
-证明特点，不怕[[Absolute Function]], 拥抱它
-一般用不等式，或者性态分析法，特别注意单调性是性态分析法中的重点
-
-单调性 [[Monotonicity]]
-是[[Bijective Map]]的基础，换元法要求反函数，反函数要求单调
-性态分析归根到底是限定区间按分段单调函数分析。
-单调性的性质不等式还是很好看的
-单调性是数列极限的存在性充分判据的一部分
-
-奇偶性
-定积分里面容易被忽略但是有奇效的点
-贡献了很多性质等式 如f(0)=0
-
-周期性也主要是定积分有用
-
-凹凸性
-割线定理，和切线一起给出了上下界估计的一个较为精确的方法
 ## Pattern 
+
+> 
 
 [[Hook Function]]
 > structure with symmetric
@@ -74,7 +52,7 @@ $\lim \frac{a_n}{a_{n-1}} = A$, 如果数列极限存在并且不是0,那么这�
 
 $\lim_{n \to \infty} (1-\frac{1}{n})^n = \frac{1}{e}$
 
-## 凑配法b b 
+## 凑配法
 
 凑倒数方程,分式函数凑倒数对称结构
 > [[Hook Function]]
@@ -88,6 +66,8 @@ $1=e^0 = a^0$  $e^x - 1 = e^x - e^0$
 $0 = \ln(1)$ $\ln x =  \ln x - \ln 1$
 
 $f(x)^{g(x)}$ 初等化 $e^{g(x) \ln f(x)}$
+
+
 $\mid x \mid = \sqrt{x^2}$
 
 复杂根式的(不)等式可以用对数代换
@@ -103,7 +83,15 @@ $f(g(u)) \to f(x)$ [[Compound Function to Outside Function]]
 > 利用对称关系构造方程组
 
 
+## 工具箱
 
+### 对称性
+
+[[Parity]]
+定积分/k-重积分
+二重积分，先看区域对称性，然后看在这个对称性下对称点是否相消。
+轮换对称性， 积分和字母表示无关，所以可以对调字母，
+对调字母后，如果区域表达式刚好没变（关于对角线对称）， 那么就可以与原式相加化简。
 
 ## Aim wise
 
@@ -117,6 +105,10 @@ $f(g(u)) \to f(x)$ [[Compound Function to Outside Function]]
 $\forall \epsilon$, 可以被任意取不依赖自变量的趋于零的序列的某一项代替
 如果从依赖自变量的趋于零的序列来代替$\epsilon$, 则要求所求表达式要比该序列收敛得更快，所以变成了充分不必要的。
 
+### 根存在性问题
+
+有理函数方程，先函数性态分析。
+偶函数发现只有某一个对称区间有零点
 
 ### 上下界估计
 
@@ -228,6 +220,14 @@ $(\prod f_i(x))|_{(x_0)}$,用乘法公式绝对很难算， 肯定有某一项�
 绝对连续，绝对可导的结论，对比绝对收敛
 
 某点高阶导存在，说明某点低阶导数连续
+
+### 中值定理
+
+可以用来化简 $\Delta f(x)$
+进一步可以通过导数范围估计函数范围
+简化估计乘积的定积分
+
+求积分的极限，求变限积分（二重积分）的导数
 
 ---
 ## **Related**
