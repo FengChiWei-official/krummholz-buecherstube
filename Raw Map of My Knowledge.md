@@ -10,10 +10,9 @@ tags:
 
 ## Core Concepts
 
-[[Function]]
-
-[[Index of Abstract Algebra]] $\to$ [[Index of Linear Algebra]]
-[[Index of Calculus]]
+Todos: technologically uncertainties. -- [[Index of Todos]]
+Knowledge:  [[Map of Knowledge]]
+Vocabulary: [[Raw Vocabularies Sheet]]
 
 ## Key Methods
 
