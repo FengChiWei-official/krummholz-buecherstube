@@ -13,7 +13,7 @@ tags:
 In Inequalities, there 2 means to handle:
 
 1. $x \le \, \mid x \mid$
-2. [[Triangle Inequality]]
+2. [[Trigonometric Inequality]]
 	1. Technique:
 2. **Bounding an absolute value**
 

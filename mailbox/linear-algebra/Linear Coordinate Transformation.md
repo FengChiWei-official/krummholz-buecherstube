@@ -23,8 +23,8 @@ $$
 Geometrically, linear coordinate transformations include rotations, scalings, reflections, shears, and compositions of these — all represented by matrices.
 
 ## Usage
-1. [[Proof of Reversed Triangle Inequality]]
-2. [[Sum to Product for Triangle]]
+1. [[Proof of Reversed Trigonometric Inequality]]
+2. [[Sum to Product for Trigonometric Function]]
 
 ---
 ## **Related**

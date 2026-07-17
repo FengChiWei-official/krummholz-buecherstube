@@ -12,7 +12,7 @@ tags:
 2. The [[Complex Exponential Functions]] Approach
 
 ## Views
-[[Identities of Triangle Function]]
+[[Identities of Trigonometric Function]]
 
 ---
 ## **Related**

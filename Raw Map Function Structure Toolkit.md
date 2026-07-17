@@ -12,13 +12,14 @@ tags:
 
 [[Absolute Function]]
 [[Hook Function]]
+[[Trigonometric Functions]] -> [[Identities of Trigonometric Function]]
 [[]] 距离结构
 斜率结构
 平方和差结构
 
-## Key Methods
+### Trigonometric
 
-## Applications
+[[Chain of Cosine]]
 
 ---
 ## **Related**

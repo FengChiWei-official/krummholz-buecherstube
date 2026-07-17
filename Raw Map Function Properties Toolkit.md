@@ -13,6 +13,7 @@ tags:
 [[Boundedness]]
 [[Monotonicity]]
 [[Parity]]
+[[Symmetry of Function]]
 [[Periodicity]]
 
 

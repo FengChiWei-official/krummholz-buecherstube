@@ -8,7 +8,7 @@ tags:
 
 ## Definition
 
-It is the reversed form of [[Product to Sum for Triangle]]
+It is the reversed form of [[Product to Sum for Trigonometric]]
 let $\alpha = x + y$, $\beta = x - y$, based on *[[Linear Coordinate Transformation]]*.
 > $x = \frac {\alpha + \beta}{2}$ $y = \frac {\alpha - \beta}{2}$
 

@@ -16,7 +16,7 @@ $$\mid \, \mid a \mid - \mid b \mid\, \mid \: \le \: \mid a - b \mid$$
 Which is equivalent to:
 $$-|\alpha - \beta| \le |\alpha| - |\beta| \le |\alpha - \beta|$$
 ## Proof
-[[Proof of Reversed Triangle Inequality]]
+[[Proof of Reversed Trigonometric Inequality]]
 
 ---
 ## **Related**

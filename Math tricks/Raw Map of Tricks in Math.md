@@ -16,10 +16,9 @@ pattern based: [[Index of Math Expressions Pattern]]
 # Toolkits
 
 [[Raw Map Function Toolkits]]
+[[Raw Map for Integral Toolkit]]
 
 ## Pattern 
-
-> 
 
 [[Hook Function]]
 > structure with symmetric

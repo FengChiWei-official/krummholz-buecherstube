@@ -26,7 +26,7 @@ Identity Transform focuses on exact rewrites that preserve equality and create c
 ### Trigonometric Identity
 [[Identity]]
 [[View of Inverse Trigonometric Identity]]
-[[View of Parity Indetity]]
+[[View of Parity Indentity]]
 [[View of Periodicity in Transformations]]
 
 ### Exponential-Log Identity

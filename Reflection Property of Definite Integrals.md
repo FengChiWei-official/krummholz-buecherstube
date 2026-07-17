@@ -8,8 +8,9 @@ tags:
 
 ## Definition
 
-[[Table of Basic Integrals]]
-[[Table of Trigonometric Function Integrals]]
+$$
+\int_a^b f(x)dx = \int_a^b f(a+b-x)dx
+$$
 
 
 ---

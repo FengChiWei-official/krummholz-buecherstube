@@ -10,7 +10,7 @@ tags:
 
 [[Table of Integrals]]
 
-
+[[Reference Sheet of Series]]
 ## Perspectives
 
 ## Distinctions

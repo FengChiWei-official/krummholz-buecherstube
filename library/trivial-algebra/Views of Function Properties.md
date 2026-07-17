@@ -18,7 +18,7 @@ Given [[Function]] $f(x)$, do you know what is the properties of $g(f(x))$?
 ### [[Parity]]
 
 [[View of Parity in Transformations]]
-[[View of Parity Indetity]]
+[[View of Parity Indentity]]
 
 ## [[Periodicity]]
 [[View of Periodicity in Transformations]]

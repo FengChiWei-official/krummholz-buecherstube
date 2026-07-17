@@ -11,8 +11,8 @@ tags:
 ## Perspectives
 [[Hook Function|Sum to Product]]
 [[Product to Sum]]
-[[Sum to Product for Triangle]]
-[[Sum to Product for Triangle]]
+[[Sum to Product for Trigonometric Function]]
+[[Sum to Product for Trigonometric Function]]
 
 ## Distinctions
 

@@ -8,9 +8,9 @@ tags:
 
 ## Definition
 
-[[Table of Basic Integrals]]
-[[Table of Trigonometric Function Integrals]]
-
+$$
+\Gamma(x) = \int_0^{\infty} t^x e^{-t}\,\frac{dt}{t}
+$$
 
 ---
 ## **Related**
