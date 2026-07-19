@@ -20,6 +20,13 @@ pattern based: [[Index of Math Expressions Pattern]]
 
 ## Pattern 
 
+
+分析例题8.14
+
+对偶结构，三角函数分式
+一般对$\frac{1}{f(\sin, \cos)}$是用 $\sin^2 + \cos^2 = 1$添项，
+但是如果遇到$1+\cos$, $1-\sin$可以上下同时乘对偶项。
+
 [[Hook Function]]
 > structure with symmetric
 > creates Constant
