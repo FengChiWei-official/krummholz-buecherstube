@@ -1,9 +1,9 @@
 ---
 tags:
   - type/permanent
+  - status/evergreen
   - topic/learning
   - attr/principle
-  - status/evergreen
 aliases:
   - Quantization
 ---

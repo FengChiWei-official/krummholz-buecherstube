@@ -14,19 +14,16 @@ class Solution {
 
 public:
 	int longestSubarray(vector<int>& nums, int limit) {
-		
+		int l = 0;
 		// window's state
 		deque<int> qM;
 		deque<int> qm;
 		// answer
 		int ans = 0;
-		
-		int l = 0;
-		// 1. right expand
 		for (int r = 0; r < nums.size(); r++) {
 		
 		
-			
+			// 1. right expand
 			// // update state1 Max queue
 			while (!qM.empty() && nums[qM.back()] <= nums[r]) {
 				qM.pop_back();
@@ -67,7 +64,3 @@ public:
 ---
 
 ## Thoughts
-
-1. Sliding Window doesn't need initialize the state variable.
-2. `r` is a variable growing step by step, so `for` statement is suitable solution.
-

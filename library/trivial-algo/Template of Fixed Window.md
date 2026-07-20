@@ -7,7 +7,6 @@ source: 《卡片盒笔记法》 by Sönke Ahrens
 ---
 
 ## Text
-
 ```cpp
 class Solution {
 public:

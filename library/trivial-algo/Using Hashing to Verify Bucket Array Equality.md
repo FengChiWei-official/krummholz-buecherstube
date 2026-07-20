@@ -1,9 +1,9 @@
 ---
 tags:
   - type/permanent
+  - status/evergreen
   - attr/principle
   - topic/learning
-  - status/evergreen
 ---
 
 ## Definition
