@@ -15,6 +15,7 @@ tags:
 - [ ] [[Latin Todo]]
 - [ ] [[Math Todo]]
 - [ ] [[translate todo]]
+- [ ] [[Hobby todo]]
 
 ## Key Methods
 
