@@ -23,8 +23,8 @@ tags:
         - `communic-at-i-on-al-is` *adj.* **communicational**（交流的/通讯的，接 `-alis` 关系形容词后缀）
       - `communic-at-or` *n.* **communicator**（交流者/传播者，接 `-or` 施动者名词后缀）
       - `communic-at-iv-us` *adj.* **communicative**（爱说话的/开朗的，接 `-ivus` 特征形容词后缀）
-      - `communic-at-ori-us` *adj.* ***\*communicatory***（具有传达功能的，接 `-orius` 功能形容词后缀）
-    - **[前缀衍生子枝]**
+      - `communic-at-or-ius` *adj.* ***\*communicatory***（具有传达功能的，接 `-orius` 功能形容词后缀）
+    - **前缀衍生子枝**
       - `ex-communic-at-us` *v./n.* **excommunicate**（驱逐出教会/革除教籍）
       - `in-communic-a-bil-is` *adj.* **incommunicable**（无法传达的/不能沟通的）
   - **三、 将来分词（Future Participle）分支**：表示将要发生或有倾向发生的动作状态

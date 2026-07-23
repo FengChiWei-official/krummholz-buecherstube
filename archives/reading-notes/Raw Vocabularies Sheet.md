@@ -17,6 +17,9 @@ source: 《卡片盒笔记法》 by Sönke Ahrens
 
 [[命运石之门 序章]]
 
+## CiS lectures
+
+[[CiS 03]]
 ## Sorted
 
 [[Prep sheet]]
