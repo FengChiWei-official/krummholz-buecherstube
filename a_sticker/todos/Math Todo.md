@@ -20,3 +20,4 @@ tags:
 - [ ] [[Coordinate Frame]]
 - [x] [[Points of Discontinuity]]
 - [ ] [[function and continuous and differential function]]
+- [ ] 题8.5 10.4
