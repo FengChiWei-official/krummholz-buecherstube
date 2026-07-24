@@ -5,13 +5,10 @@ tags:
   - topic/learning
   - attr/concept
 aliases:
-  - Mass Point
+  - -nd
 ---
 
 ## Definition
 
 ---
 ## **Related**
-
-[[Past Participle]]
-[[Present Participle]]

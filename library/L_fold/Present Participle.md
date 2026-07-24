@@ -4,8 +4,6 @@ tags:
   - status/in-progress
   - topic/learning
   - attr/concept
-aliases:
-  - Mass Point
 ---
 
 ## Definition
@@ -13,5 +11,4 @@ aliases:
 ---
 ## **Related**
 
-[[Past Participle]]
-[[Present Participle]]
+[[Particle]]

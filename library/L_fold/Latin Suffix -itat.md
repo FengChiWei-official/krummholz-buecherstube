@@ -5,13 +5,15 @@ tags:
   - topic/learning
   - attr/concept
 aliases:
-  - Mass Point
+  - ate
 ---
 
 ## Definition
 
+主格 `-itas`
+宾格`-itat-em`
+
+形容词+[[Latin Suffix -itat]] = 抽象名词
+
 ---
 ## **Related**
-
-[[Past Participle]]
-[[Present Participle]]

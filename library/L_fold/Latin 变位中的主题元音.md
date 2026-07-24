@@ -8,11 +8,7 @@ source: 《卡片盒笔记法》 by Sönke Ahrens
 
 ## Text
 
-[[fix -ory -atory]]
-[[Fix -id]]
-[[Fix -ance -ence]]
-
-[[Latin 派生]]
+第三变位基本不保留主题元音，其他一般保留。
 
 ---
 
