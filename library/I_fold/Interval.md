@@ -8,7 +8,7 @@ tags:
 
 ## Definition
 
-Intervals are ordered in a [[Tree]] way.
+Intervals are ordered in a [[ADT Tree]] way.
 
 ---
 ## **Related**

@@ -17,6 +17,7 @@ Knowledge:  [[Map of Knowledge]]
 Vocabulary: [[Raw Vocabularies Sheet]]
 Hobbies:  [[Map of Music]]
 
+
 ## Key Methods
 
 ## Applications

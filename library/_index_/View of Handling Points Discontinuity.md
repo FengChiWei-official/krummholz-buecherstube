@@ -1,15 +1,18 @@
 ---
 tags:
   - type/permanent
-  - status/in-progress
   - topic/learning
-  - attr/concept
+  - attr/views
+  - status/in-progress
 ---
 
 ## Definition
 
-[[Lazy]]
-[[Pattern Matching]]
+## Perspectives
+
+## Distinctions
+
+## Examples
 
 ---
 ## **Related**

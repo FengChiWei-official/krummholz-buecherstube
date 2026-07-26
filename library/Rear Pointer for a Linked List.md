@@ -8,8 +8,10 @@ tags:
 
 ## Definition
 
-[[Lazy]]
-[[Pattern Matching]]
+pros: 
+1. helps when inserting.
+cons:
+2. needs extra handling. [[Deleting Nodes from a Linked List]]
 
 ---
 ## **Related**
