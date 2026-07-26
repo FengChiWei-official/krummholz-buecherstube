@@ -8,8 +8,5 @@ tags:
 
 ## Definition
 
-[[Lazy]]
-[[Pattern Matching]]
-
 ---
 ## **Related**

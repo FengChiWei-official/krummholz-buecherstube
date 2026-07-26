@@ -1,6 +1,8 @@
 ---
 tags:
   - status/evergreen
+aliases:
+  - Graph
 ---
 
 #entity/virtual #cs 

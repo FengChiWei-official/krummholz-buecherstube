@@ -12,4 +12,4 @@ a structure of a group of computer for **comunication**
 - how to unify all kinds of **entity** -> [[middle-layer-thoughts]]
 
 ## likelyhood
-[[Graph structure]]
+[[ADT Graph]]
