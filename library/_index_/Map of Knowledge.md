@@ -7,7 +7,7 @@ tags:
 ---
 
 ## Definition
-
+[[Raw Index of Root]]
 ## Core Concepts
 
 [[Index of Algorithm]]
@@ -15,7 +15,7 @@ tags:
 [[Index of Physics Fundamentals]]
 [[Map of Relationship]]
 [[Map of Programming Language]] 
-[[Raw Index of My Knowledge]]
+[[Raw Index of Root]]
 ## Key Methods
 
 ## Applications
