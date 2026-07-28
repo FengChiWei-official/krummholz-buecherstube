@@ -11,6 +11,12 @@ tags:
 Specific binary search is a algorithm that return `bool`.
 General binary search includes [[Binary Search for Boundaries]] that returns `index`.
 
+##  Special Type
+
+[[Binary Search on Answer or Candidate Space]]
+
+
+
 ---
 ## **Related**：
 

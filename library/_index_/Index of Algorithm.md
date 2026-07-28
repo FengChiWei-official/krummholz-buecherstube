@@ -7,7 +7,8 @@ tags:
 ---
 
 ## Definition
-建立对算法版图的全局掌控感。识别题型、映射数据结构、制定解题策略。
+
+[[Algorithm]]
 
 - [ ] Merge [[Lagecy View of Algorithm]] and [[Algorithm tips]], 
 - [ ] [[Algorithm Decision Tree]] Update that one as well.

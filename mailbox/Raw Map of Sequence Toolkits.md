@@ -8,11 +8,13 @@ tags:
 
 ## Definition
 
-## Core Concepts
+[[Sequence]]
 
-[[Raw Map Function Properties Toolkit]]
-[[Raw Map Function Structure Toolkit]]
-[[Raw Map Variation Substitution Toolkit]]
+## Tools
+
+[[Telescoping Sum Toolkits]]
+
+> todo： 单调性是否都是用来构建递推不等式？
 
 函数复合抽象对象： [[Raw Map Function Toolkits]]
 单调性，脱去函数后为不等式
@@ -21,3 +23,5 @@ tags:
 
 ---
 ## **Related**
+
+[[Logarithmic Function Toolkit]]
