@@ -16,6 +16,7 @@ tags:
 [[Map of Relationship]]
 [[Map of Programming Language]] 
 [[Raw Index of Root]]
+[[Map of Life]]
 ## Key Methods
 
 ## Applications
