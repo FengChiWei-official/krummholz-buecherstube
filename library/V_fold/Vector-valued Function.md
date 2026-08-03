@@ -6,7 +6,6 @@ tags:
   - status/in-progress
 aliases:
   - Vector Function
-  - Parametric Curve
 ---
 
 ## Definition
@@ -17,5 +16,5 @@ $f : \mathbb{R} \to \mathbb{R}^n, n\in \mathbb{N}^+$
 
 ---
 ## **Related**
-[[Motion Equation]]
+[[Equation of Motion]]
 [[Helix Curve]]

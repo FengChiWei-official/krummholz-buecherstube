@@ -7,7 +7,8 @@ tags:
 ---
 
 ## Definition
-A kind of [[Vector-valued Function|Parametric Curve]].
+
+It a sort of [[Geometric Object]].
 
 [[Origin]] to [[Position]]
 ## Symbol

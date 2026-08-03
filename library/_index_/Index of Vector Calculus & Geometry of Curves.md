@@ -6,15 +6,42 @@ tags:
   - status/in-progress
 ---
 ## Definition
+
+Objects:
+[[Geometric Objects & Representations]]
+
+types:
+[[Scalar Calculus]] v.s. [[Vector Calculus]]
+
+## Relationship
+
+- **[[Vector Calculus]]** constructs spatial geometry & kinematics:
+  - $\vec{r}(t)$, $\vec{v}(t)$, $\vec{a}(t)$
+  - Vector differentials $\mathrm{d}\vec{r}_i$
+
+- **[[Metric Reduction]]** converts vector differentials into scalar measures:
+  - 1D Curve Element: $ds = \|\mathrm{d}\vec{r}\|$
+  - 2D Surface Element: $dS = \|\mathrm{d}\vec{r}_1 \times \mathrm{d}\vec{r}_2\|$
+  - 3D Volume Element: $dV = |(\mathrm{d}\vec{r}_1 \times \mathrm{d}\vec{r}_2) \cdot \mathrm{d}\vec{r}_3|$
+
+- **[[Scalar Calculus]]** evaluates the resulting scalar integrals:
+  - $\int_C f \, ds \implies \int_a^b F(t) \, \mathrm{d}t$
+  - $\iint_S f \, dS \implies \iint_D F(u,v) \, \mathrm{d}u\mathrm{d}v$
+
+---
+
+---
+
+
 ### 1. The Geometric Foundation & Parametrization
-* **[[Trace of a Curve]]**: The fundamental, static geometric entity in space (the set of points occupied by the curve, independent of any parametrization).
-* **[[Trajectory Equation]] (or [[Parametric Curve]])**: A [[Vector-valued Function]] that introduces a parameter `t`(e.g., time) to map a real interval onto the [[Trace of a Curve]].
+* **[[Trace]]**: The fundamental, static geometric entity in space (the set of points occupied by the curve, independent of any parametrization).
+* **[[Trajectory Equation]] (or [[Parametric Curve]])**: A [[Vector-valued Function]] that introduces a parameter `t`(e.g., time) to map a real interval onto the [[Trace]].
 
 ### 2. Kinematic Derivations (Time-Domain)
 By differentiating the [[Trajectory Equation]] with respect to the parameter \(t\), we naturally define the fundamental kinematic vectors:
 1. **[[Displacement]]** : The change in the position vector.
 2. **[[Velocity]]** : The first derivative of position, representing the instantaneous rate of change and direction of motion.
-3. **[[mailbox/trivial-physics/Acceleration]]** : The second derivative of position.
+3. **[[Acceleration]]** : The second derivative of position.
 
 ### 3. Geometric Metric & Infinitesimal Elements
 For physical and geometric measurements, we require not only the linear distance ([[Displacement]]), but also the actual path length traveled along the curve ([[Arc Length]]).

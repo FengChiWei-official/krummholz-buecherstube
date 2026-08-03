@@ -111,4 +111,4 @@ tags:
 - [[View of Addtive Group of Integer]] - 整数加法群的视角（mailbox中）
 - [[AM-GM Inequality]] - 多维度的不等式分析
 - [[Index of Algorithm]] - 应用领域：算法设计
-- [[Index of Physics Fundamentals]] - 应用领域：物理建模
+- [[Index of Vector Calculus & Geometry of Curves]] - 应用领域：物理建模

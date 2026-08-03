@@ -87,4 +87,4 @@ tags:
 - [[Algorithm Decision Tree]] - 算法选择树
 - [[View of Knapsack DP]] - 特定问题类的详细视角
 - [[Index of Abstract Algebra]] - 代数基础（数论相关）
-- [[Index of Physics Fundamentals]] - 物理基础（几何与计算）
+- [[Index of Vector Calculus & Geometry of Curves]] - 物理基础（几何与计算）

@@ -12,7 +12,7 @@ tags:
 
 [[Index of Algorithm]]
 [[Index of Math]]
-[[Index of Physics Fundamentals]]
+
 [[Map of Relationship]]
 [[Map of Programming Language]] 
 [[Raw Index of Root]]

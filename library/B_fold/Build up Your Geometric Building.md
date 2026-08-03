@@ -8,8 +8,8 @@ tags:
 ## Definition
 
 ### 1. The Geometric Foundation & Parametrization
-* **[[Trace of a Curve]]**: The fundamental, static geometric entity in space (the set of points occupied by the curve, independent of any parametrization).
-* **[[Trajectory Equation]] (or [[Parametric Curve]])**: A [[Vector-valued Function]] that introduces a parameter `t`(e.g., time) to map a real interval onto the [[Trace of a Curve]].
+* **[[Trace]]**: The fundamental, static geometric entity in space (the set of points occupied by the curve, independent of any parametrization).
+* **[[Trajectory Equation]] (or [[Parametric Curve]])**: A [[Vector-valued Function]] that introduces a parameter `t`(e.g., time) to map a real interval onto the [[Trace]].
 
 ### 2. Kinematic Derivations (Time-Domain)
 By differentiating the [[Trajectory Equation]] with respect to the parameter \(t\), we naturally define the fundamental kinematic vectors:
