@@ -20,6 +20,7 @@ This page is an index that explains two distinct usages of DFS and links to the 
 - [[DFS Implement Principle]]
 - [[DFS Template]]
 - [[View of Visited]]
+- [[Types of BFS & DFS]]
 
 ### Examples (linked to the appropriate canonical note)
 - [[200. Number of Islands]] — connectivity example (see [[Connectivity DFS]]).
@@ -27,3 +28,7 @@ This page is an index that explains two distinct usages of DFS and links to the 
 
 ---
 ## **Related**
+
+[[Breadth-First Search|BFS]]
+
+[[Different Types of State]]

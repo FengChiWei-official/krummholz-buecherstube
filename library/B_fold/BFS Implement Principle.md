@@ -13,9 +13,12 @@ Purpose: find shortest paths in unweighted graphs, level-order traversal, and re
 
 Key points
 
+> [[Different Types of State]]
+
 1. Define your graph properly (directed? undirected?).
 2. Mark/visit when you enqueue ("mark-on-push") to avoid multiple enqueues.
 3. Enqueue the start node(s) explicitly and initialize their distance/state.
+4. 
 
 When to prefer BFS vs Connectivity-DFS
 
@@ -26,7 +29,7 @@ When to prefer BFS vs Connectivity-DFS
 [[BFS Templates]]
 
 ## Example
-- [[archives/algorithms/841. Keys and Rooms]]
+- [[841. Keys and Rooms]]
 - [[牛客_小红走迷宫]]
 
 ---
