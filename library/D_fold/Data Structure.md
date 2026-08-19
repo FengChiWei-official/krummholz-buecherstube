@@ -8,7 +8,7 @@ tags:
 
 ## Definition
 
-[[Abstract Data Type|ADT]] + [[Storage Structure]] = Data Structure.
+[[Abstract Data Type in Data Structure|ADT]] + [[Storage Structure]] = Data Structure.
 
 
 ---

@@ -9,7 +9,7 @@ source: 《卡片盒笔记法》 by Sönke Ahrens
 ## Text
 
 [[Data Structure]] 
-[[Abstract Data Type]]
+[[Abstract Data Type in Data Structure]]
 
 [[Linear List]]
 [[View How to choice the Implement of Linear List]]

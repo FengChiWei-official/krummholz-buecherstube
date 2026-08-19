@@ -8,11 +8,7 @@ tags:
 
 ## Definition
 
-[[Term Plethora versus Aplenty]]
-
-[[View of Haskell's Properties]]
-[[Abstract Data Type in Programming Language|ADTs]]
-
+Lazy evaluation
 
 ---
 ## **Related**

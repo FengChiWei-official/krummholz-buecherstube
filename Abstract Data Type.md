@@ -4,15 +4,14 @@ tags:
   - status/in-progress
   - topic/learning
   - attr/concept
+aliases:
+  - ADT
 ---
 
 ## Definition
 
-[[Term Plethora versus Aplenty]]
-
-[[View of Haskell's Properties]]
-[[Abstract Data Type in Programming Language|ADTs]]
-
+[[Abstract Data Type in Data Structure]]
+[[Abstract Data Type in Programming Language]]
 
 ---
 ## **Related**

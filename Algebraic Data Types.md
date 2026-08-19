@@ -8,11 +8,8 @@ tags:
 
 ## Definition
 
-[[Term Plethora versus Aplenty]]
-
-[[View of Haskell's Properties]]
-[[Abstract Data Type in Programming Language|ADTs]]
-
+[[Enumeration Types|Sum Types]]
+[[Product Types]]
 
 ---
 ## **Related**

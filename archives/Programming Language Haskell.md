@@ -12,4 +12,7 @@ tags:
 ---
 ## **Related**
 
+[[Learning Haskell]]
+
+[[Functional Programming Language]]
 [[View of Haskell's Properties]]

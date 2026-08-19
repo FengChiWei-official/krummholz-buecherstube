@@ -8,11 +8,9 @@ tags:
 
 ## Definition
 
-[[Term Plethora versus Aplenty]]
-
-[[View of Haskell's Properties]]
-[[Abstract Data Type in Programming Language|ADTs]]
-
+```
+Constructor Type1 Type2
+```
 
 ---
 ## **Related**

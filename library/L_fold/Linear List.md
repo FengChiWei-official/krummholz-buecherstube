@@ -8,7 +8,7 @@ tags:
 
 ## Definition
 
-A [[Linear List]] is an [[Abstract Data Type]] representing a finite sequence of data elements. 
+A [[Linear List]] is an [[Abstract Data Type in Data Structure]] representing a finite sequence of data elements. 
 In a **non-empty** list, every element has at most one** direct predecessor** and at most one **direct successor**, where only the first element has no predecessor and only the last element has no successor.
 
 > [!note]
