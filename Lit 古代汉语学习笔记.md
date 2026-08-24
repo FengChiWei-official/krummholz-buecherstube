@@ -8,13 +8,7 @@ tags:
 
 ## Definition
 
-## Core Concepts
-
-[[Individual Psychology]]
-[[我的底座]]
-## Key Methods
-
-## Applications
+[[苛政猛於虎]]
 
 ---
 ## **Related**

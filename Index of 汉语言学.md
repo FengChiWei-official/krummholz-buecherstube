@@ -10,8 +10,8 @@ tags:
 
 ## Core Concepts
 
-[[Individual Psychology]]
-[[我的底座]]
+[[Lit 古代汉语学习笔记]]
+
 ## Key Methods
 
 ## Applications
