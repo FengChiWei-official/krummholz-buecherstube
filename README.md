@@ -88,6 +88,7 @@ Root files should not stay unmanaged. Move a root file into `mailbox/`, `library
 - `attr/links` — multi-angle explanation notes.
 - `attr/principle`, `attr/concept` — ordinary knowledge cards.
 - `attr/technique`, `attr/method` — hands-on technique and method cards.
+- `topic/<name>` — open vocabulary, one per note (`topic/learning`, `topic/math`, `topic/cs`, …). Not a closed set; checked for prefix only.
 
 ## Promotion Rule
 

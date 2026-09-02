@@ -29,6 +29,18 @@ A fresh clone/pull is fully operational: all procedures live in this skill, all 
 
 If the owner opens with a new item ('我有一个新东西'), fold S1 into the options: tidy first if state requires, then sharpening questions + main-tree mount proposal per Spec §S7/S1.
 
+### Resuming half-done work
+
+A dirty tree or untracked files usually mean the last session ended mid-work. Cross-check them against the todo tree (`a_sticker/todos/`): grep each dirty/untracked note name for `- [ ] [[NAME]]` hooks and inbound links. Found → resume from the continuation note (S5). Not found → they are unsaved new work: ask the owner which todo owns them, or offer S1.
+
+### Ambiguity → ask, never guess
+
+If a note carries no state signal (no tags, no links, no todo hook) and no rule determines its zone or type — as with a bare one-line capture — the correct move is to ask the owner. Doctrine cannot attribute what has no attributes; guessing violates "repo state, not memory".
+
+### Tool signals vs content
+
+`check`/`triage`/`status` findings are signals, not verdicts. A "promote candidate" only means the evergreen tag is present — content may be empty or unstable; verify before acting. The same holds for stale and untagged findings (mtime heuristics). When a signal contradicts the note's actual content, the content wins; report the contradiction instead of forcing an action.
+
 ## Hard mechanics
 
 - Wikilinks resolve by **note name, not path**. Renaming requires updating every `[[Old Name]]` inbound link — grep `[[Old` first.

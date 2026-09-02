@@ -530,7 +530,11 @@ def _collect_check():
             continue
         fm = parse_frontmatter(text)
         for tag in get_tags(fm):
-            if tag.startswith(("type/", "status/", "attr/")) and tag not in VALID_TAGS:
+            if tag.startswith("topic/"):
+                # open vocabulary — prefix check only (AGENTS.md Tags section)
+                if not tag[len("topic/"):]:
+                    tag_findings.append(f"{p.relative_to(ROOT)}: empty topic tag 'topic/'")
+            elif tag.startswith(("type/", "status/", "attr/")) and tag not in VALID_TAGS:
                 tag_findings.append(f"{p.relative_to(ROOT)}: invalid tag '{tag}'")
             elif tag == "todo" and not str(p).startswith(str(ROOT / "a_sticker/todos")):
                 tag_findings.append(f"{p.relative_to(ROOT)}: bare 'todo' tag outside a_sticker/todos/")
@@ -609,7 +613,8 @@ def _collect_triage():
     for p in sorted((ROOT / "mailbox").glob("*.md")):
         fm = parse_frontmatter(p.read_text(encoding="utf-8", errors="replace"))
         if "status/evergreen" in get_tags(fm):
-            findings["promote"].append(f"promote candidate: {p.stem}")
+            findings["promote"].append(
+                f"promote candidate: {p.stem} (evergreen tag only — content may not be stable)")
     for p in notes:
         rel = str(p.relative_to(ROOT))
         if not rel.startswith("library/"):
@@ -707,7 +712,7 @@ def cmd_status(args) -> int:
     triage = _collect_triage()
     print("\n## triage (counts)")
     print(f"- root files: {len(triage['root'])}")
-    print(f"- promote candidates (mailbox evergreen): {len(triage['promote'])}")
+    print(f"- promote candidates (evergreen tag only — verify content first): {len(triage['promote'])}")
     print(f"- stale in-progress (> 90 days): {len(triage['stale'])}")
     print(f"- untagged: {len(triage['untagged'])}")
     print(f"- dead todo references: {len(triage['dead_todo'])}")
@@ -730,8 +735,8 @@ def cmd_status(args) -> int:
     if triage["root"]:
         moves.append("file me: run triage, decide zone, move")
     if triage["promote"]:
-        moves.append(f"promote candidates: {len(triage['promote'])} — "
-                     "run `python3 tools/vault.py promote NAME --dry-run`")
+        moves.append(f"promote candidates: {len(triage['promote'])} (signal, not verdict — "
+                     "check content) — run `python3 tools/vault.py promote NAME --dry-run`")
     if triage["stale"]:
         moves.append(f"{len(triage['stale'])} notes idle > 90 days — review or archive")
     if triage["untagged"]:

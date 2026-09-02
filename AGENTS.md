@@ -23,5 +23,5 @@ Read this first, then the source-of-truth files it points to. Do not improvise d
 
 ## Tags (closed set)
 
-`type/permanent`, `type/lit`; `status/in-progress|evergreen|archive`; `attr/map`, `attr/links`, `attr/principle`, `attr/concept`, `attr/technique`, `attr/method`; plus bare `todo` on todo notes (`a_sticker/todos/` and todo-role notes) only.
+`type/permanent`, `type/lit`; `status/in-progress|evergreen|archive`; `attr/map`, `attr/links`, `attr/principle`, `attr/concept`, `attr/technique`, `attr/method`; plus bare `todo` on todo notes (`a_sticker/todos/` and todo-role notes) only. Additionally `topic/<name>` is an open vocabulary (free-form: `topic/learning`, `topic/math`, `topic/cs`, …) — exactly one `topic/*` tag per note recommended, checked for prefix only, not a closed set.
 
