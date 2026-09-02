@@ -16,7 +16,7 @@ This vault is a modified Zettelkasten. It is organized by **state**, not by a fo
 - `library/<A–Z>_fold/` — stable cards, sharded by first letter.
 - `zzz_output/` — the vault's terminal output: finished own-voice works (essays, summaries, proposals, poems) that link viewpoints from `library/` — the proof of having learned. `Root.md` in it is the default tree entry (主树) into the knowledge network. The `zzz_` prefix keeps it last in the sidebar.
 - `a_sticker/` — scratch: `todos/` task lists (`Index of Todos.md` is the todo-tree registry), `or/` AI-conversation captures, `new_terms/` vocab staging.
-- `template/` — card scaffolds: `concept/method/principle/technique/map/links/lit-temp.md`.
+- `template/` — card scaffolds: `concept/method/principle/technique/map/links/lit-temp.md` + `Todo Template.md`.
 
 ## Tooling
 

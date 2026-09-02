@@ -72,7 +72,7 @@ Output mount: back-link the new output from `Raw Index of Root` (or the closest 
 Flow:
 
 1. omp assembles the cluster (index + backlinks) as a reading list.
-2. **Owner writes the output themselves** — `zzz_output/` is by definition own-voice showcase; AI never drafts it.
+2. **Owner writes the output themselves** — `zzz_output/` is by definition own-voice terminal output (the proof of having learned); AI never drafts it.
 3. omp checks links resolve, adds the output backlink into the topic's Index note.
 4. Tag `status/evergreen`. If the output introduces new synthesis worth keeping as cards, extract those as new library notes (AI suggests extraction points, owner writes them).
 

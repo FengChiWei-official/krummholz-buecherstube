@@ -67,7 +67,8 @@ Keep it in [[mailbox]] when it still contains TODOs, experiments, debugging, or 
 3. Todo-hook unfinished work (`- [ ] [[NAME]]` in the owning todo).
 4. Triage batched and cool (`python3 tools/vault.py triage`).
 5. Promote only when stable (`python3 tools/vault.py promote NAME`).
-6. Check before commit (`python3 tools/vault.py check`).
+6. Check before commit (`python3 tools/vault.py check`); session entry via `python3 tools/vault.py status`.
+7. Publish — when a cluster is learned, write the output in `zzz_output/` and back-link it into the main tree (criteria: [[Collaboration Workflow Spec]] §S4).
 
 ## Related
 
