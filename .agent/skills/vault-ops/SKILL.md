@@ -82,7 +82,7 @@ If truly orphaned, link it into the nearest `Index of` hub.
 
 ### Unfinished work session
 
-Insert `- [ ] [[NAME]]` in the owning todo note (never leave work unhooked).
+Insert `- [ ] [[NAME]]` in the owning todo note (never leave work unhooked). Resolve the owning todo dynamically from the note's topic/name: hook into the matching topic todo, or create `a_sticker/todos/<Topic> Todo.md` from `template/Todo Template.md`, register it in `Index of Todos.md`, then insert.
 
 ### Renaming
 
@@ -114,6 +114,6 @@ Scenario-by-scenario protocols live in `library/K_fold/Collaboration Workflow Sp
 | S2 post-writing review | owner finished a note | run check, verify tags/source, propose 3–8 new links (owner approves inserts) | Spec §S2 |
 | S3 systematic ingestion | starting a curriculum topic | create Index + Raw Index stubs, triage per session, enforce ≥1 cross-topic link | Spec §S3 |
 | S4 output timing | topic cluster feels mature | assemble reading list; owner writes output; omp checks links + backlink | Spec §S4 |
-| S5 todo fast-save | session interrupted | insert `- [ ] [[NAME]]` + continuation note into owning todo | Spec §S5 |
+| S5 todo fast-save | session interrupted | insert hook + continuation note into owning todo; resolve/create owning todo dynamically by topic/name | Spec §S5 |
 | S6 tag maintenance | promotion / review / taxonomy change | validate at promote, check at review, planned grep-rewrite on taxonomy change | Spec §S6 |
 | S7 session entry | owner unsure what to do / opens with a new thing | run `python3 tools/vault.py status`, report state, present numbered next-move options; owner picks, omp executes per S1–S6 | Spec §S7 |

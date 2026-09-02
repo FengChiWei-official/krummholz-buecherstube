@@ -295,7 +295,6 @@ _BASELINE_LIT_NOSOURCE = {
     'a_sticker/new_terms/terms sheet.md',
     'a_sticker/or/Can we Learn about Semantic Space.md',
     'a_sticker/or/Hypernetwork.md',
-    'a_sticker/todos/todo interval.md',
     'archives/CiS 03.md',
     'archives/Latin Root -Nomial.md',
     'archives/Prefix Poly-.md',
@@ -394,7 +393,7 @@ _BASELINE_LIT_NOSOURCE = {
     'library/T_fold/Term Hyponym.md',
     'library/T_fold/Traversal Index to Traversal Object.md',
     'library/Template of BFS with Cycles.md',
-    'mailbox/Raw math idea.md',
+    'archives/Raw math idea.md',
 }
 
 SKIP_DIRS = {".git", ".obsidian", "zzz_output", ".agent"}
@@ -602,7 +601,7 @@ def _collect_triage():
     """Gather placement-debt findings per category. Shared by `triage` and `status`."""
     now = time.time()
     notes = sorted(iter_notes())
-    findings = {"root": [], "promote": [], "stale": [], "untagged": [], "dead_todo": []}
+    findings = {"root": [], "promote": [], "stale": [], "untagged": [], "unhooked": [], "dead_todo": []}
 
     # 1. root files beyond allowed set
     for p in sorted(ROOT.glob("*.md")):
@@ -624,6 +623,18 @@ def _collect_triage():
             age_days = (now - p.stat().st_mtime) / 86400
             if age_days > 90:
                 findings["stale"].append(f"stale in-progress: {rel} ({int(age_days)} days old)")
+    # 3.5 mailbox in-progress notes without any todo entry (S5 anti-loss rule).
+    # Any wikilink to the note from any file in a_sticker/todos/ counts as
+    # hooked (todo item or Index of Todos registration).
+    todo_targets = set()
+    for p in sorted((ROOT / "a_sticker" / "todos").glob("*.md")):
+        for t, _ in extract_wikilinks(p.read_text(encoding="utf-8", errors="replace")):
+            todo_targets.add(t)
+    for p in sorted((ROOT / "mailbox").glob("*.md")):
+        fm = parse_frontmatter(p.read_text(encoding="utf-8", errors="replace"))
+        if "status/in-progress" in get_tags(fm) and p.stem not in todo_targets:
+            findings["unhooked"].append(
+                f"unhooked in-progress: mailbox/{p.name} — no todo entry (Spec §S5)")
 
     # 4. untagged notes (no type/* tag). By design untagged: root infra files,
     # todo notes (bare `todo` tag), templates.
@@ -658,7 +669,7 @@ def _collect_triage():
 def cmd_triage(args) -> int:
     findings = _collect_triage()
     print("# mtime heuristic — treat as prompt, not verdict\n")
-    for category in ("root", "promote", "stale", "untagged", "dead_todo"):
+    for category in ("root", "promote", "stale", "untagged", "unhooked", "dead_todo"):
         for line in findings[category]:
             print(line)
     return 0
@@ -715,6 +726,7 @@ def cmd_status(args) -> int:
     print(f"- promote candidates (evergreen tag only — verify content first): {len(triage['promote'])}")
     print(f"- stale in-progress (> 90 days): {len(triage['stale'])}")
     print(f"- untagged: {len(triage['untagged'])}")
+    print(f"- unhooked in-progress (no todo entry): {len(triage['unhooked'])}")
     print(f"- dead todo references: {len(triage['dead_todo'])}")
 
     # (d) uncommitted zzz_output changes — git-state only, content never read
@@ -742,6 +754,9 @@ def cmd_status(args) -> int:
     if triage["untagged"]:
         moves.append(f"untagged: {len(triage['untagged'])} — tidy: "
                      "run `python3 tools/vault.py triage`, add `type/*` tags")
+    if triage["unhooked"]:
+        moves.append(f"{len(triage['unhooked'])} unhooked in-progress notes — "
+                     "todo-hook per Spec §S5 (dynamic todo creation)")
     if zzz_changes:
         moves.append(f"unpublished-output changes: {len(zzz_changes)} files — "
                      "finish/publish via Spec §S4")

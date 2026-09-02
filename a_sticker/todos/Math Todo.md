@@ -21,3 +21,11 @@ tags:
 - [x] [[Points of Discontinuity]]
 - [ ] [[function and continuous and differential function]]
 - [ ] 题8.5 10.4
+- [ ] [[Back-to-Basics Heuristic Definitions & Generalization]] — 补启发式定义泛化例题
+- [ ] [[Parametric Candidate Generation with Constraint Filtering]] — 补候选生成+约束过滤例题
+- [ ] [[Principle of Reduction]] — 补化归原理跨题应用
+- [ ] [[Logarithmic Function Toolkit]] — 收敛对数工具卡后评估 promote
+- [ ] [[Partial Sum Sequence Toolkit]] — 收敛前缀和工具卡后评估 promote
+- [ ] [[Telescoping Sum Toolkits]] — 收敛裂项工具卡后评估 promote
+- [ ] [[Telescoping Sum]] — 与 Toolkits 互链后评估 promote
+- [ ] [[Sequence]] — 收敛数列工具卡后评估 promote

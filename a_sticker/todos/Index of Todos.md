@@ -17,6 +17,11 @@ tags:
 - [ ] [[translate todo]]
 - [ ] [[Hobby todo]]
 - [ ] [[Life todo]]
+- [ ] [[Haskell Todo]]
+- [ ] [[Animation Todo]]
+- [ ] [[Games Todo]]
+- [ ] [[Hyprland(ml4w) Config todo]]
+- [ ] [[算法思想]]
 
 ## Key Methods
 
