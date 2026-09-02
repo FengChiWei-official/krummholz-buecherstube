@@ -13,6 +13,7 @@ Stdlib only. Vault root = parent of tools/. Works from any cwd.
 
 import argparse
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -20,6 +21,19 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent.parent
+
+
+def _load_extra_lines(path: Path) -> set[str]:
+    """Read one-entry-per-line file, skipping blanks and # comments."""
+    if not path.exists():
+        return set()
+    result = set()
+    for line in path.read_text().splitlines():
+        line = line.strip().split("#")[0].strip()
+        if line:
+            result.add(line)
+    return result
+
 
 # ---------------------------------------------------------------- constants
 
@@ -283,6 +297,8 @@ _BASELINE_UNRESOLVED_NAMES = [
     '黏对',
 ]
 WHITELIST_UNRESOLVED |= set(_BASELINE_UNRESOLVED_NAMES)
+# External overrides (one entry per line, # comments)
+WHITELIST_UNRESOLVED |= _load_extra_lines(ROOT / "tools" / "whitelist_unresolved.txt")
 
 # Legacy lit notes that already lacked a real source at the 2026-09 baseline.
 # check reports these informationally; NEW un-sourced lit notes still fail hard.
@@ -395,8 +411,12 @@ _BASELINE_LIT_NOSOURCE = {
     'library/Template of BFS with Cycles.md',
     'archives/Raw math idea.md',
 }
+# External overrides (one entry per line, # comments)
+_BASELINE_LIT_NOSOURCE |= _load_extra_lines(ROOT / "tools" / "baseline_lit_nosource.txt")
 
 SKIP_DIRS = {".git", ".obsidian", "zzz_output", ".agent"}
+
+_notes_cache: dict | None = None
 
 # ---------------------------------------------------------------- helpers
 
@@ -407,6 +427,20 @@ def iter_notes(root: Path = ROOT):
         if any(part in SKIP_DIRS for part in path.parts):
             continue
         yield path
+
+
+def _load_notes() -> dict:
+    """Return {Path: text} for all vault notes, cached for one command call."""
+    global _notes_cache
+    if _notes_cache is None:
+        _notes_cache = {p: p.read_text(encoding="utf-8", errors="replace")
+                        for p in sorted(iter_notes())}
+    return _notes_cache
+
+
+def _clear_notes_cache():
+    global _notes_cache
+    _notes_cache = None
 
 
 def parse_frontmatter(text: str) -> dict:
@@ -434,10 +468,10 @@ def parse_frontmatter(text: str) -> dict:
                 fm[key] = value
             else:
                 fm[key] = []          # bare "key:" -> list items follow
-        elif line.startswith("  - ") and key is not None:
+        elif re.match(r"^\s+-\s+", line) and key is not None:
             fm.setdefault(key, [])
             if isinstance(fm[key], list):
-                fm[key].append(line[4:].strip().strip("'\""))
+                fm[key].append(re.sub(r"^\s+-\s+", "", line).strip().strip("'\""))
     return fm
 
 
@@ -454,10 +488,12 @@ _WIKILINK_RE = re.compile(r"(!?)\[\[([^\]\n]+?)(\|[^\]\n]*)?\]\]")
 def extract_wikilinks(text: str):
     """Yield (target, line_no) for every [[...]] in text (embeds included).
 
-    Skips inline code spans (`...`) — command literals like `- [ ] [[NAME]]`
-    are syntax examples, not links. Fenced code blocks are skipped by the
-    caller stripping them first when needed for invariant checks.
+    Skips inline code spans (`...`) and fenced code blocks (```...```)
+    so command literals and code examples are not parsed as links.
     """
+    # Strip fenced code blocks so wikilinks inside code examples
+    # are not parsed as unresolved references.
+    text = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
     for line_no, line in enumerate(text.splitlines(), start=1):
         line = re.sub(r"`[^`]*`", "", line)
         for match in _WIKILINK_RE.finditer(line):
@@ -494,8 +530,8 @@ def _collect_check():
     Returns an ordered list of (title, findings, hard): hard sections count
     toward check's PROBLEMS total; informational ones never do.
     """
-    notes = sorted(iter_notes())
-    texts = {p: p.read_text(encoding="utf-8", errors="replace") for p in notes}
+    texts = _load_notes()
+    notes = sorted(texts.keys())
     basenames = {p.stem for p in notes}
     basenames |= {p.stem for p in (ROOT / "zzz_output").rglob("*.md")}
 
@@ -591,6 +627,7 @@ def cmd_check(args) -> int:
         else:
             report(title, findings)
     print("CLEAN — all invariants hold" if problems == 0 else f"PROBLEMS: {problems}")
+    _clear_notes_cache()
     return 1 if problems else 0
 
 
@@ -600,7 +637,8 @@ def cmd_check(args) -> int:
 def _collect_triage():
     """Gather placement-debt findings per category. Shared by `triage` and `status`."""
     now = time.time()
-    notes = sorted(iter_notes())
+    notes = sorted(_load_notes().keys())
+    texts = _load_notes()
     findings = {"root": [], "promote": [], "stale": [], "untagged": [], "unhooked": [], "dead_todo": []}
 
     # 1. root files beyond allowed set
@@ -610,7 +648,7 @@ def _collect_triage():
 
     # 2. mailbox evergreen = stalled promotions
     for p in sorted((ROOT / "mailbox").glob("*.md")):
-        fm = parse_frontmatter(p.read_text(encoding="utf-8", errors="replace"))
+        fm = parse_frontmatter(texts[p])
         if "status/evergreen" in get_tags(fm):
             findings["promote"].append(
                 f"promote candidate: {p.stem} (evergreen tag only — content may not be stable)")
@@ -618,7 +656,7 @@ def _collect_triage():
         rel = str(p.relative_to(ROOT))
         if not rel.startswith("library/"):
             continue
-        fm = parse_frontmatter(p.read_text(encoding="utf-8", errors="replace"))
+        fm = parse_frontmatter(texts[p])
         if "status/in-progress" in get_tags(fm):
             age_days = (now - p.stat().st_mtime) / 86400
             if age_days > 90:
@@ -628,10 +666,10 @@ def _collect_triage():
     # hooked (todo item or Index of Todos registration).
     todo_targets = set()
     for p in sorted((ROOT / "a_sticker" / "todos").glob("*.md")):
-        for t, _ in extract_wikilinks(p.read_text(encoding="utf-8", errors="replace")):
+        for t, _ in extract_wikilinks(texts[p]):
             todo_targets.add(t)
     for p in sorted((ROOT / "mailbox").glob("*.md")):
-        fm = parse_frontmatter(p.read_text(encoding="utf-8", errors="replace"))
+        fm = parse_frontmatter(texts[p])
         if "status/in-progress" in get_tags(fm) and p.stem not in todo_targets:
             findings["unhooked"].append(
                 f"unhooked in-progress: mailbox/{p.name} — no todo entry (Spec §S5)")
@@ -644,7 +682,7 @@ def _collect_triage():
             continue
         if rel_path.startswith(("a_sticker/todos/", "template/")):
             continue
-        fm = parse_frontmatter(p.read_text(encoding="utf-8", errors="replace"))
+        fm = parse_frontmatter(texts[p])
         if not any(t.startswith("type/") for t in get_tags(fm)):
             findings["untagged"].append(f"untagged: {rel_path}")
 
@@ -652,14 +690,14 @@ def _collect_triage():
     basenames = {p.stem for p in notes}
     basenames |= {p.stem for p in (ROOT / "zzz_output").rglob("*.md")}
     for p in sorted((ROOT / "a_sticker/todos").glob("*.md")):
-        text = p.read_text(encoding="utf-8", errors="replace")
+        text = texts[p]
         lines = text.splitlines()
         for target, line_no in extract_wikilinks(text):
             if target in basenames or "Index of Todos" in str(p.name):
                 continue
             # unchecked items are future-note hooks (vault doctrine) — fine;
             # a checked item pointing at a missing note is dead.
-            if "- [x]" in lines[line_no - 1]:
+            if re.search(r"-\s*\[x\]", lines[line_no - 1], re.IGNORECASE):
                 findings["dead_todo"].append(
                     f"dead todo reference: {p.name}:{line_no}: [[{target}]]")
 
@@ -670,8 +708,11 @@ def cmd_triage(args) -> int:
     findings = _collect_triage()
     print("# mtime heuristic — treat as prompt, not verdict\n")
     for category in ("root", "promote", "stale", "untagged", "unhooked", "dead_todo"):
-        for line in findings[category]:
+        items = findings[category]
+        print(f"# {category}: {len(items)}")
+        for line in items:
             print(line)
+    _clear_notes_cache()
     return 0
 
 
@@ -763,9 +804,46 @@ def cmd_status(args) -> int:
     if not moves:
         moves.append("vault clean — new capture, idea polish (Spec §S1), "
                      "or ingestion (Spec §S3) are available")
-    for i, move in enumerate(moves, 1):
-        print(f"{i}. {move}")
+    _clear_notes_cache()
     return 0
+
+
+# ---------------------------------------------------------------- register
+
+
+def _cmd_register(target: str, names: list[str], path: Path) -> int:
+    """Shared: append NAMES to PATH (one per line), skip existing entries."""
+    existing = set()
+    if path.exists():
+        for line in path.read_text().splitlines():
+            line = line.strip().split("#")[0].strip()
+            if line:
+                existing.add(line)
+    added = []
+    already = []
+    for name in names:
+        if name in existing:
+            already.append(name)
+        else:
+            added.append(name)
+    if added:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a") as f:
+            for name in added:
+                f.write(f"{name}\n")
+    for name in already:
+        print(f"{target}: '{name}' already registered")
+    for name in added:
+        print(f"{target}: registered '{name}'")
+    return 1 if not added else 0
+
+
+def cmd_register_unresolved(args) -> int:
+    return _cmd_register("unresolved", args.names, ROOT / "tools" / "whitelist_unresolved.txt")
+
+
+def cmd_register_lit_nosource(args) -> int:
+    return _cmd_register("lit-nosource", args.paths, ROOT / "tools" / "baseline_lit_nosource.txt")
 
 
 # ---------------------------------------------------------------- promote
@@ -776,15 +854,12 @@ def _destination_for(name: str, fm: dict) -> Path:
         return ROOT / "library/Index" / f"{name}.md"
     if "attr/links" in get_tags(fm):
         return ROOT / "library/Links" / f"{name}.md"
-    # letter fold: first ASCII letter in the name
+    # single-pass: ASCII letter > digit > CJK > misc
     for ch in name:
         if "a" <= ch <= "z" or "A" <= ch <= "Z":
             return ROOT / f"library/{ch.upper()}_fold" / f"{name}.md"
-    # existing vault conventions: digit-leading -> 0_fold, CJK -> 中_fold
-    for ch in name:
         if ch.isdigit():
             return ROOT / "library/0_fold" / f"{name}.md"
-    for ch in name:
         if ord(ch) > 0x2E80:  # CJK range
             return ROOT / "library/中_fold" / f"{name}.md"
     return ROOT / "library/_misc" / f"{name}.md"
@@ -795,12 +870,14 @@ def cmd_promote(args) -> int:
     name = name.removeprefix("mailbox/")
     if name.endswith(".md"):
         name = name[:-3]
-    matches = list((ROOT / "mailbox").glob(f"{name}.md"))
+    name_lower = name.lower()
+    matches = [p for p in (ROOT / "mailbox").iterdir()
+               if p.is_file() and p.suffix == ".md" and p.stem.lower() == name_lower]
     if not matches:
-        print(f"error: mailbox/{name}.md not found")
+        print(f"error: mailbox/{name}.md not found", file=sys.stderr)
         return 1
     if len(matches) > 1:
-        print(f"error: ambiguous name, matches: {[str(m) for m in matches]}")
+        print(f"error: ambiguous name, matches: {[str(m) for m in matches]}", file=sys.stderr)
         return 1
 
     src = matches[0]
@@ -816,20 +893,15 @@ def cmd_promote(args) -> int:
         if tag.startswith(("type/", "status/", "attr/")) and tag not in VALID_TAGS:
             errors.append(f"tag typo: '{tag}' not in closed vocabulary")
 
-    if "type/lit" in tags:
-        print("refused: type/lit notes belong in archives/, not library/")
-        print(f"suggest: git mv '{src.relative_to(ROOT)}' archives/")
-        return 1
-
     if errors:
         for e in errors:
-            print(f"error: {e}")
-        print("nothing moved")
+            print(f"error: {e}", file=sys.stderr)
+        print("nothing moved", file=sys.stderr)
         return 1
 
     dst = _destination_for(name, fm)
     if dst.exists():
-        print(f"error: destination already exists: {dst.relative_to(ROOT)}")
+        print(f"error: destination already exists: {dst.relative_to(ROOT)}", file=sys.stderr)
         return 1
 
     print(f"plan: {src.relative_to(ROOT)} -> {dst.relative_to(ROOT)}")
@@ -837,8 +909,13 @@ def cmd_promote(args) -> int:
         print("dry-run: nothing moved")
         return 0
 
+    if "type/lit" in tags:
+        print("refused: type/lit notes belong in archives/, not library/", file=sys.stderr)
+        print(f"suggest: git mv '{src.relative_to(ROOT)}' archives/")
+        return 1
+
     dst.parent.mkdir(parents=True, exist_ok=True)
-    src.rename(dst)
+    shutil.move(str(src), str(dst))
     print(f"moved: {dst.relative_to(ROOT)}")
     print("reminder: run `python3 tools/vault.py check` before committing")
     return 0
@@ -861,6 +938,18 @@ def main() -> int:
     p_promote.add_argument("--force", action="store_true",
                            help="bypass the status check (never the lit rule)")
 
+    p_reg_unresolved = sub.add_parser(
+        "register-unresolved",
+        help="baseline a dangling wikilink target so check stops flagging it (appends to tools/whitelist_unresolved.txt)")
+    p_reg_unresolved.add_argument("names", nargs="+",
+                                  help="wikilink target name(s) to whitelist")
+
+    p_reg_lit = sub.add_parser(
+        "register-lit-nosource",
+        help="baseline a legacy type/lit note without a real source (appends to tools/baseline_lit_nosource.txt)")
+    p_reg_lit.add_argument("paths", nargs="+",
+                           help="vault-relative note path(s) (e.g. archives/Foo.md)")
+
     args = parser.parse_args()
     if args.command == "check":
         return cmd_check(args)
@@ -868,6 +957,10 @@ def main() -> int:
         return cmd_triage(args)
     if args.command == "status":
         return cmd_status(args)
+    if args.command == "register-unresolved":
+        return cmd_register_unresolved(args)
+    if args.command == "register-lit-nosource":
+        return cmd_register_lit_nosource(args)
     return cmd_promote(args)
 
 
