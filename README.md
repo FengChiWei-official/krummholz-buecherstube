@@ -51,6 +51,7 @@ This vault is a modified Zettelkasten. It is organized by **state**, not by a fo
 3. Put it in the right zone.
 4. Add links to nearby notes.
 5. Promote it only when the wording and meaning are stable.
+6. For human↔AI collaboration scenarios (idea polishing, review, ingestion, output, todo, tags), follow [Collaboration Workflow Spec](library/K_fold/Collaboration%20Workflow%20Spec.md).
 
 ## Where a Note Belongs
 
@@ -99,4 +100,5 @@ A note moves from `mailbox/` to `library/` when:
 - [Knowledge Base Operating Rules](library/K_fold/Knowledge%20Base%20Operating%20Rules.md)
 - [Links of General Coding Thoughts](library/Links/Links%20of%20General%20Coding%20Thoughts.md)
 - [Vault System Design](library/K_fold/Vault%20System%20Design.md)
+- [Collaboration Workflow Spec](library/K_fold/Collaboration%20Workflow%20Spec.md)
 - [Index of Knowledge](library/Index/Index%20of%20Knowledge.md)

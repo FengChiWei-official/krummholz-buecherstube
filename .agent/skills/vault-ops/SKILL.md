@@ -25,6 +25,7 @@ These four files are the truth. This skill restates them operationally.
 - Tags are a closed set: `type/{permanent,lit}`, `status/{in-progress,evergreen,archive}`, `attr/{map,links,principle,concept,technique,method}`, plus bare `todo` on todo notes only.
 - Lit notes need a real `source:` — never leave it empty (except `template/lit-temp.md`).
 - Never touch `zzz_output/` (owner's finished work) or `.obsidian/`.
+- Never write own-voice body content for the owner — skeleton, questions, checks, and link-proposals only; AI-generated prose belongs in `a_sticker/or/` for the owner to digest.
 
 ## Common problems → exact procedures
 
@@ -74,3 +75,15 @@ Compare content; if dup, keep the better-placed one, move inbound links, delete.
 
 The default is always mailbox (reversible) over library (commitment). A wrong folder costs a move; a wrong promotion costs doctrine drift.
 
+## Collaboration scenarios
+
+Scenario-by-scenario protocols live in `library/K_fold/Collaboration Workflow Spec.md` (also reachable as `[[Collaboration Workflow Spec]]`). Match the trigger, follow the protocol:
+
+| Scenario | Trigger | omp role | Protocol |
+|---|---|---|---|
+| S1 idea polish | owner has a new idea | ask sharpening questions, propose skeleton + related notes; never write body | Spec §S1 |
+| S2 post-writing review | owner finished a note | run check, verify tags/source, propose 3–8 new links (owner approves inserts) | Spec §S2 |
+| S3 systematic ingestion | starting a curriculum topic | create Index + Raw Index stubs, triage per session, enforce ≥1 cross-topic link | Spec §S3 |
+| S4 output timing | topic cluster feels mature | assemble reading list; owner writes output; omp checks links + backlink | Spec §S4 |
+| S5 todo fast-save | session interrupted | insert `- [ ] [[NAME]]` + continuation note into owning todo | Spec §S5 |
+| S6 tag maintenance | promotion / review / taxonomy change | validate at promote, check at review, planned grep-rewrite on taxonomy change | Spec §S6 |

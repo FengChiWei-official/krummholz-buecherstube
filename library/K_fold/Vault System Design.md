@@ -66,6 +66,8 @@ The corrected loop:
 
 Filing moves from per-note hot decision to batched cool decision — that is why it becomes sustainable.
 
+Scenario-by-scenario protocols: [[Collaboration Workflow Spec]].
+
 ---
 ## **Related**
 
