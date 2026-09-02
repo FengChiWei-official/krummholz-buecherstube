@@ -32,7 +32,7 @@ If the owner opens with a new item ('我有一个新东西'), fold S1 into the o
 ## Hard mechanics
 
 - Wikilinks resolve by **note name, not path**. Renaming requires updating every `[[Old Name]]` inbound link — grep `[[Old` first.
-- Root is the entry queue (Obsidian default landing). Allowed root files: `README.md`, `AGENTS.md`, `VAULT_CLEANUP_FIX_PLAN.md`. Everything else gets filed.
+- Root is the entry queue (Obsidian default landing). Allowed root files: `README.md`, `AGENTS.md`. Everything else gets filed.
 - Tags are a closed set: `type/{permanent,lit}`, `status/{in-progress,evergreen,archive}`, `attr/{map,links,principle,concept,technique,method}`, plus bare `todo` on todo notes only.
 - Lit notes need a real `source:` — never leave it empty (except `template/lit-temp.md`).
 - Never touch `zzz_output/` contents (owner's finished work) or `.obsidian/`. `zzz_output/` links and git-state may be checked/diagnosed (`vault.py status` reports them); content is never drafted or edited by AI.

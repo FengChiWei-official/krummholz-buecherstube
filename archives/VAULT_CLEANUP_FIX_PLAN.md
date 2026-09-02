@@ -1,3 +1,10 @@
+---
+tags:
+  - type/lit
+  - status/archive
+source: owner decision record, 2026-09 vault cleanup session (completed)
+---
+
 # Vault Cleanup & Taxonomy Restructure Plan
 
 **Vault**: `/home/mia/Documents/obsidian/krummholz-buecherstube` (all paths below relative to it)

@@ -27,10 +27,11 @@ TYPE_TAGS = {"type/permanent", "type/lit"}
 STATUS_TAGS = {"status/in-progress", "status/evergreen", "status/archive"}
 ATTR_TAGS = {"attr/map", "attr/links", "attr/principle",
              "attr/concept", "attr/technique", "attr/method"}
+
 VALID_TAGS = TYPE_TAGS | STATUS_TAGS | ATTR_TAGS
 
 # Root files that are allowed to live outside the three zones.
-ROOT_ALLOWED = {"README.md", "AGENTS.md", "VAULT_CLEANUP_FIX_PLAN.md"}
+ROOT_ALLOWED = {"README.md", "AGENTS.md"}
 
 # Pre-existing unresolved wikilinks. The 17 cleanup-verified placeholders plus
 # the 2026-09 baseline snapshot of intentional dangling hooks (owner doctrine:
@@ -623,7 +624,7 @@ def _collect_triage():
     # todo notes (bare `todo` tag), templates.
     for p in notes:
         rel_path = str(p.relative_to(ROOT))
-        if rel_path in ("AGENTS.md", "README.md", "VAULT_CLEANUP_FIX_PLAN.md"):
+        if rel_path in ("AGENTS.md", "README.md"):
             continue
         if rel_path.startswith(("a_sticker/todos/", "template/")):
             continue

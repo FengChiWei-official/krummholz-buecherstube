@@ -13,7 +13,7 @@ Read this first, then the source-of-truth files it points to. Do not improvise d
 ## Hard rules
 
 1. **Wikilinks resolve by note name, not path.** Moving a file never breaks a link; renaming one requires updating every `[[Old Name]]` inbound link. Grep before renaming.
-2. **Zones by state:** drafts → `mailbox/`, stable own-voice knowledge → `library/`, external/copied material → `archives/`. Root is the entry queue: new captures land there (Obsidian default) and are drained by `triage`; only `README.md`, `AGENTS.md`, `VAULT_CLEANUP_FIX_PLAN.md` stay permanently.
+2. **Zones by state:** drafts → `mailbox/`, stable own-voice knowledge → `library/`, external/copied material → `archives/`. Root is the entry queue: new captures land there (Obsidian default) and are drained by `triage`; only `README.md` and `AGENTS.md` stay permanently.
 3. **Doctrine:** Index note = big-topic navigation (`Index of ...`, tag `attr/map`, cross-topic ones in `library/Index/`). Links note = single-concept multi-angle interpretation (tag `attr/links`, stable ones in `library/Links/`). There is no "Map"/"View" vocabulary anymore.
 4. **Templates** live in `template/`. New lit notes carry a real `source:` — never leave `source:` empty except in `template/lit-temp.md`.
 5. **Don't touch** `zzz_output/` contents (owner's finished work) or `.obsidian/`. `zzz_output/` links and git-state may be checked/diagnosed; content is never drafted or edited by AI. `zzz_output/Root.md` is the main-tree entry (主树): tree entry `Root.md` → `Raw Index of Root` → topic indexes.
