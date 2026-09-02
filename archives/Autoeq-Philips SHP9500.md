@@ -3,6 +3,7 @@ tags:
   - type/lit
   - topic/learning
   - status/archive
+source: https://autoeq.app/
 ---
 from https://autoeq.app/
 ## Text

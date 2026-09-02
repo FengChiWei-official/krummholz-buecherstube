@@ -16,6 +16,7 @@ Read this first, then the two source-of-truth files it points to. Do not improvi
 5. **Don't touch** `zzz_output/` (owner's finished work) or `.obsidian/`.
 6. One note, one idea. Prefer short definitions; link instead of inlining.
 7. No commits or pushes unless the owner asks. Deletions and renames need the owner's sign-off.
+8. Run `python3 tools/vault.py check` before committing structural changes; before any rename/move, `grep -rn '\[\[Old Name'` first. Skill `vault-ops` at `.agent/skills/vault-ops/SKILL.md` has full procedures.
 
 ## Tags (closed set)
 

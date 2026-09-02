@@ -5,6 +5,7 @@ tags:
   - status/archive
 aliases:
   - Projecting
+source: https://www.collinsdictionary.com/zh/dictionary/english/lot
 ---
 
 ## Text

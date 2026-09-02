@@ -1,5 +1,6 @@
 ---
 tags:
+  - type/permanent
   - rule
   - physics/electromagnetism
   - status/evergreen

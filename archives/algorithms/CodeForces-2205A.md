@@ -3,6 +3,7 @@ tags:
   - type/lit
   - topic/learning
   - status/archive
+source: https://vjudge.net/problem/CodeForces-2205A/origin
 ---
 [CodeForces-2205A](https://vjudge.net/problem/CodeForces-2205A/origin)
 ## Text

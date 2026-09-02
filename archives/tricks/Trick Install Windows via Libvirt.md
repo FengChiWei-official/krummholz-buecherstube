@@ -4,7 +4,7 @@ tags:
   - attr/principle
   - topic/learning
   - type/lit
-  - type/tips
+  - attr/technique
 ---
 
 ## qwq

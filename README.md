@@ -15,8 +15,15 @@ This vault is a modified Zettelkasten. It is organized by **state**, not by a fo
 - `library/Links/` — Links notes: one concept from multiple angles — isomorphisms, cross-topic connections.
 - `library/<A–Z>_fold/` — stable cards, sharded by first letter.
 - `zzz_output/` — finished personal output, the vault's showcase. The `zzz_` prefix keeps it last in the sidebar.
-- `a_sticker/` — scratch: `todos/` task lists, `or/` AI-conversation captures, `new_terms/` vocab staging.
+- `a_sticker/` — scratch: `todos/` task lists (`Index of Todos.md` is the todo-tree registry), `or/` AI-conversation captures, `new_terms/` vocab staging.
 - `template/` — card scaffolds: `concept/method/principle/technique/map/links/lit-temp.md`.
+
+## Tooling
+
+- `python3 tools/vault.py check` — invariant report (root drained, lit sources, tag vocabulary, wikilink integrity, orphans). Run before committing structural changes.
+- `python3 tools/vault.py triage` — placement-debt report (root files, stalled promotions, stale in-progress, untagged notes, dead todo references).
+- `python3 tools/vault.py promote NAME` — graduate a mailbox note into library (validates status and tags; `--dry-run` prints the plan).
+
 
 ## Index vs Links
 
@@ -91,4 +98,5 @@ A note moves from `mailbox/` to `library/` when:
 
 - [Knowledge Base Operating Rules](library/K_fold/Knowledge%20Base%20Operating%20Rules.md)
 - [Links of General Coding Thoughts](library/Links/Links%20of%20General%20Coding%20Thoughts.md)
+- [Vault System Design](library/K_fold/Vault%20System%20Design.md)
 - [Index of Knowledge](library/Index/Index%20of%20Knowledge.md)

@@ -5,6 +5,7 @@ tags:
   - status/archive
 aliases:
   - Tip for applying a proxy to the dockerd
+source: https://registry-1.docker.io/v2/`
 ---
 yes, what you should handle is **[[docker daemon]]**.
 

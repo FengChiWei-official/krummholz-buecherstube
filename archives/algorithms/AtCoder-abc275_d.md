@@ -3,6 +3,7 @@ tags:
   - type/lit
   - topic/learning
   - status/archive
+source: https://vjudge.net/problem/AtCoder-abc275_d/origin
 ---
 [AtCoder-abc275_d](https://vjudge.net/problem/AtCoder-abc275_d/origin)
 ## Text

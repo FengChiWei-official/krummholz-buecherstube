@@ -3,7 +3,8 @@ tags:
   - type/lit
   - topic/learning
   - status/archive
-  - type/tips
+  - attr/technique
+source: https://fedorapeople.org/groups/virt/
 ---
 
 ## You should install driver of virtio

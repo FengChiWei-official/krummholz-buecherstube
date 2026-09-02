@@ -62,14 +62,16 @@ Keep it in [[mailbox]] when it still contains TODOs, experiments, debugging, or 
 
 ## How to Use the System
 
-1. Capture first.
-2. Rewrite into your own words.
-3. Link it to nearby ideas.
-4. Promote only when stable.
-5. Keep indexes small and direct.
+1. Capture first — root is the entry queue.
+2. Link it to nearby ideas at capture time, not filing time.
+3. Todo-hook unfinished work (`- [ ] [[NAME]]` in the owning todo).
+4. Triage batched and cool (`python3 tools/vault.py triage`).
+5. Promote only when stable (`python3 tools/vault.py promote NAME`).
+6. Check before commit (`python3 tools/vault.py check`).
 
 ## Related
 
 - [[Links of General Coding Thoughts]]
+- [[Vault System Design]]
 - [[middle-layer-thoughts]]
 - [[standardizing-units]]

@@ -2,7 +2,7 @@
 tags:
   - status/evergreen
   - topic/learning
-  - type/tips
+  - attr/technique
   - type/lit
 ---
 

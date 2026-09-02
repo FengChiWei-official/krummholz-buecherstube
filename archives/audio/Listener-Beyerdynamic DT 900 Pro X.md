@@ -3,6 +3,7 @@ tags:
   - type/lit
   - topic/learning
   - status/archive
+source: https://forum.headphones.com/t/headphones-com-eq-repository-request-thread/23552/158?page=2
 ---
 https://forum.headphones.com/t/headphones-com-eq-repository-request-thread/23552/158?page=2
 

@@ -3,7 +3,7 @@ tags:
   - type/lit
   - topic/learning
   - status/archive
-  - type/tips
+  - attr/technique
 ---
 
 ## Text

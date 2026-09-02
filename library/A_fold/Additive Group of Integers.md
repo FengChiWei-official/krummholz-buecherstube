@@ -1,5 +1,6 @@
 ---
 tags:
+  - type/permanent
   - attr/concept
   - status/evergreen
 ---

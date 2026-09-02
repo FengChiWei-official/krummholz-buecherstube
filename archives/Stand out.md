@@ -3,6 +3,7 @@ tags:
   - type/lit
   - topic/learning
   - status/archive
+source: https://www.collinsdictionary.com/zh/dictionary/english/rise
 ---
 
 ## Text

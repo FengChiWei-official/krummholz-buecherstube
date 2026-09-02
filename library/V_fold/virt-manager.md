@@ -3,7 +3,7 @@ tags:
   - type/permanent
   - attr/principle
   - topic/learning
-  - type/tips
+  - attr/technique
   - status/evergreen
 ---
 

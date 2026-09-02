@@ -1,7 +1,7 @@
 ---
 tags:
   - type/permanent
-  - status/seed
+  - status/in-progress
   - attr/concept
   - topic/learning
 ---

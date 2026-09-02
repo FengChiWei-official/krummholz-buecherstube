@@ -5,6 +5,7 @@ tags:
   - status/archive
 aliases:
   - Clash work properly in hyprland, however, proxy dont work
+source: http://127.0.0.1:7890
 ---
 
 ## Text

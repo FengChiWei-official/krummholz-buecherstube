@@ -1,6 +1,7 @@
 ---
 tags:
-  - type/permanent/index
+  - type/permanent
+  - attr/concept
   - topic/math
   - status/evergreen
 ---

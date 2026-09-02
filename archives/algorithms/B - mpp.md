@@ -3,6 +3,7 @@ tags:
   - type/lit
   - topic/learning
   - status/archive
+source: https://atcoder.jp/contests/abc447/tasks/abc447_b
 ---
 [B - mpp](https://atcoder.jp/contests/abc447/tasks/abc447_b)
 ## Text
