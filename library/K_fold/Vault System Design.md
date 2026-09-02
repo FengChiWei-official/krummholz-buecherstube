@@ -14,7 +14,7 @@ The system in one line: **the folder tree stores state, the links store meaning,
 
 Three layers, three jobs:
 
-- **Human** = content. Own voice, own words. Nothing here substitutes for that.
+- **Human** = content. Own voice, own words. Nothing here substitutes for that. Terminal output: `zzz_output/` — finished works linking library viewpoints; the main tree `Root.md` → `Raw Index of Root` → topic indexes gives the network a default spanning tree (主树).
 - **Obsidian** = medium. Backlinks, unresolved-link pane, tag search, graph — the association engine.
 - **omp (AI)** = structure and discipline. Checks, triage, link discovery, filing mechanics. Never the voice.
 
@@ -48,6 +48,7 @@ Retrieval rule: **when writing a new note, link it to at least one existing note
 Physical = zones/folds (unchanged; they encode state). Algorithmic = the recurring procedures that keep the physical layer honest:
 
 - `python3 tools/vault.py check` — invariants: root drained, lit notes have real `source:`, tag vocabulary, wikilink integrity, orphans (informational).
+- `python3 tools/vault.py status` — session-entry state machine: composes git + check + triage into one report with next moves; the human entry point.
 - `python3 tools/vault.py triage` — placement debt: root files, stalled promotions, stale in-progress (mtime heuristic — prompt, not verdict), untagged notes, dead checked todo references.
 - `python3 tools/vault.py promote NAME` — the graduation ceremony: mailbox → library, validates status/tags, files by letter fold (`0_fold` for digit-leading, `中_fold` for CJK), refuses `type/lit`.
 - Todo tree (`a_sticker/todos/Index of Todos.md`) — work debt.
@@ -62,7 +63,7 @@ The corrected loop:
 3. **Todo-hook** — unfinished work gets a `- [ ] [[NAME]]` entry.
 4. **Triage** — batched, cool (`python3 tools/vault.py triage`).
 5. **Promote** — when stable (`python3 tools/vault.py promote NAME`).
-6. **Check** — before commit (`python3 tools/vault.py check`).
+6. **Check** — before commit (`python3 tools/vault.py check`); session entry via `status`.
 
 Filing moves from per-note hot decision to batched cool decision — that is why it becomes sustainable.
 

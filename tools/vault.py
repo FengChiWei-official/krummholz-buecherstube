@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Vault operating procedures: invariant check, placement triage, promotion.
+"""Vault operating procedures: invariant check, placement triage, promotion,
+session-entry status.
 
 Usage:
     python3 tools/vault.py check
     python3 tools/vault.py triage
+    python3 tools/vault.py status
     python3 tools/vault.py promote NAME [--dry-run] [--force]
 
 Stdlib only. Vault root = parent of tools/. Works from any cwd.
@@ -11,9 +13,11 @@ Stdlib only. Vault root = parent of tools/. Works from any cwd.
 
 import argparse
 import re
+import subprocess
 import sys
 import time
 from pathlib import Path
+
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -484,17 +488,20 @@ def report(title: str, findings: list) -> bool:
 # ---------------------------------------------------------------- check
 
 
-def cmd_check(args) -> int:
+def _collect_check():
+    """Gather all check findings. Shared by `check` and `status`.
+
+    Returns an ordered list of (title, findings, hard): hard sections count
+    toward check's PROBLEMS total; informational ones never do.
+    """
     notes = sorted(iter_notes())
     texts = {p: p.read_text(encoding="utf-8", errors="replace") for p in notes}
     basenames = {p.stem for p in notes}
     basenames |= {p.stem for p in (ROOT / "zzz_output").rglob("*.md")}
-    problems = 0
 
     # 1. root drained
-    root_files = [p for p in ROOT.glob("*.md") if p.name not in ROOT_ALLOWED]
-    problems += report("Root drained",
-                        [f"{p.name}: file me (root is the entry queue)" for p in root_files])
+    root_findings = [f"{p.name}: file me (root is the entry queue)"
+                     for p in ROOT.glob("*.md") if p.name not in ROOT_ALLOWED]
 
     # 2. lit notes carry a real source
     # template/lit-temp.md keeps `source:` empty by design (AGENTS.md rule 4).
@@ -514,9 +521,6 @@ def cmd_check(args) -> int:
                     lit_baseline.append(entry)
                 else:
                     lit_findings.append(entry)
-    problems += report("Lit notes have real source", lit_findings)
-    report("Lit without source — informational (2026-09 baseline; owner sign-off pending)",
-           lit_baseline)
 
     # 3. tag vocabulary
     tag_findings = []
@@ -529,7 +533,6 @@ def cmd_check(args) -> int:
                 tag_findings.append(f"{p.relative_to(ROOT)}: invalid tag '{tag}'")
             elif tag == "todo" and not str(p).startswith(str(ROOT / "a_sticker/todos")):
                 tag_findings.append(f"{p.relative_to(ROOT)}: bare 'todo' tag outside a_sticker/todos/")
-    problems += report("Tag vocabulary", tag_findings)
 
     # 4. wikilink integrity
     unresolved_findings = []
@@ -541,8 +544,6 @@ def cmd_check(args) -> int:
                 continue
             unresolved_findings.append(
                 f"{p.relative_to(ROOT)}:{line_no}: unresolved [[{target}]]")
-    problems += report("Wikilink integrity (NEW unresolved only; whitelist = known placeholders)",
-                        unresolved_findings)
 
     # 5. orphans (zero inbound AND zero outbound)
     outbound = {}
@@ -564,9 +565,27 @@ def cmd_check(args) -> int:
             continue
         if not outbound[p] and not inbound.get(p.stem):
             orphan_findings.append(f"{rel}: no inbound and no outbound wikilinks")
-    report("Orphans — informational (invisible-to-association risk; link them when touched)",
-           orphan_findings)
 
+    return [
+        ("Root drained", root_findings, True),
+        ("Lit notes have real source", lit_findings, True),
+        ("Lit without source — informational (2026-09 baseline; owner sign-off pending)",
+         lit_baseline, False),
+        ("Tag vocabulary", tag_findings, True),
+        ("Wikilink integrity (NEW unresolved only; whitelist = known placeholders)",
+         unresolved_findings, True),
+        ("Orphans — informational (invisible-to-association risk; link them when touched)",
+         orphan_findings, False),
+    ]
+
+
+def cmd_check(args) -> int:
+    problems = 0
+    for title, findings, hard in _collect_check():
+        if hard:
+            problems += report(title, findings)
+        else:
+            report(title, findings)
     print("CLEAN — all invariants hold" if problems == 0 else f"PROBLEMS: {problems}")
     return 1 if problems else 0
 
@@ -574,21 +593,22 @@ def cmd_check(args) -> int:
 # ---------------------------------------------------------------- triage
 
 
-def cmd_triage(args) -> int:
+def _collect_triage():
+    """Gather placement-debt findings per category. Shared by `triage` and `status`."""
     now = time.time()
     notes = sorted(iter_notes())
-    print("# mtime heuristic — treat as prompt, not verdict\n")
+    findings = {"root": [], "promote": [], "stale": [], "untagged": [], "dead_todo": []}
 
     # 1. root files beyond allowed set
     for p in sorted(ROOT.glob("*.md")):
         if p.name not in ROOT_ALLOWED:
-            print(f"file me: {p.name} (root is the entry queue)")
+            findings["root"].append(f"file me: {p.name} (root is the entry queue)")
 
     # 2. mailbox evergreen = stalled promotions
     for p in sorted((ROOT / "mailbox").glob("*.md")):
         fm = parse_frontmatter(p.read_text(encoding="utf-8", errors="replace"))
         if "status/evergreen" in get_tags(fm):
-            print(f"promote candidate: {p.stem}")
+            findings["promote"].append(f"promote candidate: {p.stem}")
     for p in notes:
         rel = str(p.relative_to(ROOT))
         if not rel.startswith("library/"):
@@ -597,7 +617,7 @@ def cmd_triage(args) -> int:
         if "status/in-progress" in get_tags(fm):
             age_days = (now - p.stat().st_mtime) / 86400
             if age_days > 90:
-                print(f"stale in-progress: {rel} ({int(age_days)} days old)")
+                findings["stale"].append(f"stale in-progress: {rel} ({int(age_days)} days old)")
 
     # 4. untagged notes (no type/* tag). By design untagged: root infra files,
     # todo notes (bare `todo` tag), templates.
@@ -609,7 +629,7 @@ def cmd_triage(args) -> int:
             continue
         fm = parse_frontmatter(p.read_text(encoding="utf-8", errors="replace"))
         if not any(t.startswith("type/") for t in get_tags(fm)):
-            print(f"untagged: {rel_path}")
+            findings["untagged"].append(f"untagged: {rel_path}")
 
     # 5. dead todo links
     basenames = {p.stem for p in notes}
@@ -623,8 +643,107 @@ def cmd_triage(args) -> int:
             # unchecked items are future-note hooks (vault doctrine) — fine;
             # a checked item pointing at a missing note is dead.
             if "- [x]" in lines[line_no - 1]:
-                print(f"dead todo reference: {p.name}:{line_no}: [[{target}]]")
+                findings["dead_todo"].append(
+                    f"dead todo reference: {p.name}:{line_no}: [[{target}]]")
 
+    return findings
+
+
+def cmd_triage(args) -> int:
+    findings = _collect_triage()
+    print("# mtime heuristic — treat as prompt, not verdict\n")
+    for category in ("root", "promote", "stale", "untagged", "dead_todo"):
+        for line in findings[category]:
+            print(line)
+    return 0
+
+
+# ---------------------------------------------------------------- status
+
+
+def _git_porcelain():
+    """git status --porcelain lines, or None when git/repo is unavailable."""
+    try:
+        proc = subprocess.run(["git", "-C", str(ROOT), "status", "--porcelain"],
+                               capture_output=True, text=True, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if proc.returncode != 0:
+        return None
+    return [ln for ln in proc.stdout.splitlines() if ln.strip()]
+
+
+def cmd_status(args) -> int:
+    """Session-entry state report: git + check + triage + next moves.
+
+    Read-only, always exits 0. This IS the entry state machine: repo state,
+    not memory, decides what is possible.
+    """
+    print("# vault status — session entry report (read-only)\n")
+
+    # (a) git state
+    porcelain = _git_porcelain()
+    print("## git")
+    if porcelain is None:
+        print("git: unavailable")
+    elif not porcelain:
+        print("clean")
+    else:
+        untracked = sum(1 for ln in porcelain if ln.startswith("??"))
+        print(f"{len(porcelain)} entries ({untracked} untracked)")
+        for ln in porcelain:
+            print(f"  {ln.strip()}")
+
+    # (b) check sections, summary only
+    print("\n## check (summary)")
+    for title, findings, hard in _collect_check():
+        state = "OK" if not findings else f"{len(findings)} findings"
+        if not hard and findings:
+            state += " (informational)"
+        print(f"- {title}: {state}")
+
+    # (c) triage key findings, counts only
+    triage = _collect_triage()
+    print("\n## triage (counts)")
+    print(f"- root files: {len(triage['root'])}")
+    print(f"- promote candidates (mailbox evergreen): {len(triage['promote'])}")
+    print(f"- stale in-progress (> 90 days): {len(triage['stale'])}")
+    print(f"- untagged: {len(triage['untagged'])}")
+    print(f"- dead todo references: {len(triage['dead_todo'])}")
+
+    # (d) uncommitted zzz_output changes — git-state only, content never read
+    zzz_changes = [ln.strip() for ln in (porcelain or []) if "zzz_output/" in ln]
+    print("\n## zzz_output (owner's terminal output — git-state only)")
+    if zzz_changes:
+        print(f"unpublished-output changes: {len(zzz_changes)} files")
+        for ln in zzz_changes:
+            print(f"  {ln}")
+    else:
+        print("no uncommitted changes")
+
+    # next moves — fixed decision table, plain ifs
+    print("\n## next moves")
+    moves = []
+    if porcelain:
+        moves.append("commit or tidy first (run `python3 tools/vault.py status` after)")
+    if triage["root"]:
+        moves.append("file me: run triage, decide zone, move")
+    if triage["promote"]:
+        moves.append(f"promote candidates: {len(triage['promote'])} — "
+                     "run `python3 tools/vault.py promote NAME --dry-run`")
+    if triage["stale"]:
+        moves.append(f"{len(triage['stale'])} notes idle > 90 days — review or archive")
+    if triage["untagged"]:
+        moves.append(f"untagged: {len(triage['untagged'])} — tidy: "
+                     "run `python3 tools/vault.py triage`, add `type/*` tags")
+    if zzz_changes:
+        moves.append(f"unpublished-output changes: {len(zzz_changes)} files — "
+                     "finish/publish via Spec §S4")
+    if not moves:
+        moves.append("vault clean — new capture, idea polish (Spec §S1), "
+                     "or ingestion (Spec §S3) are available")
+    for i, move in enumerate(moves, 1):
+        print(f"{i}. {move}")
     return 0
 
 
@@ -713,6 +832,7 @@ def main() -> int:
 
     sub.add_parser("check", help="invariant report (read-only)")
     sub.add_parser("triage", help="placement-debt report (read-only)")
+    sub.add_parser("status", help="session-entry state report: git + check + triage + next moves (read-only)")
 
     p_promote = sub.add_parser("promote", help="move mailbox -> library with graduation rules")
     p_promote.add_argument("name", help="note name (mailbox/ prefix and .md optional)")
@@ -725,6 +845,8 @@ def main() -> int:
         return cmd_check(args)
     if args.command == "triage":
         return cmd_triage(args)
+    if args.command == "status":
+        return cmd_status(args)
     return cmd_promote(args)
 
 

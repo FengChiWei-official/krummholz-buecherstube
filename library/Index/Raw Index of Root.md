@@ -8,7 +8,6 @@ tags:
 
 ## Definition
 
-## Definition
 
 ## Core Concepts
 

@@ -67,6 +67,7 @@ Criteria (all three, defaults not gates):
 1. The topic's index/Links notes are `status/evergreen`.
 2. ≥5 stable notes in the cluster.
 3. Owner can state the thesis in one sentence without rereading. If not, the cluster isn't ripe — the failure mode is writing output to *understand*, which produces re-digested textbooks instead of own voice.
+Output mount: back-link the new output from `Raw Index of Root` (or the closest topic `Index of`) so the main tree reaches it; outputs are the terminal state of the S3→S4 pipeline.
 
 Flow:
 
@@ -96,7 +97,20 @@ Tags are not maintained continuously — three moments only:
 2. At S2 review (omp checks attr correctness).
 3. Tag taxonomy changes (rare, like the views→links migration): omp runs a vault-wide grep-rewrite as a planned change (exhaustive rename plan, link updates, verification), never ad hoc.
 
-Tag-wrangler plugin handles renames inside Obsidian interactively; `vault.py check` is the batch truth.
+
+## S7 入口状态机 (Session-entry state machine)
+
+Trigger: owner opens a session unsure what to do ("我有一个新东西" / "现在能干什么" / "上次没整理").
+
+Flow:
+
+1. omp runs `python3 tools/vault.py status` — repo state, not memory, is the source.
+2. omp reports state plainly (dirty tree, root strays, stalled promotions, idle notes, unpublished outputs).
+3. omp presents the status next-moves as numbered options, each with a one-line plan (e.g. "① 先整理:运行 triage 归档 N 篇 root 笔记,再提交;② 新想法可在主树 X 分支挂载,相关笔记:A、B、C").
+4. Owner picks; omp executes per the matching scenario S1–S6.
+
+AI boundary: options and plans only — state and actions are facts from tools; omp never invents state.
+
 
 ## Quick Cards
 
@@ -133,8 +147,9 @@ Tag-wrangler plugin handles renames inside Obsidian interactively; `vault.py che
 2. omp: 组装 reading list (index + backlinks)。
 3. Owner: 自己写 output (`zzz_output/`)。
 4. omp: 验证链接,把 output 反向挂进 Index。
-5. 打 `status/evergreen`。
-6. 新综合点 → AI 建议 extraction points,owner 写成新卡。
+5. 反向挂载:把 output 挂进 `Raw Index of Root` 或最近的 topic Index(主树可达)。
+6. 打 `status/evergreen`。
+7. 新综合点 → AI 建议 extraction points,owner 写成新卡。
 
 ### 卡片 S5 — 快存挂 todo
 
@@ -151,6 +166,14 @@ Tag-wrangler plugin handles renames inside Obsidian interactively; `vault.py che
 3. 分类变化时: omp 做计划性 grep-rewrite (改计划→改链接→验证),绝不 ad hoc。
 4. Obsidian 内交互改名用 tag-wrangler 插件。
 5. 批量真相以 `python3 tools/vault.py check` 为准。
+
+### 卡片 S7 — 入口
+
+1. omp: run `python3 tools/vault.py status`。
+2. omp: 报告仓库状态(脏树/root 积压/待 promote/闲置笔记/未发布 output)。
+3. omp: 给出编号选项+每项一句计划。
+4. Owner 选择 → 按 S1–S6 执行。
+5. 状态以工具输出为准,不凭记忆。
 
 ---
 ## **Related**

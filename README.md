@@ -14,7 +14,7 @@ This vault is a modified Zettelkasten. It is organized by **state**, not by a fo
 - `library/Index/` — cross-topic Index notes (`Index of ...`). Topic-local indexes may stay beside their topic in the letter folds.
 - `library/Links/` — Links notes: one concept from multiple angles — isomorphisms, cross-topic connections.
 - `library/<A–Z>_fold/` — stable cards, sharded by first letter.
-- `zzz_output/` — finished personal output, the vault's showcase. The `zzz_` prefix keeps it last in the sidebar.
+- `zzz_output/` — the vault's terminal output: finished own-voice works (essays, summaries, proposals, poems) that link viewpoints from `library/` — the proof of having learned. `Root.md` in it is the default tree entry (主树) into the knowledge network. The `zzz_` prefix keeps it last in the sidebar.
 - `a_sticker/` — scratch: `todos/` task lists (`Index of Todos.md` is the todo-tree registry), `or/` AI-conversation captures, `new_terms/` vocab staging.
 - `template/` — card scaffolds: `concept/method/principle/technique/map/links/lit-temp.md`.
 
@@ -23,6 +23,7 @@ This vault is a modified Zettelkasten. It is organized by **state**, not by a fo
 - `python3 tools/vault.py check` — invariant report (root drained, lit sources, tag vocabulary, wikilink integrity, orphans). Run before committing structural changes.
 - `python3 tools/vault.py triage` — placement-debt report (root files, stalled promotions, stale in-progress, untagged notes, dead todo references).
 - `python3 tools/vault.py promote NAME` — graduate a mailbox note into library (validates status and tags; `--dry-run` prints the plan).
+- `python3 tools/vault.py status` — session-entry state report (git + invariants + placement debt + next moves). Run this first in any session.
 
 
 ## Index vs Links
@@ -52,6 +53,8 @@ This vault is a modified Zettelkasten. It is organized by **state**, not by a fo
 4. Add links to nearby notes.
 5. Promote it only when the wording and meaning are stable.
 6. For human↔AI collaboration scenarios (idea polishing, review, ingestion, output, todo, tags), follow [Collaboration Workflow Spec](library/K_fold/Collaboration%20Workflow%20Spec.md).
+7. When a cluster is truly learned, publish to `zzz_output/` and link it into the main tree via the criteria in the Collaboration Workflow Spec (§S4).
+8. Unsure what to do at any point? Run `python3 tools/vault.py status` (or ask the AI to) — it reports state and options.
 
 ## Where a Note Belongs
 

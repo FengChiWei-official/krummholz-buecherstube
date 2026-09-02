@@ -16,7 +16,7 @@ Read this first, then the source-of-truth files it points to. Do not improvise d
 2. **Zones by state:** drafts → `mailbox/`, stable own-voice knowledge → `library/`, external/copied material → `archives/`. Root is the entry queue: new captures land there (Obsidian default) and are drained by `triage`; only `README.md`, `AGENTS.md`, `VAULT_CLEANUP_FIX_PLAN.md` stay permanently.
 3. **Doctrine:** Index note = big-topic navigation (`Index of ...`, tag `attr/map`, cross-topic ones in `library/Index/`). Links note = single-concept multi-angle interpretation (tag `attr/links`, stable ones in `library/Links/`). There is no "Map"/"View" vocabulary anymore.
 4. **Templates** live in `template/`. New lit notes carry a real `source:` — never leave `source:` empty except in `template/lit-temp.md`.
-5. **Don't touch** `zzz_output/` (owner's finished work) or `.obsidian/`.
+5. **Don't touch** `zzz_output/` contents (owner's finished work) or `.obsidian/`. `zzz_output/` links and git-state may be checked/diagnosed; content is never drafted or edited by AI. `zzz_output/Root.md` is the main-tree entry (主树): tree entry `Root.md` → `Raw Index of Root` → topic indexes.
 6. One note, one idea. Prefer short definitions; link instead of inlining.
 7. No commits or pushes unless the owner asks. Deletions and renames need the owner's sign-off.
 8. Run `python3 tools/vault.py check` before committing structural changes; before any rename/move, `grep -rn '\[\[Old Name'` first. Skill `vault-ops` at `.agent/skills/vault-ops/SKILL.md` has full procedures.

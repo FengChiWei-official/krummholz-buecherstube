@@ -19,16 +19,32 @@ Read in this order before acting:
 
 These five files are the truth. This skill restates them operationally.
 
+## Session entry (state machine)
+
+At the start of every session — cold or warm — run `python3 tools/vault.py status`. Report the state to the owner in plain language, then present the next-moves options from its output with a short plan per option. The owner decides; you execute. Never skip this: repo state, not memory, decides what is possible.
+
+### Cold start
+
+A fresh clone/pull is fully operational: all procedures live in this skill, all tools in `tools/`, all doctrine in the four source-of-truth notes. No state outside git. First session on a new machine: run `status`, then normal session entry. Note: `.obsidian/` (plugin config, incl. tag-wrangler) is gitignored — Obsidian-side conveniences are per-machine; all agent-side behavior is repo-contained.
+
+If the owner opens with a new item ('我有一个新东西'), fold S1 into the options: tidy first if state requires, then sharpening questions + main-tree mount proposal per Spec §S7/S1.
+
 ## Hard mechanics
 
 - Wikilinks resolve by **note name, not path**. Renaming requires updating every `[[Old Name]]` inbound link — grep `[[Old` first.
 - Root is the entry queue (Obsidian default landing). Allowed root files: `README.md`, `AGENTS.md`, `VAULT_CLEANUP_FIX_PLAN.md`. Everything else gets filed.
 - Tags are a closed set: `type/{permanent,lit}`, `status/{in-progress,evergreen,archive}`, `attr/{map,links,principle,concept,technique,method}`, plus bare `todo` on todo notes only.
 - Lit notes need a real `source:` — never leave it empty (except `template/lit-temp.md`).
-- Never touch `zzz_output/` (owner's finished work) or `.obsidian/`.
+- Never touch `zzz_output/` contents (owner's finished work) or `.obsidian/`. `zzz_output/` links and git-state may be checked/diagnosed (`vault.py status` reports them); content is never drafted or edited by AI.
 - Never write own-voice body content for the owner — skeleton, questions, checks, and link-proposals only; AI-generated prose belongs in `a_sticker/or/` for the owner to digest.
 
 ## Common problems → exact procedures
+
+### Session start / unsure what to do
+
+1. `python3 tools/vault.py status`
+2. Report state + present next-moves as options per §Session entry.
+3. Execute the owner's choice per Spec §S1–S6.
 
 ### New note in root
 
@@ -88,3 +104,4 @@ Scenario-by-scenario protocols live in `library/K_fold/Collaboration Workflow Sp
 | S4 output timing | topic cluster feels mature | assemble reading list; owner writes output; omp checks links + backlink | Spec §S4 |
 | S5 todo fast-save | session interrupted | insert `- [ ] [[NAME]]` + continuation note into owning todo | Spec §S5 |
 | S6 tag maintenance | promotion / review / taxonomy change | validate at promote, check at review, planned grep-rewrite on taxonomy change | Spec §S6 |
+| S7 session entry | owner unsure what to do / opens with a new thing | run `python3 tools/vault.py status`, report state, present numbered next-move options; owner picks, omp executes per S1–S6 | Spec §S7 |
