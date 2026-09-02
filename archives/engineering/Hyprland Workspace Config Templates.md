@@ -3,7 +3,7 @@ tags:
   - type/lit
   - topic/learning
   - status/archive
-  - attr/views
+  - attr/links
 source: Workspace practice
 ---
 

@@ -2,7 +2,7 @@
 tags:
   - type/permanent
   - topic/learning
-  - attr/views
+  - attr/links
   - status/in-progress
 ---
 ## Tree Mental Models
@@ -22,4 +22,4 @@ tags:
 ---
 ## **Related**
 
-[[View of Haskell's Properties]]
+[[Links of Haskell's Properties]]

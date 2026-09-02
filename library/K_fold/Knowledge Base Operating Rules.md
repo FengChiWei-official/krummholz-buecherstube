@@ -16,18 +16,20 @@ This vault works by separating state, not by forcing everything into a folder tr
 - [[library]] stores your own stable synthesis: reusable ideas, principles, definitions, and methods.
 - [[archives]] stores external material or historical records that are kept for reference but are not part of your current understanding.
 
-## Map vs View
+## Index vs Links
 
-- A map note organizes where to find related notes.
-- A view note organizes how to understand one topic from multiple angles.
-- Map solves navigation; view solves interpretation.
+- An Index note organizes where to find related notes: big-topic architecture and navigation.
+- A Links note organizes how to understand one concept from multiple angles.
+- Index solves navigation; Links solves interpretation.
+- Map == Index — one word: Index.
 
-## Where to Store Map and View
+## Where to Store Index and Links Notes
 
-- Large cross-topic maps should be placed in [[library/_index_]].
-- Topic maps can be placed next to their topic notes in [[library]].
-- In-progress maps or views can stay in [[mailbox]] until stable.
-- Stable maps and views should be promoted to [[library]].
+- Large cross-topic Index notes should be placed in [[library/Index]].
+- Topic-local Index notes can be placed next to their topic notes in [[library]].
+- Prefer `Index of ...` naming for Index notes.
+- In-progress Index or Links notes can stay in [[mailbox]] until stable.
+- Stable Links notes should be promoted to [[library/Links]].
 
 ## When to Write a Card
 
@@ -45,7 +47,7 @@ If a note is still exploratory, keep it in [[mailbox]]. If it is already your ow
 - One card, one central idea.
 - Prefer short, explicit definitions over long narratives.
 - Add links for parent concepts, sibling concepts, and application scenes.
-- Use a map note (MOC) when a topic becomes large enough that direct browsing is no longer enough.
+- Use an Index note (MOC) when a topic becomes large enough that direct browsing is no longer enough.
 
 ## How to Promote a Note
 
@@ -68,6 +70,6 @@ Keep it in [[mailbox]] when it still contains TODOs, experiments, debugging, or 
 
 ## Related
 
-- [[View of General Coding Thoughts]]
+- [[Links of General Coding Thoughts]]
 - [[middle-layer-thoughts]]
 - [[standardizing-units]]

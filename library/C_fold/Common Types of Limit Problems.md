@@ -2,7 +2,7 @@
 tags:
   - type/permanent
   - topic/learning
-  - attr/views
+  - attr/links
   - status/in-progress
 ---
 
@@ -12,8 +12,8 @@ tags:
 
 ## Perspectives
 
-[[View of Solving Limitation of Function]]
-[[View of Solving Limit of Sequence]]
+[[Links of Solving Limitation of Function]]
+[[Links of Solving Limit of Sequence]]
 
 
 ## Distinctions

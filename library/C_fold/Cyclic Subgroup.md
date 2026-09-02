@@ -24,4 +24,4 @@ $$
 $\mathbf{A^{\prime}}$ is a [[Cyclic Subgroup]],
 
 ## View
-[[View of Cyclic Subgroup or Group]]
+[[Links of Cyclic Subgroup or Group]]

@@ -14,4 +14,4 @@ aliases:
 ---
 ## **Related**
 
-[[View of Monotonicity in Transformations]]
+[[Links of Monotonicity in Transformations]]

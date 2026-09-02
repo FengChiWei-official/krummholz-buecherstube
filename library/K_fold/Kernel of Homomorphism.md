@@ -11,7 +11,7 @@ $$
 $$
 
 ## instance 
-[[Null Space]] of [[Linear Agebra]]
+[[Null Space]] of [[Linear Algebra]]
 
 ## theorem
 [[Theorem on kernel of Homomorphism]]

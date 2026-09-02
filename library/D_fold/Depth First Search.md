@@ -19,7 +19,7 @@ This page is an index that explains two distinct usages of DFS and links to the 
 ### Implement / Further reading
 - [[DFS Implement Principle]]
 - [[DFS Template]]
-- [[View of Visited]]
+- [[Links of Visited]]
 - [[Types of BFS & DFS]]
 
 ### Examples (linked to the appropriate canonical note)

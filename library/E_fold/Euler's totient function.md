@@ -35,7 +35,7 @@ $$
 $$
 
 ## property
-1. [[Mutiplicative function]]
+1. [[Multiplicative function]]
 ---
 ## **related**：
 [[Code implement of Euler's totient function]]

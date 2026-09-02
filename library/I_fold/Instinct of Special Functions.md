@@ -2,7 +2,7 @@
 tags:
   - type/permanent
   - topic/learning
-  - attr/views
+  - attr/links
   - status/in-progress
 ---
 
@@ -17,7 +17,7 @@ about ratio
 about 根式
 [[Rational Function that is 1 to 1]]
 
-[[mailbox/trivial-trigonometry/Trigonometric Functions]]
+[[Trigonometric Functions]]
 
 $f(x) = x^a sin(\frac{1}{x})$
 

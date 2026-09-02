@@ -17,9 +17,9 @@ Translations will be appended here as they are created.
 
 ## Translated Notes (check when reviewed)
 
-- [ ] [[mailbox/trivial-analysis/Rational Function that is 1 to 1]]
-- [ ] [[Lagecy View of Algorithm]]
-- [ ] [[mailbox/algo/Pre-condition Check]]
-- [ ] [[mailbox/trivial-data-structure/Map of Concepts of Data]]
-- [ ] [[Raw Map of Tricks in Math]]
+- [ ] [[Rational Function that is 1 to 1]]
+- [ ] [[Legacy View of Algorithm]]
+- [ ] [[Pre-condition Check]]
+- [ ] [[Index of Concepts of Data]]
+- [ ] [[Raw Index of Tricks in Math]]
 

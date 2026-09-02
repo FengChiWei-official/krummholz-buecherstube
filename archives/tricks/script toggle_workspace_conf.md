@@ -3,7 +3,6 @@ tags:
   - type/lit
   - topic/learning
   - status/archive
-source: 《卡片盒笔记法》 by Sönke Ahrens
 ---
 > [!note]
 > You should create `~/.config/hypr/scripts/custom/to_headless.sh`, with

@@ -2,7 +2,7 @@
 tags:
   - type/permanent
   - topic/learning
-  - attr/views
+  - attr/links
   - status/evergreen
 ---
 

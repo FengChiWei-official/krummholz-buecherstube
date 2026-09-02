@@ -1,13 +1,41 @@
-# Knowledge Base README
+# Knowledge Base
 
-This vault is organized by state, not by a deep folder tree.
+This vault is a modified Zettelkasten. It is organized by **state**, not by a folder tree: atomic cards, explicit links, and your own voice over collected material.
 
 ## Core Zones
 
-- `mailbox/`: work in progress, temporary reasoning, experiments, drafts, and notes that still need shaping.
-- `library/`: stable personal knowledge, reusable ideas, principles, definitions, methods, and indexes.
-- `archives/`: external sources, copied materials, references, and historical records.
-- Root folder: a temporary landing area for notes that are not yet placed cleanly. It should be kept small and gradually drained into `mailbox/`, `library/`, or `archives/`.
+- `mailbox/` — work in progress: drafts, experiments, notes still being shaped.
+- `library/` — stable knowledge in your own voice: reusable ideas, principles, definitions, methods, indexes.
+- `archives/` — external material kept for reference: quotations, transcripts, copied sources.
+- Root — a temporary landing area. Keep it small; drain it into the three zones above.
+
+## Support Dirs
+
+- `library/Index/` — cross-topic Index notes (`Index of ...`). Topic-local indexes may stay beside their topic in the letter folds.
+- `library/Links/` — Links notes: one concept from multiple angles — isomorphisms, cross-topic connections.
+- `library/<A–Z>_fold/` — stable cards, sharded by first letter.
+- `zzz_output/` — finished personal output, the vault's showcase. The `zzz_` prefix keeps it last in the sidebar.
+- `a_sticker/` — scratch: `todos/` task lists, `or/` AI-conversation captures, `new_terms/` vocab staging.
+- `template/` — card scaffolds: `concept/method/principle/technique/map/links/lit-temp.md`.
+
+## Index vs Links
+
+- An **Index note** is big-topic architecture: it tells you *where things live*.
+- A **Links note** is single-concept synthesis: it tells you *how to understand* something from multiple angles.
+- Index solves navigation. Links solves interpretation.
+- Map == Index — one word: Index.
+
+### Index Notes
+
+- Tag `attr/map`; name them `Index of ...`.
+- Cross-topic indexes live in `library/Index/`; topic-local ones live beside their topic.
+- In-progress indexes stay in `mailbox/` until stable.
+
+### Links Notes
+
+- Tag `attr/links`.
+- Write one when a concept needs multiple perspectives, examples, or distinctions.
+- Shape them in `mailbox/`; promote to `library/Links/` when mature.
 
 ## How to Use the Vault
 
@@ -19,93 +47,48 @@ This vault is organized by state, not by a deep folder tree.
 
 ## Where a Note Belongs
 
-Use `archives/` when:
-- the note is copied from a source;
-- the note is mainly a quotation, transcript, or external reference;
-- you are not yet rewriting it into your own understanding.
+- `archives/` — copied from a source, mainly quotation or reference, not yet rewritten in your own words.
+- `mailbox/` — still exploratory: TODOs, rough proofs, unstable structure you expect to change.
+- `library/` — your own voice, reusable across contexts, stable enough to serve as a reference card.
 
-Use `mailbox/` when:
-- the idea is still being explored;
-- the note contains TODOs, rough proofs, experiments, or unstable wording;
-- you expect the structure to change soon.
+Root files should not stay unmanaged. Move a root file into `mailbox/`, `library/`, or `archives/` by the rules above — or convert it into an Index note if it guides navigation.
 
-Use `library/` when:
-- the note is in your own voice;
-- the meaning is reusable across contexts;
-- the structure is stable enough to act as a reference card.
+### Working in mailbox/
 
-## Map and View Notes
+- Rewrite rough notes into clearer cards; split large notes into smaller ones.
+- Add missing links.
+- Keep `status/in-progress` while refining.
 
-- A map note tells you where related notes live.
-- A view note shows one topic from multiple angles.
-- Map solves navigation.
-- View solves interpretation.
+### Working in library/
 
-### Map Notes
-
-- Use `attr/map`.
-- Prefer names like `Index of ...` for topic maps.
-- Put cross-topic maps in `library/_index_/`.
-- Put topic-local maps next to the topic they organize.
-
-### View Notes
-
-- Use `attr/views`.
-- Use them when a topic needs multiple perspectives, examples, or distinctions.
-- Keep them in `mailbox/` until the content is stable.
-- Move them to `library/` once the explanation is mature.
-
-## Folder Conventions
-
-### Root Folder
-
-Root files should not stay unmanaged.
-If a file is still in the root folder, do one of these:
-- move it into `mailbox/` if it is still being worked on;
-- move it into `library/` if it is stable;
-- move it into `archives/` if it is external material;
-- convert it into a map note if it is meant to guide navigation.
-
-### mailbox/
-
-Use mailbox as the active staging area.
-Typical actions:
-- rewrite rough notes into clearer cards;
-- split large notes into smaller cards;
-- add missing links;
-- mark the note as `status/in-progress` while it is being refined.
-
-### library/
-
-Use library as the stable knowledge layer.
-Typical actions:
-- keep one note focused on one idea;
-- prefer explicit definitions and direct links;
-- use indexes to organize broad topics;
-- promote notes out of mailbox only when they are ready.
+- One note, one idea.
+- Prefer short, explicit definitions over narratives.
+- Use Index notes to organize broad topics.
+- Promote out of mailbox only what is ready.
 
 ## Recommended Tags
 
-- `type/permanent` for stable personal notes.
-- `type/lit` for source material.
-- `status/in-progress` for drafts and working notes, if the note is still being shaped.
-- `status/evergreen` for stable references and finished synthesis.
-- `status/archive` for imported material.
-- `attr/map` for navigation notes.
-- `attr/views` for multi-angle explanation notes.
-- `attr/principle` and `attr/concept` for ordinary knowledge cards.
+- `type/permanent` — stable personal notes.
+- `type/lit` — source material. **A lit note MUST carry a real `source:`.**
+- `status/in-progress` — drafts and notes still being shaped.
+- `status/evergreen` — stable references, finished synthesis.
+- `status/archive` — imported material.
+- `attr/map` — navigation notes.
+- `attr/links` — multi-angle explanation notes.
+- `attr/principle`, `attr/concept` — ordinary knowledge cards.
+- `attr/technique`, `attr/method` — hands-on technique and method cards.
 
 ## Promotion Rule
 
-A note can move from `mailbox/` to `library/` when:
+A note moves from `mailbox/` to `library/` when:
+
 - its meaning is stable;
-- it can be reused in more than one context;
+- it is reusable in more than one context;
 - the wording is clean and short;
 - it no longer depends on temporary debugging or active drafting.
 
 ## Related Files
 
-- [Knowledge Base Operating Rules](library/trivial-thoughts/Knowledge%20Base%20Operating%20Rules.md)
-- [Library Consolidation Work Log](mailbox/Library%20Consolidation%20Work%20Log.md)
-- [AGENTS](AGENTS.md)
-- [View of General Coding Thoughts](library/trivial-thoughts/View%20of%20General%20Coding%20Thoughts.md)
+- [Knowledge Base Operating Rules](library/K_fold/Knowledge%20Base%20Operating%20Rules.md)
+- [Links of General Coding Thoughts](library/Links/Links%20of%20General%20Coding%20Thoughts.md)
+- [Index of Knowledge](library/Index/Index%20of%20Knowledge.md)

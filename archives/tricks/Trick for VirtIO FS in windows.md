@@ -3,12 +3,11 @@ tags:
   - type/lit
   - topic/learning
   - status/archive
-source: 《卡片盒笔记法》 by Sönke Ahrens
 ---
 
 ## Steps
 1. install `Virtio Driver` in `device manager`.（）
-2. install `WinFsp` ([[trick install Win Fsp|Guidence]])
+2. install `WinFsp` ([[Trick install Win Fsp|Guidence]])
 
 ## find
 

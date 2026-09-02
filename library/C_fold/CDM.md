@@ -24,4 +24,4 @@ aliases:
 
 ---
 ## **related**：
-it is an elegent usage of [[Linear Agebra]].
+it is an elegent usage of [[Linear Algebra]].

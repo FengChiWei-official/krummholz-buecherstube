@@ -4,8 +4,6 @@ tags:
   - status/in-progress
   - topic/learning
   - attr/concept
-aliases:
-  - ADT
 ---
 
 ## Definition

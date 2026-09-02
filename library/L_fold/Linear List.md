@@ -23,4 +23,4 @@ Sequential version: [[Sequential List]]
 Linked version: [[Linked List]]
 
 ### Views 
-[[View How to choice the Implement of Linear List]]
+[[Links of How to Choose the Implementation of Linear List]]

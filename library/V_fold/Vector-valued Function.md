@@ -12,7 +12,7 @@ aliases:
 $f : \mathbb{R} \to \mathbb{R}^n, n\in \mathbb{N}^+$ 
 
 ## View
-[[View of Vector-valued Function]]
+[[Links of Vector-valued Function]]
 
 ---
 ## **Related**

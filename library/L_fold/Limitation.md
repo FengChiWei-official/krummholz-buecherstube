@@ -14,8 +14,8 @@ $\lim_{x \to a} \lim_{x \to a} f(x) = \lim_{x \to a} f(x) = A$
 
 ## Solution
 
-[[library/trivial-algebra/View of Solving Limitation of Function]]
-[[View of Continuity]]
+[[Links of Solving Limitation of Function]]
+[[Links of Continuity]]
 
 ---
 ## **Related**

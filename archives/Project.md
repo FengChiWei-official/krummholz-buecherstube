@@ -3,7 +3,6 @@ tags:
   - type/lit
   - topic/learning
   - status/archive
-source: 《卡片盒笔记法》 by Sönke Ahrens
 aliases:
   - Projecting
 ---
@@ -36,7 +35,7 @@ aliases:
 > _A functional, structural extension_
 > 
 
-> [[Project v.s. Protrude v.s. Stand out]]
+> [[Project vs. Protrude vs. Stand out]]
 
 ---
 

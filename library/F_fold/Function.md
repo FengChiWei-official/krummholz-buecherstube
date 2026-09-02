@@ -12,7 +12,7 @@ tags:
 
 ## For [[Composition]]
 
-[[View of All Important Function in Composition]]
+[[Links of All Important Function in Composition]]
 
 ## Representation
 

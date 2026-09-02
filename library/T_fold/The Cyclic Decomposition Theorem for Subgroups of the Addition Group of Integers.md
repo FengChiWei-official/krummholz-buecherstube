@@ -5,7 +5,7 @@ tags:
   - topic/learning
   - status/in-progress
 aliases:
-  - Addtive Subgroup of Integers is In shape of Za
+  - Additive Subgroup of Integers is In shape of Za
 ---
 
 ## conclusion

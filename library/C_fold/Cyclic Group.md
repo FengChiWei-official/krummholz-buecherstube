@@ -18,4 +18,4 @@ $$
 $$
 
 ## View
-[[View of Cyclic Subgroup or Group]]
+[[Links of Cyclic Subgroup or Group]]

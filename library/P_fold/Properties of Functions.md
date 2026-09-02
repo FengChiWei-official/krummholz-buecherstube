@@ -17,7 +17,7 @@ tags:
 
 
 ## View 
-[[Views of Function Properties]]
+[[Links of Function Properties]]
 
 [[Differentiability]] implies [[Continuity]].
 [[Integrability]] implies [[Boundedness]].

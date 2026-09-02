@@ -8,7 +8,7 @@ tags:
 
 ## Definition
 
-[[Map of my Presets]]
+[[Index of my Presets]]
 
 ---
 ## **Related**

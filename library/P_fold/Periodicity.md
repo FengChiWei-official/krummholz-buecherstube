@@ -13,4 +13,4 @@ aliases:
 ---
 ## **Related**
 
-[[View of Periodicity in Transformations]]
+[[Links of Periodicity in Transformations]]

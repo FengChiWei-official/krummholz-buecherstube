@@ -10,7 +10,7 @@ tags:
 
 [[Term Plethora versus Aplenty]]
 
-[[View of Haskell's Properties]]
+[[Links of Haskell's Properties]]
 [[Abstract Data Type in Programming Language|ADTs]]
 
 

@@ -1,2 +1,2 @@
 
-[[Map of Concepts of Data]]
+[[Index of Concepts of Data]]

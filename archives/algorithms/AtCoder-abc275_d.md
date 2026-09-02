@@ -3,7 +3,6 @@ tags:
   - type/lit
   - topic/learning
   - status/archive
-source: 《卡片盒笔记法》 by Sönke Ahrens
 ---
 [AtCoder-abc275_d](https://vjudge.net/problem/AtCoder-abc275_d/origin)
 ## Text

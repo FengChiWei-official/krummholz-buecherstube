@@ -12,7 +12,7 @@ tags:
 [[01 Knapsack DP]]
 
 ## Views
-[[View of Knapsack DP]]
+[[Links of Knapsack DP]]
 
 ---
 ## **Related**：

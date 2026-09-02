@@ -3,7 +3,6 @@ tags:
   - type/lit
   - topic/learning
   - status/archive
-source: 《卡片盒笔记法》 by Sönke Ahrens
 ---
 
 ## Topic: [[Boundedness]] of $f(x) = \frac{x}{1+x^2}$

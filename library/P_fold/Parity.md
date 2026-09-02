@@ -14,4 +14,4 @@ aliases:
 ## **Related**
 
 
-[[View of Parity in Transformations]]
+[[Links of Parity in Transformations]]

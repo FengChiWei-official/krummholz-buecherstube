@@ -15,4 +15,4 @@ tags:
 [[Learning Haskell]]
 
 [[Functional Programming Language]]
-[[View of Haskell's Properties]]
+[[Links of Haskell's Properties]]

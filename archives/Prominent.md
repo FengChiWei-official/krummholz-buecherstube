@@ -3,7 +3,6 @@ tags:
   - type/lit
   - topic/learning
   - status/archive
-source: 《卡片盒笔记法》 by Sönke Ahrens
 ---
 
 ## Text
@@ -15,7 +14,7 @@ source: 《卡片盒笔记法》 by Sönke Ahrens
 
 **standing out**.
 1. **physically standing out**: 
-	1. projecting, protruding or standing out from its surroundings. --- [[Project v.s. Protrude v.s. Stand out|Ref]]
+	1. projecting, protruding or standing out from its surroundings. --- [[Project vs. Protrude vs. Stand out|Ref]]
 2. - **Importance or status:** Particularly noticeable, widely known, important, or famous (e.g., “a prominent politician” or “a prominent feature of the landscape”).
 #### 2. Synonyms
 *   **For physical prominence:** Conspicuous, noticeable, salient, protruding, obtrusive, striking.

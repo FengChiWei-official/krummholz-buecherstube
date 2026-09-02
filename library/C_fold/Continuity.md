@@ -8,7 +8,7 @@ tags:
 
 ## Definition
 
-[[View of Continuity]]
+[[Links of Continuity]]
 
 ---
 ## **Related**

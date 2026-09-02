@@ -19,7 +19,7 @@ A special kind of [[ADT Graph|Graph]].
 
 [[Binary Tree]]
 
-[[View Properties of Trees]]
+[[Links of Properties of Trees]]
 
 [[Edgings Point of Trees]]
 

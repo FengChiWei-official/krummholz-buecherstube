@@ -3,7 +3,6 @@ tags:
   - type/lit
   - topic/learning
   - status/archive
-source: 《卡片盒笔记法》 by Sönke Ahrens
 ---
 [B - mpp](https://atcoder.jp/contests/abc447/tasks/abc447_b)
 ## Text

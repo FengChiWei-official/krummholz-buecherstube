@@ -15,4 +15,4 @@ $$ \text{im } \phi = \{ x \in G^{\prime} \mid x= \phi(a) \text{ for some a in G 
 [[Domain of Definition]]
 
 ## instance
-[[Column Space]] of [[Linear Agebra]]
+[[Column Space]] of [[Linear Algebra]]

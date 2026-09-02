@@ -12,7 +12,7 @@ aliases:
 
 ## Identities
 
-[[View of Inverse Trigonometric Identity]]
+[[Links of Inverse Trigonometric Identity]]
 
 ## Definition Zone
 [[Instance of Move Inverse Trigonometric Functions]]

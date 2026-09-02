@@ -14,7 +14,7 @@ tags:
 	- Every element `a` of Group `G` has an [[Inverse]].
 
 ## Its View
-[[View of Group]]
+[[Links of Group]]
 ## Common 
 - [[Additive Group of Integers]]
 

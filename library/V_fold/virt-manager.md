@@ -20,9 +20,9 @@ tags:
 
 ## Add windows virtual machine
 
-[[Tip-Install Windows via Libvirt]]
+[[Trick Install Windows via Libvirt]]
 
 ---
 ## **Related**：
 [[Libvirt]]
-[[Tip fix can not open virt-manager]]
+[[Trick fix can not open virt-manager]]

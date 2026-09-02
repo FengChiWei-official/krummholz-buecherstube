@@ -2,14 +2,14 @@
 tags:
   - type/permanent
   - topic/learning
-  - attr/views
+  - attr/links
   - status/in-progress
 ---
 
 ## Definition
 
 [[Algorithm Decision Tree]]
-[[Lagecy View of Algorithm]]
+[[Legacy View of Algorithm]]
 ## Normal Forms
 
 [[C++ algorithm start up]]
@@ -44,7 +44,7 @@ tags:
 [[AC Automaton]]
 ## tricks
 
-[[View of Bit Manipulation]]
+[[Links of Bit Manipulation]]
 [[Integer scaling]] :: [[Floating-point precision issues]]
 [[Hex to bin]]
 [[Trie Tree]]
