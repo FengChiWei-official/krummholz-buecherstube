@@ -15,8 +15,9 @@ Read in this order before acting:
 2. `README.md`
 3. `library/K_fold/Knowledge Base Operating Rules.md`
 4. `library/K_fold/Vault System Design.md`
+5. `library/K_fold/Collaboration Workflow Spec.md`
 
-These four files are the truth. This skill restates them operationally.
+These five files are the truth. This skill restates them operationally.
 
 ## Hard mechanics
 
