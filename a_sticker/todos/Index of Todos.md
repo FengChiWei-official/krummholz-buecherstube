@@ -17,6 +17,8 @@ tags:
 - [ ] [[translate todo]]
 - [ ] [[Hobby todo]]
 - [ ] [[Life todo]]
+- [ ] [[考研 Todo]]
+- [ ] [[x86 Assembly Todo]]
 
 ## Key Methods
 
