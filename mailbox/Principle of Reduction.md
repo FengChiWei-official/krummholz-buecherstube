@@ -14,7 +14,7 @@ aliases:
 
 ## Exemples
 
-[[]]
+[[D23 Reducing into Known Froms]]
 
 
 ---

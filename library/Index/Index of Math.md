@@ -23,3 +23,5 @@ tags:
 
 ---
 ## **Related**
+
+[[Index of Probability]] — the full probability cluster (linked from there)

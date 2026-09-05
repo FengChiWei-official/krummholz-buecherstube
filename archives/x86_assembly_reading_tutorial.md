@@ -1,3 +1,11 @@
+---
+tags:
+  - type/permanent
+  - status/evergreen
+  - topic/cs
+  - attr/technique
+---
+
 # x86 汇编阅读理解教程 (考试/应试方向)
 
 ## 目标
