@@ -19,6 +19,11 @@ tags:
 - [ ] [[Life todo]]
 - [ ] [[考研 Todo]]
 - [ ] [[x86 Assembly Todo]]
+- [ ] [[Haskell Todo]]
+- [ ] [[Animation Todo]]
+- [ ] [[Games Todo]]
+- [ ] [[Hyprland(ml4w) Config todo]]
+- [ ] [[算法思想]]
 
 ## Key Methods
 

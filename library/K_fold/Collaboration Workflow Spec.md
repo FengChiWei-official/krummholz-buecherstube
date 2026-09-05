@@ -83,7 +83,7 @@ Trigger: 会话被打断 / 快速保存,不丢线索。
 Flow:
 
 1. Quick-save = just leave the note where it is (root ok — it's the entry queue).
-2. omp inserts `- [ ] [[NAME]]` + a 5–10 word continuation note (e.g. `- [ ] [[NAME]] — 补完和 X 的对比`) into the owning topic todo; no owning todo exists → ask the owner: create a new topic todo per S3, or hook into any existing todo's Applications section. (`Index of Todos.md` only registers topic todos — it has no per-note inbox.)
+2. omp inserts `- [ ] [[NAME]]` + a 5–10 word continuation note (e.g. `- [ ] [[NAME]] — 补完和 X 的对比`) into the owning topic todo. The owning todo is resolved **dynamically from the note's topic/name — no owner round-trip**: (a) a matching topic todo exists → hook there; (b) none fits → create `a_sticker/todos/<Topic> Todo.md` from `template/Todo Template.md`, register `- [ ] [[<Topic> Todo]]` in `Index of Todos.md` Core Concepts, then hook. (`Index of Todos.md` registers topic todos; it has no per-note inbox.)
 3. Commit message pattern `wip: NAME — what remains` (owner or omp writes it; omp may commit only when owner asks).
 4. Future resume = open the todo; the `[[NAME]]` backlink + continuation note gives the exact re-entry point. No archaeology.
 
@@ -111,7 +111,7 @@ Flow:
 
 AI boundary: options and plans only — state and actions are facts from tools; omp never invents state. Additional rules:
 
-- Dirty tree / untracked files = likely half-done work: cross-check against the todo tree before proposing anything; unhooked notes go to the owner for attribution.
+- Dirty tree / untracked files = likely half-done work: cross-check against the todo tree before proposing anything; unhooked in-progress notes are todo-hooked directly per S5 dynamic attribution (zone ambiguity still goes to the owner).
 - A note with no state signal (no tags/links/todo hook) cannot be attributed by doctrine — **ask the owner**, never guess.
 - Tool findings are signals, not verdicts: a "promote candidate" (evergreen tag only) may be an empty stub — content wins over the signal; report the contradiction, don't force the action.
 - Execution stance adapts to the agent's actual capability: a read-only agent stays in "report + options" mode by design; write-capable omp executes only after the owner picks.
@@ -161,7 +161,7 @@ AI boundary: options and plans only — state and actions are facts from tools; 
 
 1. 笔记原地不动 (root ok)。
 2. omp: 在所属 topic todo 插入 `- [ ] [[NAME]] — 续写说明 (5–10 词)`。
-3. 无所属 todo → 问 owner:按 S3 新建,或挂进任一现有 todo 的 Applications(`Index of Todos.md` 只登记 topic todo,无逐条 inbox)。
+3. 无所属 todo → omp 按主题/名称动态定:有匹配则挂,无则按模板新建 `<Topic> Todo.md`、登记进 `Index of Todos.md`,再插入挂钩;不问 owner。
 4. Commit: `wip: NAME — what remains` (omp 仅在 owner 要求时提交)。
 5. 恢复: 打开 todo,backlink + 续写说明即重入点。
 
