@@ -12,6 +12,7 @@ tags:
 
 [[Individual Psychology]]
 [[我的底座]]
+[[]]
 ## Key Methods
 
 ## Applications

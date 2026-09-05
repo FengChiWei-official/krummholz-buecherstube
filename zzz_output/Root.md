@@ -8,7 +8,18 @@ tags:
 
 ## Definition
 
-[[Raw Index of Root]]
+All uncertainty shall fall with [[Raw Index]].
+
+## List 
+
+[[Raw Index]]
+
+--- 
+
+Todos: technologically uncertainties. -- [[Index of Todos]]
+Knowledge:  [[Index of Knowledge]]
+
+Hobbies:  [[Index of Hobbies]]
 
 ---
 ## **Related**

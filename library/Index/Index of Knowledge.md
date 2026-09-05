@@ -7,7 +7,7 @@ tags:
 ---
 
 ## Definition
-[[Raw Index of Root]]
+[[Raw Index]]
 ## Core Concepts
 
 [[Index of Programming Language]] 
@@ -18,6 +18,8 @@ tags:
 
 [[Index of 汉语言学]]
 [[Index of 文学]]
+
+[[Raw Vocabularies Sheet]]
 
 ---
 [[Index of Relationship]]
@@ -30,4 +32,4 @@ tags:
 ---
 ## **Related**
 
-[[Raw Index of Root]]
+[[Raw Index]]
