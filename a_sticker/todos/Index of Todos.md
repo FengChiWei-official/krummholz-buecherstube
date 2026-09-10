@@ -24,6 +24,7 @@ tags:
 - [ ] [[Games Todo]]
 - [ ] [[Hyprland(ml4w) Config todo]]
 - [ ] [[算法思想]]
+- [ ] [[System Todo]]
 
 ## Key Methods
 

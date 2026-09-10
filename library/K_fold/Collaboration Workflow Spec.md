@@ -40,7 +40,7 @@ Flow:
 1. Owner: "check X" (or omp runs after any writing session).
 2. omp runs `python3 tools/vault.py check`.
 3. omp reads the note and reports: tag correctness (closed set; is `attr/*` right for the content?), missing `source:` if lit, frontmatter shape vs the `template/` counterpart.
-4. **Link discovery**: omp greps title-adjacent terms vault-wide and proposes 3–8 concrete new links with file:line — owner approves, omp inserts. Links change meaning, human approves; structure fixes omp applies directly.
+4. **Link discovery**: omp greps title-adjacent terms vault-wide and proposes 3–8 concrete new links with file:line — owner approves, omp inserts. Each proposed link carries a one-line link context (why connect). Links change meaning, human approves; structure fixes omp applies directly.
 5. omp moves the note root→mailbox if still in root (mechanical, allowed).
 6. If `status/evergreen` and in mailbox → suggest `promote --dry-run`.
 
@@ -134,7 +134,7 @@ AI boundary: options and plans only — state and actions are facts from tools; 
 1. Owner: "check X"。
 2. omp: run `python3 tools/vault.py check`。
 3. omp: 报告 tag/source/frontmatter 问题。
-4. omp: 提出 3–8 个新链接 (file:line)。
+4. omp: 提出 3–8 个新链接 (file:line + 一句 why)。
 5. Owner 批准 → omp 插入;结构问题 omp 直接修。
 6. evergreen 在 mailbox → suggest `promote --dry-run`。
 

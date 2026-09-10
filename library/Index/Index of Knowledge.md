@@ -7,7 +7,7 @@ tags:
 ---
 
 ## Definition
-[[Raw Index]]
+[[Raw Index of Everything]]
 ## Core Concepts
 
 [[Index of Programming Language]] 
@@ -32,4 +32,4 @@ tags:
 ---
 ## **Related**
 
-[[Raw Index]]
+[[Raw Index of Everything]]

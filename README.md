@@ -1,6 +1,14 @@
 # Knowledge Base
 
 This vault is a modified Zettelkasten. It is organized by **state**, not by a folder tree: atomic cards, explicit links, and your own voice over collected material.
+> 核心:人只做两件事——用自己的话写下一个思想,并当场把它链进旧网(写一句为什么)。其余全是机器的事。系统的唯一验收标准:检索时能否回报惊奇。
+
+## 最小记忆集
+
+1. 写笔记 = 从 `template/` 选模板建卡(frontmatter 自动合规,不用记 tag)。
+2. 当场链至少一个旧笔记,写一句为什么(链接在捕获时发生,不在归档时)。
+3. 不会操作或中断 = 问 AI(`python3 tools/vault.py status`)或挂 todo。其余规则永远不用记。
+
 
 ## Core Zones
 
