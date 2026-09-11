@@ -12,7 +12,7 @@ tags:
 
 [[Individual Psychology]]
 [[我的底座]]
-[[]]
+[[思考的诱因-考研]]
 ## Key Methods
 
 ## Applications

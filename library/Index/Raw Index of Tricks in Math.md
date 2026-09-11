@@ -27,7 +27,7 @@ pattern based: [[Index of Math Expressions Pattern]]
 [[Raw Index for Integral Toolkits]]
 [[Raw Index of Sequence Toolkits]]
 [[Raw Index of Series Toolkits]]
-
+[[Raw Index of Inequality Toolkits]]
 ### Focused Ones
 
 [[Partial Sum Sequence Toolkit]]
@@ -36,6 +36,7 @@ pattern based: [[Index of Math Expressions Pattern]]
 
 [[Logarithmic Function Toolkit]]
 [[Function Patterns Reduction Toolkits]]
+[[Absolute Function Toolkits]]
 ## Strategy
 
 [[Raw Index of Mathematical Heuristics]]

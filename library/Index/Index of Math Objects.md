@@ -10,7 +10,9 @@ tags:
 
 ## Core Concepts
 
-[[Object-Type Detaction for Computation of Limitation]]
+[[Object -- Identify the form of the limit]]
+[[Object -- Determine continuity and discontinuity]]
+[[Object -- Investigate the microscopic behavior of the function as x tends to some point]]
 
 ---
 ## **Related**

@@ -14,6 +14,8 @@ tags:
 [[Trigonometric Substitution]]
 [[Rational Substitution]] 
 
+倒代换 无穷小<-无穷大
+
 ## Key Methods
 
 ## Applications

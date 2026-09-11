@@ -32,3 +32,4 @@ tags:
 5. Conclusion:  
     Since $\frac{1}{|f(x)|} \ge 2$, it follows that $|f(x)| \le \frac{1}{2}$.  
     The range of the function is $[-\frac{1}{2}, \frac{1}{2}]$, thus it is bounded.
+
