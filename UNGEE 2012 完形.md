@@ -108,6 +108,78 @@ plead 辩护 请求
 
 这里的结构是倒装的 O pleads S
 
+
+### Text II
+
+Provoke justified outrage.
+激起正当的愤怒。
+provoke 激起某些情感
+justified 正当的
+
+reneging on a longstanding commitment.
+renege on 背弃
+
+to abide by 遵守
+
+regulation 规章 条例
+
+Instead, the company has done precisely what it had long promised it would not: challenge the constitutionality of Vermon's rules in the federal court, as part of a desperate effort to keep its xxx nuclear power plant running. It's a stunning move.
+
+相反，这家公司做出了它长期以来信誓旦旦保证绝不会做的事：在联邦法院对佛蒙特州规章的合宪性提出挑战——这是为了让其 xxx 核电站继续运转而做出的垂死挣扎。这实在是一个令人震惊的举动。
+
+**challenge the constitutionality of...**
+挑战……的合宪性。
+
+**as part of a desperate effort to...**
+- **字面意思**：作为……的绝望努力的一部分。
+- **解析**：desperate effort 常用来形容走投无路、孤注一掷或垂死挣扎的举动。to
+
+stunning 在这里是“令人震惊的”、“让人大跌眼镜的”意思。
+
+The state went a step further, requiring that any extension of the plant's license be subject to the Vermont legislature 's approval.
+
+Legislature 立法机关
+
+**live by** 约等于 abide by 遵守
+
+**raise serious questions about...**
+**字面意思**：对……引发了严重的质疑/问题。
+**解析**：raise questions 是一个常用搭配，意为“引发疑问”、“敲响警钟”。加上 serious（严重的），表明情况令人担忧。
+
+Congress
+1. The Senate 参议院 来自元老院
+2. senator 参议员
+3. The House of Representative 众议院
+4. Representative 参议员
+
+
+**Enraged by Entergy's behavior**
+**被安特吉公司的行为激怒** / **因安特吉公司的所作所为而愤怒**
+Enrage 是动词原形（意为“激怒”）
+
+The legal issues in the case are obscure: whereas the SC has ruled that the states do have some regulatory authority over nuclear power, legal scholars say the Vermont case will offer a precedent-setting test of how far those powers extend.
+
+**regulatory authority over ...**
+- **字面意思**：对……的监管权限/权力。
+
+**a precedent-setting test**
+- **字面意思**：一个具有开创先例意义的测试 / 考验。
+
+1. **seem to have concluded that...**
+- **字面意思**：似乎已经得出结论认为…… / 似乎已经断定……。
+- **解析**：conclude 在这里是“断定、得出结论”的意思，用 seem to have... 表示作者根据该公司的实际行动做出的推测。
+
+But there should be consequences.
+**但是，（这样做）必须承担后果。** / **然而，必须得有代价。**
+
+1. **Pledging to run ... safely**
+- **字面意思**：承诺安全地运营……
+- **解析**：pledge 是动词/名词，意为“发誓、承诺、保证”。Pledging ... 在这里作伴随状语，讽刺该公司一边在口头上向公众承诺安全，一边却在背地里干出违背协议的事。
+
+As the NRC reviews the company’s application, it should keep in mind what promises from Entergy are worth.
+
+**当核管理委员会（NRC）审核该公司的申请时，它应当牢记安特吉公司的承诺究竟值多少分文（即：安特吉公司的承诺根本一文不值）。**
+
 ---
 
 ## Thoughts
