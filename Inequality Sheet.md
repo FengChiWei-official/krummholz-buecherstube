@@ -17,6 +17,7 @@ tags:
 [[Absolute Inequality]]
 [[Trigonometric Inequality]]
 [[Reversed Trigonometric Inequality]]
+[[Logarithmic Inequality]]
 
 
 ---

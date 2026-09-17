@@ -17,5 +17,7 @@ $\ln(1+\frac{1}{n}) = \ln (n+1) - \ln n = -\ln (\frac{n}{n+1})$
 
 [[Graphs of  Functions]] 
 
+[[Logarithmic Inequality]]
+
 ---
 ## **Related**

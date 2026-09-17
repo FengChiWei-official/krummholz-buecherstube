@@ -16,6 +16,10 @@ tags:
 
 [[Graphs of  Functions]]
 
+[[Standard Limits]]
+
+[[Equivalent Infinitesimals]]
+
 ## Perspectives
 
 ## Distinctions

@@ -8,9 +8,12 @@ tags:
 
 ## Definition
 
+[[Inequality Sheet]]
+
 [[Boundedness]]
 [[AM-GM Inequality]]
 [[Trigonometric Inequality]]
+[[Logarithmic Inequality]]
 
 [[Absolute Function]]
 
