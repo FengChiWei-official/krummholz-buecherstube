@@ -8,18 +8,18 @@ tags:
 
 ## Definition
 
-手段指针表。求解品味、路线顺序与各类技巧的正文在 [[Index of Limit Strategy]];本页只登记卡。
+A pointer table of means. The body — solving taste, route order, and the techniques — lives in [[Index of Limit Strategy]]; this page registers cards only.
 
 ## Core Concepts
 
 ### [[Object -- Identify the form of the limit]]
 
-#### 通用手段
+#### General Means
 
 [[Standard Limits]]
 [[L'Hospital Rule]]
 
-#### 特殊技巧
+#### Special Techniques
 
 [[Denominator Normalization]] --> [[Radical Normalization]] --> [[Radical Normalization for Limit]]
 [[Simplification Rational Limit]]

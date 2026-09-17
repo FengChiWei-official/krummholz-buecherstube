@@ -7,39 +7,39 @@ tags:
 ---
 
 ## Definition
+
 Limit Strategy organizes solving routes by trigger: rational structure, substitution form, squeeze condition, and exponential conversion.
 
-## 求解品味
+## Solving Taste
 
-### 路线顺序
+### Route Order
 
-1. 先化成可以理解/分析的未定式+普通极限
-2. 简单分式 先看条件，然后用等价无穷小/重要极限。Reduce into [[Standard Limits]]
-3. 不能适用，先考虑简单的主部提取
-4. 再次洛必达， 或者是变限积分。[[L'Hospital Rule]] simple fractions to even simpler ones.
+1. First turn the expression into an indeterminate form plus an ordinary limit that can be understood and analyzed.
+2. Simple fractions: check the condition first, then use equivalent infinitesimals / the notable limits. Reduce into [[Standard Limits]].
+3. If neither applies, first try the simple dominant-part extraction.
+4. Then L'Hospital's rule, or variable-limit integrals. [[L'Hospital Rule]] turns simple fractions into even simpler ones.
 
-### 按结构分支
+### Branches by Structure
 
-如果有差分或者复合，简单的可以使用taylor（不同类相减）或者mvt（同类相减），太复杂就要落回主部提取化成主部（相对关系-1）
+- **Difference or composition**: when it is simple, use Taylor (subtracting terms of different types) or MVT (subtracting terms of the same type); when it is too complex, fall back to dominant-part extraction and reduce to the dominant part (relative relation $-1$).
+- **Infinity**: consider reciprocal substitution / dominant-part extraction.
 
-如果有无穷大，考虑倒代换/主部提取
+### When the Squeeze Theorem Applies
 
-### 夹逼准则的使用场景
+1. A constant lower bound is known.
+2. The expression can easily be bounded.
+3. Periodicity.
+4. Boundedness / limit (local boundedness).
+5. Infinite series.
+6. Bounded oscillation.
 
-1. 已知一个常数下界
-2. 可以轻松放缩
-3. 周期性
-4. 有界性/极限（局部有界）
-5. 无穷级数
-6. 有界振荡
+### When You Do Not Know What to Do
 
-### 不知道做什么的时候
-
-1. 把无法理解的部分恒等变化（幂指函数）
-2. 把整体配凑为乘式
-3. 通过技巧把没有手段研究的结构去掉（变限积分）
-4. 性态估计，大致了解整体性质
-5. 主部提取 A-A = A(1 - 1) = A(\frac{A'}{A} -1)
+1. Apply an identity transform to the part you cannot understand (power-exponential functions).
+2. Arrange the whole expression into a product.
+3. Remove, by a technique, the structure you have no means to study (variable-limit integrals).
+4. Estimate the behaviour: get a rough picture of the overall properties.
+5. Dominant-part extraction: $A - A = A(1 - 1) = A\left(\frac{A'}{A} - 1\right)$.
 
 ## Route Selection
 
@@ -51,28 +51,37 @@ Limit Strategy organizes solving routes by trigger: rational structure, substitu
 ## Core Routes
 
 ### Rational Route
+
 [[Rational Limit]]
 [[Simplification Rational Limit]]
 
 ### Radical Route
+
 [[Radical Normalization for Limit]]
+
 ### Exponential Route
+
 [[Power-Exponential Functions Transform]]
 [[Definition-of-E-like Limit]]
 
-### logarithm
+### Logarithmic Route
+
 [[Logarithmic Functions Pattern for Limit]]
+
 ### Bounding Route
+
 [[Monotonic Squeezing]]
 
 ### Overview Route
+
 [[Links of Solving Limit of Function]]
 [[Limit]]
 
-## 特殊技巧
+## Special Techniques
 
 [[Denominator Normalization]] --> [[Radical Normalization]] --> [[Radical Normalization for Limit]]
-有些时候可以显式化无穷小，降低求解难度。 让分母方便进一步变形。
+
+Sometimes you can make the infinitesimals explicit, lowering the difficulty of solving and keeping the denominator convenient for further transformation.
 
 [[Simplification Rational Limit]]
 [[Power-Exponential Functions Transform]]
@@ -81,24 +90,25 @@ Limit Strategy organizes solving routes by trigger: rational structure, substitu
 
 The first trick is [[Equivalent Infinitesimals]].
 
-The second one is [[Focus on the Dominant]], which derives
+The second is [[Focus on the Dominant]], which derives:
 
-Difference of Functions and Compounded Function -> [[Taylor Series]] or [[Mean Value theorem]]
-> [[Principle of Reduction]].
+- difference of functions and composite functions -> [[Taylor Series]] or [[Mean Value theorem]]
+  > [[Principle of Reduction]].
 
-or 
-1. $\alpha = o(\beta) \to (\alpha + \beta) \~ \beta$
+Equivalently:
+
+1. $\alpha = o(\beta) \to (\alpha + \beta) \sim \beta$
 2. $\alpha = o(\beta) \to (\alpha \beta) = o(\beta^2)$
 
 ## Functions defined by integrals
 
-the major goal of it is using [[L'Hospital Rule]].
-However, most of time you should use [[Taylor Series]] to simplizing it first.
+The major goal here is using [[L'Hospital Rule]].
+However, most of the time you should use [[Taylor Series]] to simplify it first.
 
-1. $\int_0^x f(t) dt$ ，其中 $\lim_{t \to 0} f(t) = 0$。
-2. $\int_0^{h(x)} f(t) dt$ ，其中当 $x \to a$ 时， $h(x) \to 0,  h(x) \ne 0$，而被积函数的极限 $f(t) \to A$（是一个非零常数）。
+1. $\int_0^x f(t) dt$ , where $\lim_{t \to 0} f(t) = 0$.
+2. $\int_0^{h(x)} f(t) dt$ , where as $x \to a$ we have $h(x) \to 0$, $h(x) \ne 0$, and the integrand has limit $f(t) \to A$ (a non-zero constant).
 
-都可以看成先用泰勒提取主部，然后用洛必达证明等价。
+Both can be seen as: extract the dominant part with Taylor first, then prove equivalence with L'Hospital's rule.
 
 ## $\lim_n f(x, n)$
 
