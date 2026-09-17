@@ -15,5 +15,5 @@ tags:
 ---
 ## **Related**
 
-[[Limitation]]
+[[Limit]]
 [[Series]]

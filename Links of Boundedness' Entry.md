@@ -15,7 +15,7 @@ tags:
 ### What can you get from [[Boundedness]]
 
 [[Raw Index Function Properties Toolkit]]
-极限存在性 [[Limitation]] -> [[Raw Index of Limitation Solving Toolkits]]
+极限存在性 [[Limit]] -> [[Raw Index of Limit Solving Toolkits]]
 [[Inequality]] -> [[Raw Index of Inequality Toolkits]]
 [[Integrability]]
 
@@ -27,7 +27,7 @@ tags:
 [[Hook Function]]
 [[Raw Index of Inequality Toolkits]]
 
-[[Index of Limitation Properties Toolkits]]
+[[Index of Limit Properties Toolkits]]
 
 
 

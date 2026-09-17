@@ -9,7 +9,7 @@ tags:
 ## Definition
 
 ### Steps
-1. [[Simplification Rational Limitation]]
+1. [[Simplification Rational Limit]]
 2. Select a method
 
 ### Usual Technique

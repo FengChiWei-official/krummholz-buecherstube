@@ -13,4 +13,4 @@ aliases:
 ---
 ## **Related**
 
-[[Radical Normalization for Limitation]]
+[[Radical Normalization for Limit]]

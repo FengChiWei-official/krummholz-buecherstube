@@ -14,7 +14,7 @@ Mechanism $$x+\frac{1}{x} \ge 2$$
 Transforming a **SUM** of reciprocal terms into a **Constant Product**
 It give a **Lower Boundary** of the [[Hook Function]].
 > [!note] 
-> Therefore, It usually don't appear in [[Limitation]] Proof, who's common form is $C \le f(x)$ and a [[Inequality]] given it's upper bound.
+> Therefore, It usually don't appear in [[Limit]] Proof, who's common form is $C \le f(x)$ and a [[Inequality]] given it's upper bound.
 
 ## Variation
 [[Common Variant of Hook Function]]

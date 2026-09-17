@@ -88,11 +88,11 @@ python3 tools/vault.py graph --unwired mailbox  # 只看某范围内没接线的
 
 | 卡片 | 建议插入 | 证据 |
 |---|---|---|
-| `library/L_fold/Limitation.md` | `goal:: [[Index of Limit Strategy]]` | 该 Index §Overview Route 已列它 |
-| `library/R_fold/Rational Limitation.md` 等 6 张路线卡 | `goal:: [[Index of Limit Strategy]]` | `Index of Limit Strategy` §Core Routes 逐一点名 |
-| `library/D_fold/Definition-of-E-like Limitation.md`、`library/P_fold/Power-Exponential Functions Transform.md` | `goal:: [[Index of Limit Strategy]]` + `object:: [[幂指式]]`(对象卡待建,骨架我建) | `Raw Index of Limitation Toolkits`:13 把它当幂指类入口 |
+| `library/L_fold/Limit.md` | `goal:: [[Index of Limit Strategy]]` | 该 Index §Overview Route 已列它 |
+| `library/R_fold/Rational Limit.md` 等 6 张路线卡 | `goal:: [[Index of Limit Strategy]]` | `Index of Limit Strategy` §Core Routes 逐一点名 |
+| `library/D_fold/Definition-of-E-like Limit.md`、`library/P_fold/Power-Exponential Functions Transform.md` | `goal:: [[Index of Limit Strategy]]` + `object:: [[幂指式]]`(对象卡待建,骨架我建) | `Raw Index of Limit Toolkits`:13 把它当幂指类入口 |
 | `library/C_fold/Conjugate.md`、`Conjugate Radicals.md`、`Hyperbolic Conjugate Radical.md` | `object:: [[对偶结构]]`(对象卡待建) | `Raw math idea.md`:12–30、`Index of Identity Transform` §Conjugate |
-| `mailbox/Equivalent Infinitesimals.md`、`Focus on the Dominant.md`、`L'Hospital Rule.md`、`Standard Limits.md`、`Mean Value theorem.md`、`Principle of Reduction.md` | `goal:: [[Index of Limit Strategy]]` | `Raw Index of Limitation Toolkits` §Infinitesimals/§概论 原文逐步点名 |
+| `mailbox/Equivalent Infinitesimals.md`、`Focus on the Dominant.md`、`L'Hospital Rule.md`、`Standard Limits.md`、`Mean Value theorem.md`、`Principle of Reduction.md` | `goal:: [[Index of Limit Strategy]]` | `Raw Index of Limit Toolkits` §Infinitesimals/§概论 原文逐步点名 |
 
 需要你决定的还有一个名字:不等式簇(根目录 12 篇,今天新建)的目标节点叫什么——`Raw Index of Inequality Toolkits` 只列了手段(AM-GM、放缩、单调性、夹逼),目标(证不等式 / 估计上下界 / 证有界)目前无卡。
 
@@ -108,11 +108,11 @@ python3 tools/vault.py graph --unwired mailbox  # 只看某范围内没接线的
 
 | 卡片 | 边 | 证据 |
 |---|---|---|
-| `library/D_fold/Definition-of-E-like Limitation.md` | `goal:: [[Index of Limit Strategy]]` | 该 Index §Exponential Route 已列它 |
+| `library/D_fold/Definition-of-E-like Limit.md` | `goal:: [[Index of Limit Strategy]]` | 该 Index §Exponential Route 已列它 |
 | `library/P_fold/Power-Exponential Functions Transform.md` | `goal:: [[Index of Limit Strategy]]` | 同上 |
 | `library/C_fold/Conjugate.md` | `goal:: [[Index of Identity Transform]]` | 该 Index §Core Patterns → Conjugate |
 
-报告立刻读出:`Index of Limit Strategy` 有 2 means(共同目标的雏形);`Definition-of-E-like Limitation` 报"有 aim 无 object"——**对象轴的空缺被工具自己指出来了**,这正是下一轮要长的东西。
+报告立刻读出:`Index of Limit Strategy` 有 2 means(共同目标的雏形);`Definition-of-E-like Limit` 报"有 aim 无 object"——**对象轴的空缺被工具自己指出来了**,这正是下一轮要长的东西。
 
 **S2 发现(待你定,我没有改)**:`Power-Exponential Functions Transform` 与 `Conjugate` 的 tag 是 `attr/concept`,但内容是"变换/模式"(手段),报告里因此显示为 `[object]`;`Conjugate` 的 Definition 目前也是空的。
 
@@ -128,7 +128,7 @@ bridge:: [[减负式联想学习]] — 复杂度守恒:人省下的结构负担�
 ## Sources
 
 - 实现:`tools/vault.py` 的 graph 段(`iter_typed_edges` / `_alias_map` / `_collect_graph`);模板槽位 `template/*-temp.md`。
-- 抽取来源:`archives/Raw math idea.md`(行号见上表)、`library/Index/Raw Index of Limitation Toolkits.md`、`Index of Limit Strategy.md`、`Index of Identity Transform.md`。
+- 抽取来源:`archives/Raw math idea.md`(行号见上表)、`library/Index/Raw Index of Limit Toolkits.md`、`Index of Limit Strategy.md`、`Index of Identity Transform.md`。
 
 ---
 ## **Related**
@@ -136,7 +136,7 @@ bridge:: [[减负式联想学习]] — 复杂度守恒:人省下的结构负担�
 [[Raw Index of Tricks in Math]]
 [[Index of Math]]
 [[Index of Math Objects]]
-[[Raw Index of Limitation Solving Toolkits]]
+[[Raw Index of Limit Solving Toolkits]]
 [[Raw math idea]]
 [[树的定义与碎片自动聚合-研究]]
 [[减负式联想学习]]

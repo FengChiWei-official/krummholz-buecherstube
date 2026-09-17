@@ -14,4 +14,4 @@ tags:
 ## **Related**
 
 - [ ] [[Radical Normalization]] to delete
-- [ ] [[Radical Normalization for Limitation]]
+- [ ] [[Radical Normalization for Limit]]

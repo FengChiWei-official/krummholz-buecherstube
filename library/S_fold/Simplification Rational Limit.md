@@ -8,7 +8,7 @@ tags:
 
 ## Definition
 
-The goal of `Simplification Rational Limitation` is to turn expressions that are hard to compare, cancel, or substitute
+The goal of `Simplification Rational Limit` is to turn expressions that are hard to compare, cancel, or substitute
 into standard forms that are comparable, cancelable, and directly substitutable through structured rewrites.
 
 ## Core Workflow
@@ -63,7 +63,7 @@ Common identity templates:
 
 ## Related Techniques
 
-- [[Rational Limitation]]
+- [[Rational Limit]]
 - [[Power-Exponential Functions Transform]]
 - [[The Ratio Substitution]]
 - [[Monotonic Squeezing]]

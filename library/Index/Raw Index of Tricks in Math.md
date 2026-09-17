@@ -26,7 +26,7 @@ pattern based: [[Index of Math Expressions Pattern]]
 ### Objects
 
 [[Raw Index Function Toolkits]]
-[[Raw Index of Limitation Solving Toolkits]]
+[[Raw Index of Limit Solving Toolkits]]
 [[Raw Index for Integral Toolkits]]
 [[Raw Index of Sequence Toolkits]]
 [[Raw Index of Series Toolkits]]

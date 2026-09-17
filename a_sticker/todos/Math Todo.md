@@ -4,7 +4,7 @@ tags:
 ---
 
 
-- [x] zhihu problem set of Limitation
+- [x] zhihu problem set of Limit
 - [ ] 基础30讲习题梳理
 - [ ] 常见函数如$f(x) = xe^{-x}$的图像 -> [[]]
 - [ ] 对数求导法

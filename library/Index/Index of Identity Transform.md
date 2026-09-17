@@ -31,7 +31,7 @@ Identity Transform focuses on exact rewrites that preserve equality and create c
 
 ### Exponential-Log Identity
 [[Power-Exponential Functions Transform]]
-[[Definition-of-E-like Limitation]]
+[[Definition-of-E-like Limit]]
 
 ## Typical Order
 

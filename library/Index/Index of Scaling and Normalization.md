@@ -24,8 +24,8 @@ Scaling and Normalization organizes expressions by dominant factor, denominator 
 [[Radical Normalization]]
 
 ### Dominant Factor Extraction
-[[Simplification Rational Limitation]]
-[[Rational Limitation]]
+[[Simplification Rational Limit]]
+[[Rational Limit]]
 
 ### Power-Exponential Normalization
 [[Power-Exponential Functions Transform]]

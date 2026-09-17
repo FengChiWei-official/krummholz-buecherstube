@@ -8,11 +8,11 @@ tags:
 
 ## Definition
 
-[[Limitation]]
+[[Limit]]
 
 ## Perspectives
 
-[[Links of Solving Limitation of Function]]
+[[Links of Solving Limit of Function]]
 [[Links of Solving Limit of Sequence]]
 
 

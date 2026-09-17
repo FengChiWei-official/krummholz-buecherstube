@@ -24,7 +24,7 @@ aliases:
 ## Applications
 
 [[Focus on the Dominant]] 
-> Limitation Only
+> Limit Only
 
 ---
 ## **Related**

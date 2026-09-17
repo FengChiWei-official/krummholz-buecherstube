@@ -8,7 +8,7 @@ tags:
 
 ## Definition
 
-[[Limitation That Defines E]]
+[[Limit That Defines E]]
 $$\lim_{x \to \infty} 1^x$$
 
 ## Mean to Solve

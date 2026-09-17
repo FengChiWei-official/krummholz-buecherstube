@@ -10,10 +10,10 @@ tags:
 
 ### Kinds of [[Points of Discontinuity]]
 We defined the kinds of [[Points of Discontinuity]].
-The [[Discontinuities of the First Kind|Kind 1]] stands for [[One-side Limitation]] exists.
+The [[Discontinuities of the First Kind|Kind 1]] stands for [[One-side Limit]] exists.
 - they are not equal.
 - they are not equal to the point.
-The [[Discontinuities of the Second Kind|kind 2]] stands for [[One-side Limitation]] failed to exist or equals to infinite.
+The [[Discontinuities of the Second Kind|kind 2]] stands for [[One-side Limit]] failed to exist or equals to infinite.
 
 ### Properties
 

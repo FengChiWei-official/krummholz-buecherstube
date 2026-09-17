@@ -11,7 +11,7 @@ tags:
 ## Core Concepts
 
 [[Function]]
-[[Limitation]]
+[[Limit]]
 [[Differential]]
 [[Integration]]
 ## Key Methods

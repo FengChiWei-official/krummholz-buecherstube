@@ -23,4 +23,4 @@ tags:
 ---
 ## **Related**
 
-[[Raw Index of Limitation Solving Toolkits]]
+[[Raw Index of Limit Solving Toolkits]]
