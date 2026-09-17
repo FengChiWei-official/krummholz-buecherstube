@@ -11,28 +11,18 @@ Limit Strategy organizes solving routes by trigger: rational structure, substitu
 
 ## 求解品味
 
-### 概论：不知道做什么的时候
-
-1. 把无法理解的部分恒等变化（幂指函数）
-2. 把整体配凑为乘式
-3. 通过技巧把没有手段研究的结构去掉（变限积分）
-4. 性态估计，大致了解整体性质
-5. 主部提取 A-A = A(1 - 1) = A(\frac{A'}{A} -1)
-
 ### 路线顺序
 
-先化成可以理解/分析的未定式+普通极限
-简单分式 先看条件，然后用等价无穷小/重要极限
-不能适用，先考虑简单的主部提取
-再次洛必达， 或者是变限积分
+1. 先化成可以理解/分析的未定式+普通极限
+2. 简单分式 先看条件，然后用等价无穷小/重要极限。Reduce into [[Standard Limits]]
+3. 不能适用，先考虑简单的主部提取
+4. 再次洛必达， 或者是变限积分。[[L'Hospital Rule]] simple fractions to even simpler ones.
 
-如果有差分或者复合，简单的可以使用taylor（不同类相减）或者mvt（同类相减），
-太复杂就要落回主部提取化成主部（相对关系-1）
+### 按结构分支
+
+如果有差分或者复合，简单的可以使用taylor（不同类相减）或者mvt（同类相减），太复杂就要落回主部提取化成主部（相对关系-1）
 
 如果有无穷大，考虑倒代换/主部提取
-
-Reduce into [[Standard Limits]]
-[[L'Hospital Rule]] simple fractions to even simpler ones.
 
 ### 夹逼准则的使用场景
 
@@ -42,6 +32,14 @@ Reduce into [[Standard Limits]]
 4. 有界性/极限（局部有界）
 5. 无穷级数
 6. 有界振荡
+
+### 不知道做什么的时候
+
+1. 把无法理解的部分恒等变化（幂指函数）
+2. 把整体配凑为乘式
+3. 通过技巧把没有手段研究的结构去掉（变限积分）
+4. 性态估计，大致了解整体性质
+5. 主部提取 A-A = A(1 - 1) = A(\frac{A'}{A} -1)
 
 ## Route Selection
 
