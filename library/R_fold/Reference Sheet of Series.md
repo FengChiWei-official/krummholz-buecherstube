@@ -28,7 +28,7 @@ $\frac{1}{(1+\phi)} = \sum_{k=0}^n \frac{\binom{-1}{n} \phi^k}{k!}  = \sum_{k=0}
 $\frac{1}{(1-\phi)} = \sum_{k=0}^n \frac{\binom{-1}{n} (-\phi)^k}{k!}  = \sum_{k=0}^{n} \phi^k$
 
 $\ln \phi = \sum_{k=1}^{n} \frac{x^k}{k}$
-> `k` begins at `1`
+> `k` begins at `1` !!!
 
 $\arcsin \phi = \phi + \frac{\phi^3}{6} + o(\phi)$
 $\tan \phi = \phi+\frac{\phi^3}{3} +o(\phi^3)$

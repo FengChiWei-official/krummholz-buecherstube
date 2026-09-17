@@ -43,6 +43,7 @@ If a note carries no state signal (no tags, no links, no todo hook) and no rule 
 
 ## Hard mechanics
 
+- Crossrefs are relative: `goal::` (the aim a card serves), `object::` (the shape it acts on), `bridge::` (an isomorphic idea elsewhere). Kind set is closed; targets resolve through note names **and** `aliases:`. Aim nodes need no card — they emerge from inbound `goal::` edges (doctrine detail: `a_sticker/other/Graph of Math - 类型化边方案.md`).
 - Wikilinks resolve by **note name, not path**. Renaming requires updating every `[[Old Name]]` inbound link — grep `[[Old` first.
 - Root is the entry queue (Obsidian default landing). Allowed root files: `README.md`, `AGENTS.md`. Everything else gets filed.
 - Tags are a closed set: `type/{permanent,lit}`, `status/{in-progress,evergreen,archive}`, `attr/{map,links,principle,concept,technique,method}`, plus bare `todo` on todo notes only.
@@ -57,6 +58,15 @@ If a note carries no state signal (no tags, no links, no todo hook) and no rule 
 1. `python3 tools/vault.py status`
 2. Report state + present next-moves as options per §Session entry.
 3. Execute the owner's choice per Spec §S1–S6.
+
+### Growing the graph / wiring a note (math or any topic)
+
+1. `python3 tools/vault.py graph` — aims ← means (thinnest first), objects ← users with their aims, connective holes, dangling names, unwired drafts.
+2. Unwired draft: read it, then ask the owner what aim it serves and what shape it acts on. Owner names it, then insert the edge — one body line `goal:: [[Name]] — why`. Edges change meaning, so the owner approves them.
+3. Holes (aim without object, object without aim, shape no aim reaches) are **proposal material**, not orders: turn each into a question for the owner; never auto-fill.
+4. An aim needs no card. If a synonym already exists, write the existing card's name or one of its `aliases:` — `graph` reports how many edges landed through aliases. Never let two names grow into two nodes for one idea.
+5. One name's neighborhood: `python3 tools/vault.py graph --around <name>` (Chinese aliases work directly).
+6. Index notes are **output, not scaffolding**: grow edges first; write/fill an `Index of ...` when an aim has accumulated means and the owner wants prose navigation. Making this doctrine (Spec §S3) is a proposal in `a_sticker/other/Graph of Math - 类型化边方案.md` §九 — Spec stands unchanged until the owner approves.
 
 ### New note in root
 

@@ -29,3 +29,4 @@ tags:
 - [ ] [[Telescoping Sum Toolkits]] — 收敛裂项工具卡后评估 promote
 - [ ] [[Telescoping Sum]] — 与 Toolkits 互链后评估 promote
 - [ ] [[Sequence]] — 收敛数列工具卡后评估 promote
+- [ ] [[Graph of Math - 类型化边方案]] — 试插 3 张已落地;铺开:不等式簇挂 [[Boundedness]] + 建对象卡

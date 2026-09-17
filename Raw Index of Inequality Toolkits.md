@@ -28,3 +28,5 @@ tags:
 
 ---
 ## **Related**
+
+[[Raw Index of Tricks in Math]] Belongs to.

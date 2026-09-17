@@ -8,6 +8,10 @@ tags:
 
 ## Definition
 
+## Graph
+
+(类型化边,一行一条:`goal:: [[目标]] — why`;kind ∈ goal / object / bridge;聚合见 `python3 tools/vault.py graph`)
+
 ---
 ## **Related**
 

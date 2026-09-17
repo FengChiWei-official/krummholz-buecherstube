@@ -3,14 +3,15 @@ tags:
   - type/permanent
   - status/evergreen
   - topic/learning
-  - attr/technique
-aliases:
-  - 根式规范化
+  - attr/map
 ---
 
 ## Definition
 
+[[Links of Boundedness' Entry]]
+[[]]
+
 ---
 ## **Related**
 
-[[Radical Normalization for Limitation]]
+[[Raw Index of Tricks in Math]]

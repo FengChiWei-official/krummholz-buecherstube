@@ -8,5 +8,7 @@ tags:
 
 ## Definition
 
+1. [[Definition-of-E-like Limitation]]
+
 ---
 ## **Related**

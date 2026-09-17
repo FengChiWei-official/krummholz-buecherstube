@@ -36,5 +36,9 @@ $$
 $A = e^{\frac{k}{3}(\lim \frac{e^x-1}{x} +\lim \frac{e^{2x}-1}{x} +\lim \frac{e^{3x}-1}{x})}$
 > $e^{kx} - 1  =  kx$
 
+## Graph
+
+goal:: [[Index of Limit Strategy]] — Exponential Route 的入口($1^\infty$ 型)
+
 ---
 ## **Related**

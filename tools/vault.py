@@ -6,6 +6,7 @@ Usage:
     python3 tools/vault.py check
     python3 tools/vault.py triage
     python3 tools/vault.py status
+    python3 tools/vault.py graph [--around NAME] [--unwired PATH...]
     python3 tools/vault.py promote NAME [--dry-run] [--force]
 
 Stdlib only. Vault root = parent of tools/. Works from any cwd.
@@ -534,6 +535,7 @@ def _collect_check():
     notes = sorted(texts.keys())
     basenames = {p.stem for p in notes}
     basenames |= {p.stem for p in (ROOT / "zzz_output").rglob("*.md")}
+    basenames |= set(_alias_map(texts))  # Obsidian resolves aliases too
 
     # 1. root drained
     root_findings = [f"{p.name}: file me (root is the entry queue)"
@@ -689,6 +691,7 @@ def _collect_triage():
     # 5. dead todo links
     basenames = {p.stem for p in notes}
     basenames |= {p.stem for p in (ROOT / "zzz_output").rglob("*.md")}
+    basenames |= set(_alias_map(texts))  # a todo pointing at an alias is not dead
     for p in sorted((ROOT / "a_sticker/todos").glob("*.md")):
         text = texts[p]
         lines = text.splitlines()
@@ -716,6 +719,363 @@ def cmd_triage(args) -> int:
     return 0
 
 
+# ---------------------------------------------------------------- graph
+
+# The graph struct. A note is a node; a typed-edge line in its body is an
+# edge. Nothing is scaffolded in advance — studying writes edges, the queried
+# structure falls out. Aim nodes (目标) need no card and no index: they exist
+# as soon as something points at them, so "common goals" are counted, never
+# maintained by hand.
+#
+#   goal::   [[Aim]]        — the aim this card serves                 (目标)
+#   object:: [[Shape]]      — the structure it acts on                 (对象)
+#   bridge:: [[Elsewhere]]  — an isomorphic idea outside the topic     (跨域同构)
+#
+# A card's own role comes from its tag, no extra tag and no new vocabulary:
+#   attr/technique = 技巧 (trick)   attr/method = 手段 (means)
+#   attr/concept   = 对象 (object)  attr/principle = 原理 (mean at the top)
+# Aim-hood is positional, so one card is a means to a higher aim and an aim
+# for other means at the same time. Targets resolve through note names *and*
+# `aliases:`, so the word you reach for while studying lands on the card.
+# (`goal:: x` is also an Obsidian/Dataview inline field, for free.)
+GRAPH_KINDS = ("goal", "object", "bridge")
+MEANS_ROLES = {"trick", "means", "principle"}
+
+_GRAPH_EDGE_RE = re.compile(
+    r"^\s*(?:[-*+]\s+)?(?:\[[ xX]\]\s+)?(?P<kind>[A-Za-z][A-Za-z_-]{1,15})::\s*"
+    r"\[\[(?P<target>[^\]\n|]+)(?:\|[^\]\n]*)?\]\](?P<tail>.*)$")
+
+_ROLE_BY_TAG = (("attr/technique", "trick"), ("attr/method", "means"),
+                ("attr/principle", "principle"), ("attr/concept", "object"),
+                ("attr/links", "links"), ("attr/map", "map"))
+
+
+def _alias_map(texts: dict) -> dict:
+    """{alias: note stem} — Obsidian resolves wikilinks through `aliases:`."""
+    out = {}
+    for p, text in texts.items():
+        aliases = parse_frontmatter(text).get("aliases")
+        if not aliases:
+            continue
+        if isinstance(aliases, str):
+            aliases = [aliases]
+        for name in aliases:
+            name = str(name).strip()
+            if name:
+                out.setdefault(name, p.stem)
+    return out
+
+
+def iter_typed_edges(text: str):
+    """Yield (line_no, kind, target, why) for every typed-edge line.
+
+    Syntax (bullet/checkbox and trailing why optional, kind case-insensitive):
+        - goal:: [[Bound Estimation]] — 要证不等式先要有界
+    Fenced code blocks and inline code spans are skipped, mirroring
+    extract_wikilinks, so documented syntax is not parsed as an edge.
+    `kind` is yielded raw and lowercased so callers can flag typos.
+    """
+    in_fence = False
+    for line_no, raw in enumerate(text.splitlines(), start=1):
+        if re.match(r"^\s*(?:```|~~~)", raw):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        line = re.sub(r"`[^`]*`", "", raw)
+        match = _GRAPH_EDGE_RE.match(line)
+        if not match:
+            continue
+        target = match.group("target").split("#")[0].split("/")[-1].strip()
+        if not target:
+            continue
+        why = match.group("tail").strip().lstrip("-—–:").strip()
+        yield line_no, match.group("kind").lower(), target, why
+
+
+def _card_role(path: Path, texts: dict) -> str:
+    """Role of a card, from its own tags (trick/means/object/...)."""
+    tags = get_tags(parse_frontmatter(texts[path]))
+    for tag, role in _ROLE_BY_TAG:
+        if tag in tags:
+            return role
+    return "note"
+
+
+def _collect_graph(unwired_scope=None):
+    """The graph struct plus its connective holes.
+
+    `unwired_scope` = vault-relative paths/dirs to scan for unreached capture
+    notes (default: root files + mailbox/).
+
+    Returns edges, kind_errors, aims, objects, bridges, aims_of, out_kinds,
+    debt, dangling, unwired, via_alias and the note maps. Read-only, and a
+    signal rather than a verdict — an aim with one means may simply be young.
+    """
+    texts = _load_notes()
+    by_stem = {}
+    for p in sorted(texts):
+        by_stem.setdefault(p.stem, p)
+    aliases = _alias_map(texts)
+
+    edges = []        # (src Path, line_no, kind, node name, why)
+    kind_errors = []  # (src Path, line_no, kind)
+    dangling = {}     # unresolvable target -> first source that needs it
+    via_alias = 0     # edges that landed on a card by one of its aliases
+    for p, text in texts.items():
+        for line_no, kind, target, why in iter_typed_edges(text):
+            if kind not in GRAPH_KINDS:
+                kind_errors.append((p, line_no, kind))
+                continue
+            node = target if target in by_stem else aliases.get(target)
+            if node is None:
+                dangling.setdefault(target, p)
+                node = target
+            elif node != target:
+                via_alias += 1
+            edges.append((p, line_no, kind, node, why))
+
+    out_kinds = {}   # src Path -> {kind}
+    aims = {}        # aim name -> [(src Path, why)]
+    objects = {}     # object name -> [(src Path, why)]
+    aims_of = {}     # src Path -> {aim}
+    bridges = []     # (src Path, target)
+    for src, _line, kind, node, why in edges:
+        out_kinds.setdefault(src, set()).add(kind)
+        if kind == "goal":
+            aims.setdefault(node, []).append((src, why))
+            aims_of.setdefault(src, set()).add(node)
+        elif kind == "object":
+            objects.setdefault(node, []).append((src, why))
+        else:
+            bridges.append((src, node))
+
+    # debt — the graph's connective holes, not a verdict on any single card:
+    # a means naming no aim is unusable, one naming no shape is unfindable,
+    # and a shape no aim reaches is studied but never aimed at.
+    no_aim, no_object = [], []
+    for src in sorted(out_kinds):
+        if _card_role(src, texts) not in MEANS_ROLES:
+            continue
+        if "goal" not in out_kinds[src]:
+            no_aim.append(src)
+        elif "object" not in out_kinds[src]:
+            no_object.append(src)
+    purposeless = sorted(
+        name for name, users in objects.items()
+        if not any(aims_of.get(src) for src, _why in users))
+
+    # unwired: capture-zone notes (root + mailbox by default) the graph misses.
+    inbound_names = set(aims) | set(objects) | {t for _, t in bridges}
+    unwired = []
+    if unwired_scope:
+        scope = []
+        for item in unwired_scope:
+            path = Path(item)
+            path = path if path.is_absolute() else ROOT / path
+            if path.is_dir():
+                scope += [p for p in sorted(path.rglob("*.md"))
+                          if not any(part in SKIP_DIRS for part in p.parts)]
+            elif path.is_file():
+                scope.append(path)
+    else:
+        scope = [p for p in sorted(ROOT.glob("*.md")) if p.name not in ROOT_ALLOWED]
+        scope += sorted((ROOT / "mailbox").glob("*.md"))
+    for p in scope:
+        if p not in texts or p in out_kinds or p.stem in inbound_names:
+            continue
+        unwired.append(p)
+    unwired.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+
+    return {
+        "edges": edges,
+        "kind_errors": kind_errors,
+        "aims": aims,
+        "objects": objects,
+        "bridges": bridges,
+        "aims_of": aims_of,
+        "out_kinds": out_kinds,
+        "debt": (no_aim, no_object, purposeless),
+        "dangling": dangling,
+        "unwired": unwired,
+        "via_alias": via_alias,
+        "texts": texts,
+        "by_stem": by_stem,
+        "aliases": aliases,
+    }
+
+
+def _plural(count: int, word: str, plural: str = "") -> str:
+    """`1 note` / `2 notes` — report text reads as English either way."""
+    if count == 1:
+        return f"{count} {word}"
+    return f"{count} {plural or word + 's'}"
+
+
+def _graph_counts(g) -> dict:
+    counts = {"goal": 0, "object": 0, "bridge": 0}
+    for _src, _line, kind, _target, _why in g["edges"]:
+        counts[kind] += 1
+    counts["notes"] = len({src for src, *_ in g["edges"]})
+    return counts
+
+
+def _print_report(title: str, findings: list):
+    print(f"## {title}")
+    if findings:
+        for item in findings:
+            print(f"  {item}")
+    else:
+        print("  OK — nothing here")
+    print()
+
+
+def cmd_graph(args) -> int:
+    g = _collect_graph(unwired_scope=args.unwired)
+    texts = g["texts"]
+    if args.around:
+        return _print_around(args.around, g)
+
+    print("# math graph — the struct in your notes (read-only)\n")
+    counts = _graph_counts(g)
+    print(f"edges: goal {counts['goal']}  object {counts['object']}  "
+          f"bridge {counts['bridge']}  ({len(g['edges'])} total over "
+          f"{_plural(counts['notes'], 'note')})")
+    if g["via_alias"]:
+        print(f"of those, {g['via_alias']} landed through a card's `aliases:`\n")
+
+    _print_report("kind errors (valid kinds: goal, object, bridge)",
+                  [f"{p.relative_to(ROOT)}:{line}: '{kind}::' — did you mean "
+                   f"{_nearest_kind(kind)}?" for p, line, kind in g["kind_errors"]])
+
+    aim_lines = []
+    for name, users in sorted(g["aims"].items(), key=lambda kv: (len(kv[1]), kv[0])):
+        aim_lines.append(f"{name} — {_plural(len(users), 'mean', 'means')}")
+        for src, why in sorted(users):
+            aim_lines.append(f"    ← {src.stem} [{_card_role(src, texts)}]"
+                              + (f" — {why}" if why else ""))
+    _print_report("aims ← means (thinnest first: where the graph is young)", aim_lines)
+
+    object_lines = []
+    for name, users in sorted(g["objects"].items(), key=lambda kv: (-len(kv[1]), kv[0])):
+        aims_here = sorted({a for src, _why in users for a in g["aims_of"].get(src, ())})
+        line = f"{name} — {_plural(len(users), 'user')}"
+        if aims_here:
+            line += f", aims: {', '.join(aims_here)}"
+        object_lines.append(line)
+    _print_report("objects ← users (what each shape is used for)", object_lines)
+
+    no_aim, no_object, purposeless = g["debt"]
+    _print_report("connective holes (a note is a fragment until it is wired)",
+                  [f"{p.relative_to(ROOT)}: has object:: but no goal:: — what is it for?"
+                   for p in no_aim]
+                  + [f"{p.relative_to(ROOT)}: has goal:: but no object:: — what shape does it act on?"
+                     for p in no_object]
+                  + [f"{name}: a shape no aim reaches — which aim would use it?"
+                     for name in purposeless])
+
+    _print_report("dangling targets (allowed as hooks — the name you reached for)",
+                  [f"[[{name}]] — first needed by {src.relative_to(ROOT)}; "
+                   f"baseline with: python3 tools/vault.py register-unresolved \"{name}\""
+                   for name, src in sorted(g["dangling"].items())])
+
+    scope_label = ", ".join(args.unwired) if args.unwired else "root + mailbox"
+    _print_report(f"unwired drafts ({scope_label}, no typed edge) — {len(g['unwired'])}",
+                  [str(p.relative_to(ROOT)) for p in g["unwired"]])
+    _clear_notes_cache()
+    return 0
+
+
+def _nearest_kind(word: str) -> str:
+    """Cheapest useful hint for a mistyped edge kind: shared prefix, else parts."""
+    for kind in GRAPH_KINDS:
+        if kind.startswith(word) or word.startswith(kind):
+            return kind
+    return "/".join(GRAPH_KINDS)
+
+
+def _node_names(g) -> list:
+    return sorted(set(g["aims"]) | set(g["objects"]) | {t for _, t in g["bridges"]})
+
+
+def _similar_names(name: str, g) -> list:
+    """Cheap substring match so a near-miss name still finds its node."""
+    low = name.lower()
+    pool = set(_node_names(g)) | set(g["by_stem"]) | set(g["aliases"])
+    return sorted(n for n in pool if low in n.lower() or n.lower() in low)[:10]
+
+
+def _print_around(name: str, g) -> int:
+    """Neighborhood of one node — the struct read from a single name.
+
+    This is the studying query: given an aim, what means exist and what shape
+    does each act on; given a shape, which means use it and toward what aim.
+    """
+    texts = g["texts"]
+    by_stem, aliases = g["by_stem"], g["aliases"]
+    if name in by_stem:
+        node, card = name, by_stem[name]
+        print(f"# {node} — neighborhood (read-only)\n")
+    elif name in aliases:
+        node, card = aliases[name], by_stem.get(aliases[name])
+        print(f"# {name} → {node} (alias) — neighborhood (read-only)\n")
+    else:
+        node, card = name, None
+        print(f"# {name} — nothing is wired to this name yet\n")
+        matches = _similar_names(name, g)
+        if matches:
+            print("closest existing names:")
+            for m in matches:
+                print(f"  {m}")
+        return 0
+
+    means = g["aims"].get(node)
+    if means:
+        print(f"## as an aim ({_plural(len(means), 'mean', 'means')})")
+        for src, why in sorted(means):
+            line = f"- {src.stem} [{_card_role(src, texts)}] — {src.relative_to(ROOT)}"
+            if why:
+                line += f"\n    why: {why}"
+            shapes = sorted({t for s, _l, kind, t, _w in g["edges"]
+                             if s == src and kind == "object"})
+            if shapes:
+                line += "\n    object:: " + ", ".join(shapes)
+            print(line)
+        print()
+
+    users = g["objects"].get(node)
+    if users:
+        print(f"## as an object ({_plural(len(users), 'user')})")
+        for src, why in sorted(users):
+            line = f"- {src.stem} [{_card_role(src, texts)}] — {src.relative_to(ROOT)}"
+            aims_here = sorted(g["aims_of"].get(src, ()))
+            if aims_here:
+                line += f"\n    goal:: " + ", ".join(aims_here)
+            if why:
+                line += f"\n    why: {why}"
+            print(line)
+        print()
+
+    own = [(kind, t, w) for s, _l, kind, t, w in g["edges"]
+           if card is not None and s == card]
+    if own:
+        print("## this card's own edges")
+        for kind, target, why in own:
+            print(f"- {kind}:: [[{target}]]" + (f" — {why}" if why else ""))
+        print()
+
+    touching = sorted({(s.stem, t) for s, t in g["bridges"] if node in (s.stem, t)})
+    if touching:
+        print("## bridges touching it")
+        for src, target in touching:
+            print(f"- {src} ≈ {target}")
+        print()
+
+    if not (means or users or own or touching):
+        print(f"no edges here yet — wire it from a card with `goal:: [[{node}]]`")
+    return 0
+
+
 # ---------------------------------------------------------------- status
 
 
@@ -732,7 +1092,7 @@ def _git_porcelain():
 
 
 def cmd_status(args) -> int:
-    """Session-entry state report: git + check + triage + next moves.
+    """Session-entry state report: git + check + triage + graph + next moves.
 
     Read-only, always exits 0. This IS the entry state machine: repo state,
     not memory, decides what is possible.
@@ -780,6 +1140,24 @@ def cmd_status(args) -> int:
     else:
         print("no uncommitted changes")
 
+    # (e) the graph struct: what the notes already connect
+    graph = _collect_graph()
+    counts = _graph_counts(graph)
+    print("\n## graph (the struct in your notes — `python3 tools/vault.py graph`)")
+    print(f"- edges: {len(graph['edges'])} (goal {counts['goal']}, "
+          f"object {counts['object']}, bridge {counts['bridge']}) over "
+          f"{_plural(counts['notes'], 'note')}")
+    aims = graph["aims"]
+    print(f"- aims: {len(aims)}" + (
+        f" (thinnest: {min(aims, key=lambda k: len(aims[k]))})" if aims else ""))
+    no_aim, no_object, purposeless = graph["debt"]
+    print(f"- connective holes: {len(no_aim)} means without an aim, "
+          f"{len(no_object)} means without an object, "
+          f"{len(purposeless)} objects no aim reaches")
+    print(f"- unwired drafts (root + mailbox): {len(graph['unwired'])}")
+    if graph["kind_errors"]:
+        print(f"- kind errors: {len(graph['kind_errors'])}")
+
     # next moves — fixed decision table, plain ifs
     print("\n## next moves")
     moves = []
@@ -801,9 +1179,24 @@ def cmd_status(args) -> int:
     if zzz_changes:
         moves.append(f"unpublished-output changes: {len(zzz_changes)} files — "
                      "finish/publish via Spec §S4")
+    if graph["kind_errors"]:
+        moves.append(f"graph: {len(graph['kind_errors'])} mistyped edge kinds — "
+                     "run `python3 tools/vault.py graph`")
+    if no_aim or no_object or purposeless:
+        moves.append(f"graph: {len(no_aim)} means without an aim, {len(no_object)} "
+                     "without an object, "
+                     f"{len(purposeless)} purposeless objects — `vault.py graph` lists them")
+    if graph["dangling"]:
+        moves.append(f"graph: {len(graph['dangling'])} names nothing points at yet — "
+                     "fine as hooks, or write the card")
+    if graph["unwired"]:
+        moves.append(f"graph: {len(graph['unwired'])} unwired drafts in root/mailbox — "
+                     "one `goal:: [[...]]` line wires each (`vault.py graph` lists them)")
     if not moves:
         moves.append("vault clean — new capture, idea polish (Spec §S1), "
                      "or ingestion (Spec §S3) are available")
+    for i, move in enumerate(moves, 1):
+        print(f"{i}. {move}")
     _clear_notes_cache()
     return 0
 
@@ -930,7 +1323,16 @@ def main() -> int:
 
     sub.add_parser("check", help="invariant report (read-only)")
     sub.add_parser("triage", help="placement-debt report (read-only)")
-    sub.add_parser("status", help="session-entry state report: git + check + triage + next moves (read-only)")
+    sub.add_parser("status", help="session-entry state report: git + check + triage + graph struct + next moves (read-only)")
+
+    p_graph = sub.add_parser(
+        "graph",
+        help="read the graph struct in your notes: aims ← means, objects ← users, "
+             "connective holes (read-only); --around NAME for one node's neighborhood")
+    p_graph.add_argument("--around", metavar="NAME",
+                         help="one node's neighborhood: as an aim, as an object, its own edges")
+    p_graph.add_argument("--unwired", nargs="*", metavar="PATH",
+                         help="vault dirs/files to scan for unreached notes (default: root + mailbox/)")
 
     p_promote = sub.add_parser("promote", help="move mailbox -> library with graduation rules")
     p_promote.add_argument("name", help="note name (mailbox/ prefix and .md optional)")
@@ -957,6 +1359,8 @@ def main() -> int:
         return cmd_triage(args)
     if args.command == "status":
         return cmd_status(args)
+    if args.command == "graph":
+        return cmd_graph(args)
     if args.command == "register-unresolved":
         return cmd_register_unresolved(args)
     if args.command == "register-lit-nosource":

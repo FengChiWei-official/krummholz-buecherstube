@@ -6,6 +6,7 @@ tags:
   - attr/concept
 aliases:
   - 分母规范化
+  - 分母有理化
 ---
 
 ## Definition

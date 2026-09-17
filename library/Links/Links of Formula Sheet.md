@@ -11,6 +11,11 @@ tags:
 [[Table of Integrals]]
 
 [[Reference Sheet of Series]]
+
+[[Inequality Sheet]]
+
+[[Graphs of  Functions]]
+
 ## Perspectives
 
 ## Distinctions

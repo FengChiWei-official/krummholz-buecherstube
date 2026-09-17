@@ -20,6 +20,7 @@ $f(g(x))$ should be deduct into  $f(g(x)) - f'(g'(x))$
 1.  [[Taylor Series]] -> $ab^mx^{mn}$
 2. 
 
+[[Denominator Normalization]]
 ## Applications
 
 ---

@@ -15,5 +15,7 @@ $\ln(1+\frac{1}{n}) = \ln (n+1) - \ln n = -\ln (\frac{n}{n+1})$
 
 >"This identity is a versatile tool commonly applied in telescoping sums and series, asymptotic analysis, and establishing mathematical inequalities."
 
+[[Graphs of  Functions]] 
+
 ---
 ## **Related**

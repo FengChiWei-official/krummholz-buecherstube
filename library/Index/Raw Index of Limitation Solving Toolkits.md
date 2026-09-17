@@ -45,6 +45,14 @@ tags:
 Reduce into [[Standard Limits]]
 [[L'Hospital Rule]] simple fractions to even simpler ones.
 
+#### 特殊技巧
+
+[[Denominator Normalization]] --> [[Radical Normalization]] --> [[Radical Normalization for Limitation]]
+有些时候可以显式化无穷小，降低求解难度。 让分母方便进一步变形。
+
+[[Simplification Rational Limitation]]
+[[Power-Exponential Functions Transform]]
+
 ### $\lim_n f(x, n)$
 
 [[Case Analysis]]
@@ -83,15 +91,7 @@ However, most of time you should use [[Taylor Series]] to simplizing it first.
 
 什么条件下，我们常见结构是无穷大/无穷小
 
-## [[Object -- Investigate the microscopic behavior of the function as x tends to some point]]
 
-
-单调有界
-定义
-夹逼准则
-局部有界 + 导数（差商） = 局部不等式  [[Raw Index of Inequality Toolkits]]
-
-[[Boundedness]] $\to$ $\lim_{x \to \infty} f(x) = A, A \in \mathbb{R}$
 
 
 
@@ -101,3 +101,5 @@ However, most of time you should use [[Taylor Series]] to simplizing it first.
 
 ---
 ## **Related**
+
+[[Index of Limitation Properties Toolkits]]

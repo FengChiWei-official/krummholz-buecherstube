@@ -22,8 +22,11 @@ pattern based: [[Index of Math Expressions Pattern]]
 ### General Ones
 
 [[Raw Index General Toolkits]]
+
+### Objects
+
 [[Raw Index Function Toolkits]]
-[[Raw Index of Limitation Toolkits]]
+[[Raw Index of Limitation Solving Toolkits]]
 [[Raw Index for Integral Toolkits]]
 [[Raw Index of Sequence Toolkits]]
 [[Raw Index of Series Toolkits]]
@@ -37,9 +40,12 @@ pattern based: [[Index of Math Expressions Pattern]]
 [[Logarithmic Function Toolkit]]
 [[Function Patterns Reduction Toolkits]]
 [[Absolute Function Toolkits]]
+[[Index of Identity Transform]]
 ## Strategy
 
 [[Raw Index of Mathematical Heuristics]]
 
-## Rest
+## Entries
+
+[[Raw Index of Math Entries]]
 
