@@ -49,6 +49,8 @@ meinal chore
 the lawn needs mowing
 
 drains
+down the drain.
+"The economy's **up the spout**."(经济彻底搞砸了/完蛋了。）
 
 cosseted and cocooned
 

@@ -5,28 +5,28 @@ tags:
 
 
 - [x] zhihu problem set of Limit
-- [ ] 基础30讲习题梳理
-- [ ] 常见函数如$f(x) = xe^{-x}$的图像 -> [[]]
-- [ ] 对数求导法
+- [x] 基础30讲习题梳理
+- [x] 常见函数如$f(x) = xe^{-x}$的图像 -> [[]]
+- [x] 对数求导法
 - [x] [[Curvature]]
-- [ ] **数学分析中的典型问题与方法**
+- [x] **数学分析中的典型问题与方法**
 - [x] 求导 [[Table of Integrals]]
 - [ ] [[Manifold learning]]
 - [ ] [[Raw Index of Tricks in Math]]
-- [ ] [[Links of Formula Sheet]]
+- [x] [[Links of Formula Sheet]]
 - [x] [[Links of Function Properties]]
 - [ ] [[Raw Index Function Structure Toolkit]]
-- [ ] [[Index of Math]]
-- [ ] [[Coordinate Frame]]
+- [x] [[Index of Math]]
+- [x] [[Coordinate Frame]]
 - [x] [[Points of Discontinuity]]
 - [ ] [[function and continuous and differential function]]
 - [ ] 题8.5 10.4
-- [ ] [[Back-to-Basics Heuristic Definitions & Generalization]] — 补启发式定义泛化例题
-- [ ] [[Parametric Candidate Generation with Constraint Filtering]] — 补候选生成+约束过滤例题
-- [ ] [[Principle of Reduction]] — 补化归原理跨题应用
-- [ ] [[Logarithmic Function Toolkit]] — 收敛对数工具卡后评估 promote
-- [ ] [[Partial Sum Sequence Toolkit]] — 收敛前缀和工具卡后评估 promote
-- [ ] [[Telescoping Sum Toolkits]] — 收敛裂项工具卡后评估 promote
-- [ ] [[Telescoping Sum]] — 与 Toolkits 互链后评估 promote
-- [ ] [[Sequence]] — 收敛数列工具卡后评估 promote
-- [ ] [[Graph of Math - 类型化边方案]] — 试插 3 张已落地;铺开:不等式簇挂 [[Boundedness]] + 建对象卡
+- [x] [[Back-to-Basics Heuristic Definitions & Generalization]] — 补启发式定义泛化例题
+- [x] [[Parametric Candidate Generation with Constraint Filtering]] — 补候选生成+约束过滤例题
+- [x] [[Principle of Reduction]] — 补化归原理跨题应用
+- [x] [[Logarithmic Function Toolkit]] — 收敛对数工具卡后评估 promote
+- [x] [[Partial Sum Sequence Toolkit]] — 收敛前缀和工具卡后评估 promote
+- [x] [[Telescoping Sum Toolkits]] — 收敛裂项工具卡后评估 promote
+- [x] [[Telescoping Sum]] — 与 Toolkits 互链后评估 promote
+- [x] [[Sequence]] — 收敛数列工具卡后评估 promote
+- [x] [[Graph of Math - 类型化边方案]] — 试插 3 张已落地;铺开:不等式簇挂 [[Boundedness]] + 建对象卡

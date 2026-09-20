@@ -16,6 +16,7 @@ pattern based: [[Index of Math Expressions Pattern]]
 
 [[The OPD Problem-Solving Framework]]
 
+[[Links of Standard Function Analysis]]
 
 # Toolkits
 

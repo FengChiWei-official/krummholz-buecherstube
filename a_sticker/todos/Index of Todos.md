@@ -25,6 +25,8 @@ tags:
 - [ ] [[Hyprland(ml4w) Config todo]]
 - [ ] [[算法思想]]
 - [ ] [[System Todo]]
+- [ ] [[AI 报告挂载 Todo]]
+- [ ] [[Trend Radar]]
 
 ## Key Methods
 
