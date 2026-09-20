@@ -42,6 +42,7 @@ pattern based: [[Index of Math Expressions Pattern]]
 [[Function Patterns Reduction Toolkits]]
 [[Absolute Function Toolkits]]
 [[Index of Identity Transform]]
+[[Absolute Function Toolkits]]
 ## Strategy
 
 [[Raw Index of Mathematical Heuristics]]
