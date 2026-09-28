@@ -1,168 +1,248 @@
 {
- "date": "2026-09-20",
+ "date": "2026-09-27",
  "boards": {
   "arena-text": {
-   "claude-fable-5-high": {
+   "claude-opus-5.5-high": {
     "rank": 1,
-    "score": 1506.0
+    "score": 1509.0
    },
    "claude-opus-4-6-high": {
     "rank": 2,
     "score": 1505.0
    },
-   "claude-opus-4-7-high": {
+   "claude-fable-5-high": {
     "rank": 3,
-    "score": 1502.0
+    "score": 1504.0
    },
-   "muse-spark-1.2 (xHigh)": {
+   "claude-opus-4-7-high": {
     "rank": 4,
-    "score": 1500.0
+    "score": 1502.0
    },
    "claude-fable-5.1-max": {
     "rank": 5,
-    "score": 1498.0
+    "score": 1501.0
    },
    "claude-opus-4-6": {
     "rank": 6,
-    "score": 1497.0
+    "score": 1498.0
+   },
+   "muse-spark-1.2 (xHigh)": {
+    "rank": 7,
+    "score": 1496.0
    },
    "claude-opus-4-7": {
-    "rank": 7,
-    "score": 1494.0
+    "rank": 8,
+    "score": 1495.0
    },
    "muse-spark-1.3-max": {
-    "rank": 8,
-    "score": 1493.0
+    "rank": 9,
+    "score": 1494.0
    },
    "gemini-3.8-flash-high": {
-    "rank": 9,
-    "score": 1493.0
+    "rank": 10,
+    "score": 1492.0
    },
    "claude-opus-5-high": {
-    "rank": 10,
-    "score": 1493.0
+    "rank": 11,
+    "score": 1491.0
    },
    "muse-spark-1.1": {
-    "rank": 11,
-    "score": 1493.0
-   },
-   "gemini-3.7-flash-high": {
     "rank": 12,
-    "score": 1490.0
+    "score": 1491.0
    },
    "muse-spark": {
     "rank": 13,
-    "score": 1488.0
+    "score": 1489.0
    },
    "claude-opus-5-max": {
     "rank": 14,
-    "score": 1487.0
+    "score": 1488.0
+   },
+   "gemini-3.7-flash-high": {
+    "rank": 15,
+    "score": 1488.0
+   },
+   "kimi-k3-max": {
+    "rank": 16,
+    "score": 1488.0
    },
    "gemini-3.1-pro-preview": {
-    "rank": 15,
+    "rank": 17,
     "score": 1487.0
    },
    "gemini-3-pro": {
-    "rank": 16,
-    "score": 1485.0
-   },
-   "kimi-k3-max": {
-    "rank": 17,
+    "rank": 18,
     "score": 1485.0
    },
    "gpt-5.6-sol-xhigh": {
-    "rank": 18,
-    "score": 1483.0
-   },
-   "glm-5.3-max": {
     "rank": 19,
     "score": 1483.0
    },
-   "gpt-5.5-high": {
+   "gemini-3.6-flash-high": {
     "rank": 20,
     "score": 1482.0
+   },
+   "gpt-5.5-high": {
+    "rank": 21,
+    "score": 1481.0
+   },
+   "claude-opus-4-8-high": {
+    "rank": 22,
+    "score": 1480.0
+   },
+   "mimo-v2.6-pro": {
+    "rank": 23,
+    "score": 1480.0
+   },
+   "glm-5.3-max": {
+    "rank": 24,
+    "score": 1480.0
+   },
+   "qwen3.8-max": {
+    "rank": 25,
+    "score": 1479.0
+   },
+   "gpt-6-astra-max": {
+    "rank": 26,
+    "score": 1478.0
+   },
+   "gemini-3.5-flash-high": {
+    "rank": 27,
+    "score": 1477.0
+   },
+   "gpt-5.5": {
+    "rank": 28,
+    "score": 1477.0
+   },
+   "deepseek-v4.1-flash-max": {
+    "rank": 29,
+    "score": 1477.0
+   },
+   "gpt-5.2-chat-latest-20260210": {
+    "rank": 30,
+    "score": 1476.0
    }
   },
   "arena-code": {
-   "gpt-6-astra-max": {
+   "claude-opus-5.5-max": {
     "rank": 1,
-    "score": 1800.0
+    "score": 1827.0
+   },
+   "gpt-6-astra-max": {
+    "rank": 2,
+    "score": 1792.0
    },
    "claude-fable-5.1-max": {
-    "rank": 2,
-    "score": 1758.0
+    "rank": 3,
+    "score": 1751.0
    },
    "claude-opus-5-max": {
-    "rank": 3,
-    "score": 1687.0
-   },
-   "qwen3.8-max-0902": {
     "rank": 4,
-    "score": 1681.0
+    "score": 1693.0
    },
-   "kimi-k3-max": {
+   "gpt-6-sol-max": {
     "rank": 5,
-    "score": 1674.0
+    "score": 1681.0
    },
    "qwen3.8-max": {
     "rank": 6,
-    "score": 1671.0
+    "score": 1672.0
    },
    "claude-opus-5-high": {
     "rank": 7,
+    "score": 1662.0
+   },
+   "qwen3.8-max-0902": {
+    "rank": 8,
+    "score": 1662.0
+   },
+   "kimi-k3-max": {
+    "rank": 9,
     "score": 1660.0
    },
    "muse-spark-1.3-max": {
-    "rank": 8,
-    "score": 1652.0
+    "rank": 10,
+    "score": 1656.0
    },
    "qwen3.8-flash-next": {
-    "rank": 9,
-    "score": 1635.0
-   },
-   "claude-fable-5-high": {
-    "rank": 10,
-    "score": 1628.0
+    "rank": 11,
+    "score": 1636.0
    },
    "hy4-preview": {
-    "rank": 11,
-    "score": 1624.0
+    "rank": 12,
+    "score": 1631.0
+   },
+   "grok-4.7-xhigh": {
+    "rank": 13,
+    "score": 1629.0
+   },
+   "claude-fable-5-high": {
+    "rank": 14,
+    "score": 1627.0
    },
    "muse-spark-1.3 (xHigh)": {
-    "rank": 12,
-    "score": 1623.0
-   },
-   "grok-4.6-high": {
-    "rank": 13,
-    "score": 1618.0
-   },
-   "gpt-5.6-sol-xhigh (codex-harness)": {
-    "rank": 14,
-    "score": 1617.0
-   },
-   "glm-5.3-max": {
     "rank": 15,
-    "score": 1614.0
+    "score": 1626.0
    },
    "deepseek-v4.1-flash-max": {
     "rank": 16,
-    "score": 1614.0
+    "score": 1621.0
+   },
+   "grok-4.6-high": {
+    "rank": 17,
+    "score": 1621.0
+   },
+   "glm-5.3-max": {
+    "rank": 18,
+    "score": 1619.0
+   },
+   "mimo-v2.6-pro": {
+    "rank": 19,
+    "score": 1618.0
+   },
+   "gpt-5.6-sol-xhigh (codex-harness)": {
+    "rank": 20,
+    "score": 1617.0
    },
    "glm-5.3-flash": {
-    "rank": 17,
-    "score": 1607.0
-   },
-   "qwen3.8-27b": {
-    "rank": 18,
-    "score": 1593.0
+    "rank": 21,
+    "score": 1613.0
    },
    "glm-5.2-max": {
-    "rank": 19,
-    "score": 1592.0
+    "rank": 22,
+    "score": 1602.0
    },
    "gemini-3.7-flash-high": {
-    "rank": 20,
-    "score": 1587.0
+    "rank": 23,
+    "score": 1593.0
+   },
+   "gpt-6-luna-max": {
+    "rank": 24,
+    "score": 1593.0
+   },
+   "qwen3.8-27b": {
+    "rank": 25,
+    "score": 1591.0
+   },
+   "deepseek-v4-pro-high-20260813": {
+    "rank": 26,
+    "score": 1582.0
+   },
+   "deepseek-v4-flash-high": {
+    "rank": 27,
+    "score": 1581.0
+   },
+   "gemini-3.8-flash-high": {
+    "rank": 28,
+    "score": 1580.0
+   },
+   "step-5-preview-high": {
+    "rank": 29,
+    "score": 1565.0
+   },
+   "claude-opus-4-7-high": {
+    "rank": 30,
+    "score": 1557.0
    }
   },
   "swebench-verified": {
@@ -860,1840 +940,1852 @@
    }
   },
   "artificial-analysis": {
-   "Claude Fable 5.1": {
+   "Claude Opus 5.5": {
     "rank": 1,
+    "score": 57.6
+   },
+   "Claude Fable 5.1": {
+    "rank": 2,
     "score": 53.4
    },
    "GPT-6 Astra": {
-    "rank": 2,
+    "rank": 3,
     "score": 52.7
    },
    "Claude Opus 5": {
-    "rank": 3,
+    "rank": 4,
     "score": 50.8
    },
    "Claude Fable 5": {
-    "rank": 4,
+    "rank": 5,
     "score": 49.6
    },
    "Muse Spark 1.3": {
-    "rank": 5,
+    "rank": 6,
     "score": 48.1
    },
+   "GPT-6 Sol": {
+    "rank": 7,
+    "score": 47.5
+   },
    "GPT-5.6 Sol": {
-    "rank": 6,
+    "rank": 8,
     "score": 47
    },
+   "Grok 4.7": {
+    "rank": 9,
+    "score": 46.4
+   },
+   "MiMo-V2.6-Pro": {
+    "rank": 10,
+    "score": 46.3
+   },
    "Qwen3.8 Max": {
-    "rank": 7,
+    "rank": 11,
     "score": 45.4
    },
    "GLM-5.3": {
-    "rank": 8,
+    "rank": 12,
     "score": 44.8
    },
    "Grok 4.6": {
-    "rank": 9,
+    "rank": 13,
     "score": 44.3
    },
    "Step 5 Preview": {
-    "rank": 10,
+    "rank": 14,
     "score": 43.7
    },
    "Kimi K3": {
-    "rank": 11,
+    "rank": 15,
     "score": 43.6
    },
    "GPT-5.6 Terra": {
-    "rank": 12,
+    "rank": 16,
     "score": 42.1
    },
    "GLM 5.3 Flash": {
-    "rank": 13,
+    "rank": 17,
     "score": 41.8
    },
    "Claude Opus 4.8": {
-    "rank": 14,
+    "rank": 18,
     "score": 41.8
    },
    "Gemini 3.8 Flash": {
-    "rank": 15,
+    "rank": 19,
     "score": 40.9
    },
    "Claude Opus 4.7": {
-    "rank": 16,
+    "rank": 20,
     "score": 40.7
    },
    "Qwen3.8 2.4T A95B": {
-    "rank": 17,
+    "rank": 21,
     "score": 39.9
    },
    "Qwen3.8-Flash-Next": {
-    "rank": 18,
+    "rank": 22,
     "score": 39.8
    },
    "Gemini 3.7 Flash": {
-    "rank": 19,
+    "rank": 23,
     "score": 39.6
    },
    "Muse Spark 1.2": {
-    "rank": 20,
+    "rank": 24,
     "score": 39.6
    },
    "DeepSeek V4.1 Flash": {
-    "rank": 21,
+    "rank": 25,
     "score": 39.5
    },
    "GPT-5.4": {
-    "rank": 22,
+    "rank": 26,
     "score": 39
    },
    "Grok 4.5": {
-    "rank": 23,
+    "rank": 27,
     "score": 38.8
    },
    "GPT-5.5": {
-    "rank": 24,
+    "rank": 28,
     "score": 38.4
    },
    "Claude Sonnet 5": {
-    "rank": 25,
+    "rank": 29,
     "score": 38.2
    },
    "GPT-5.6 Luna": {
-    "rank": 26,
+    "rank": 30,
+    "score": 37.3
+   },
+   "GPT-6 Luna": {
+    "rank": 31,
     "score": 37.3
    },
    "DeepSeek V4 Pro 0813": {
-    "rank": 27,
+    "rank": 32,
     "score": 36
    },
-   "Agnes 3.0 Flash": {
-    "rank": 28,
-    "score": 35.5
-   },
-   "Agnes 2.5 Pro Beta": {
-    "rank": 29,
-    "score": 35.2
-   },
    "DeepSeek V4 Flash Vision": {
-    "rank": 30,
+    "rank": 33,
     "score": 34.8
    },
    "DeepSeek V4 Flash 0731": {
-    "rank": 31,
+    "rank": 34,
     "score": 34.3
    },
    "Gemini 3.6 Flash": {
-    "rank": 32,
+    "rank": 35,
     "score": 34
    },
    "Muse Spark 1.1": {
-    "rank": 33,
+    "rank": 36,
     "score": 33.7
    },
    "GLM-5.2": {
-    "rank": 34,
+    "rank": 37,
     "score": 33.7
    },
    "Qwen3.8 27B": {
-    "rank": 35,
+    "rank": 38,
     "score": 33.7
    },
    "Gemini 3.5 Flash": {
-    "rank": 36,
+    "rank": 39,
     "score": 33.6
    },
    "Motif 3": {
-    "rank": 37,
+    "rank": 40,
     "score": 33.6
    },
    "GPT-5.3 Codex": {
-    "rank": 38,
+    "rank": 41,
     "score": 32.5
    },
    "Claude Opus 4.6": {
-    "rank": 39,
+    "rank": 42,
     "score": 31.9
    },
    "Muse Spark": {
-    "rank": 40,
+    "rank": 43,
     "score": 31.3
    },
    "K2 Horizon 375B A23B": {
-    "rank": 41,
+    "rank": 44,
     "score": 30.5
    },
    "DeepSeek V4 Pro 0424": {
-    "rank": 42,
+    "rank": 45,
     "score": 30.4
    },
    "GPT-5.2": {
-    "rank": 43,
-    "score": 30.4
-   },
-   "Apodex 1.1": {
-    "rank": 44,
+    "rank": 46,
     "score": 30.4
    },
    "Claude Sonnet 4.6": {
-    "rank": 45,
+    "rank": 47,
     "score": 30.1
    },
    "Gemini 3.1 Pro Preview": {
-    "rank": 46,
+    "rank": 48,
     "score": 29.7
    },
    "Qwen3.7 Max": {
-    "rank": 47,
+    "rank": 49,
     "score": 29.5
    },
    "MiniMax-M3": {
-    "rank": 48,
+    "rank": 50,
     "score": 29.2
    },
    "Claude Opus 4.5": {
-    "rank": 49,
+    "rank": 51,
     "score": 29.1
    },
    "MiMo-V2-Pro": {
-    "rank": 50,
+    "rank": 52,
     "score": 28.6
    },
    "GPT-5.2 Codex": {
-    "rank": 51,
+    "rank": 53,
     "score": 28.5
    },
    "Qwen3.6 Max Preview": {
-    "rank": 52,
+    "rank": 54,
     "score": 28.4
    },
    "Nex-N2-Pro": {
-    "rank": 53,
+    "rank": 55,
     "score": 28.2
    },
    "Solar Pro 4": {
-    "rank": 54,
+    "rank": 56,
     "score": 28.2
    },
    "Gemini 3 Pro Preview": {
-    "rank": 55,
+    "rank": 57,
     "score": 28
    },
    "GLM-5": {
-    "rank": 56,
+    "rank": 58,
     "score": 27.9
    },
    "Inkling Small": {
-    "rank": 57,
+    "rank": 59,
     "score": 27.8
    },
    "JT-4.1 Flash 236B A21B": {
-    "rank": 58,
+    "rank": 60,
     "score": 27.3
    },
    "Grok Build 0.1 0616": {
-    "rank": 59,
+    "rank": 61,
     "score": 27.2
    },
    "Qwen3.6 Plus": {
-    "rank": 60,
+    "rank": 62,
     "score": 27
    },
    "Kimi K2.6": {
-    "rank": 61,
+    "rank": 63,
     "score": 27
    },
-   "Agnes 2.5 Pro Alpha": {
-    "rank": 62,
-    "score": 26.8
-   },
    "Quasar 438B": {
-    "rank": 63,
+    "rank": 64,
     "score": 26.7
    },
    "GLM-5-Turbo": {
-    "rank": 64,
+    "rank": 65,
     "score": 26.6
    },
+   "Apodex 1.1": {
+    "rank": 66,
+    "score": 26.4
+   },
    "Gemini 3 Flash Preview": {
-    "rank": 65,
+    "rank": 67,
     "score": 26.3
    },
    "GLM-5.1": {
-    "rank": 66,
+    "rank": 68,
     "score": 26.1
    },
    "GPT-5.5 Instant": {
-    "rank": 67,
-    "score": 26
-   },
-   "DeepSeek V4 Flash 0420": {
-    "rank": 68,
-    "score": 26
-   },
-   "MiMo-V2.5-Pro": {
     "rank": 69,
     "score": 26
    },
-   "Kimi K2.7 Code": {
+   "DeepSeek V4 Flash 0420": {
     "rank": 70,
+    "score": 26
+   },
+   "MiMo-V2.5-Pro": {
+    "rank": 71,
+    "score": 26
+   },
+   "Kimi K2.7 Code": {
+    "rank": 72,
     "score": 25.8
    },
    "Grok 4.20 0309 v2": {
-    "rank": 71,
+    "rank": 73,
     "score": 25.7
    },
    "K2 Horizon MoVA 36B A4B": {
-    "rank": 72,
+    "rank": 74,
     "score": 25.3
    },
    "Hy3": {
-    "rank": 73,
+    "rank": 75,
     "score": 25.3
    },
    "Grok 4.20 0309": {
-    "rank": 74,
-    "score": 25.2
-   },
-   "MiMo-V2.5": {
-    "rank": 75,
-    "score": 25.2
-   },
-   "Qwen3.7 Plus": {
     "rank": 76,
     "score": 25.2
    },
-   "MiMo-V2-Omni-0327": {
+   "MiMo-V2.5": {
     "rank": 77,
+    "score": 25.2
+   },
+   "Qwen3.7 Plus": {
+    "rank": 78,
+    "score": 25.2
+   },
+   "MiMo-V2-Omni-0327": {
+    "rank": 79,
     "score": 25.1
    },
    "Inkling": {
-    "rank": 78,
+    "rank": 80,
     "score": 25
    },
    "Ling 3.0 Flash": {
-    "rank": 79,
-    "score": 24.9
-   },
-   "GPT-5 Codex": {
-    "rank": 80,
-    "score": 24.9
-   },
-   "Grok 4.3": {
     "rank": 81,
     "score": 24.9
    },
-   "Solar Open2 250B": {
+   "GPT-5 Codex": {
     "rank": 82,
+    "score": 24.9
+   },
+   "Grok 4.3": {
+    "rank": 83,
+    "score": 24.9
+   },
+   "Solar Open2 250B": {
+    "rank": 84,
     "score": 24.7
    },
    "GPT-5.1": {
-    "rank": 83,
+    "rank": 85,
     "score": 24.7
    },
    "Ling-3.0-flash-VL": {
-    "rank": 84,
+    "rank": 86,
     "score": 24.6
    },
    "GPT-5.4 mini": {
-    "rank": 85,
+    "rank": 87,
     "score": 24.1
    },
    "MiMo-V2-Omni": {
-    "rank": 86,
+    "rank": 88,
     "score": 23.9
    },
    "GPT-5.1 Codex": {
-    "rank": 87,
+    "rank": 89,
     "score": 23.7
    },
    "GLM 5V Turbo": {
-    "rank": 88,
+    "rank": 90,
     "score": 23.5
    },
    "Kimi K2.5": {
-    "rank": 89,
+    "rank": 91,
     "score": 23.5
    },
    "GPT-5": {
-    "rank": 90,
+    "rank": 92,
     "score": 23
    },
    "Nemotron 3 Ultra 550B A55B": {
-    "rank": 91,
+    "rank": 93,
     "score": 22.9
    },
    "Qwen3.5 27B": {
-    "rank": 92,
+    "rank": 94,
     "score": 22.9
    },
    "Claude 4.1 Opus": {
-    "rank": 93,
-    "score": 22.8
-   },
-   "MiniMax-M2.5": {
-    "rank": 94,
-    "score": 22.8
-   },
-   "MiniMax-M2.7": {
     "rank": 95,
     "score": 22.8
    },
-   "Hy3-preview": {
+   "MiniMax-M2.5": {
     "rank": 96,
+    "score": 22.8
+   },
+   "MiniMax-M2.7": {
+    "rank": 97,
+    "score": 22.8
+   },
+   "Hy3-preview": {
+    "rank": 98,
     "score": 22.7
    },
    "A.X-K2": {
-    "rank": 97,
+    "rank": 99,
     "score": 22.7
    },
    "Ling-3.0-flash-Fin": {
-    "rank": 98,
+    "rank": 100,
     "score": 22.6
    },
    "Grok 4": {
-    "rank": 99,
+    "rank": 101,
     "score": 22.5
    },
    "MiMo-V2-Flash": {
-    "rank": 100,
+    "rank": 102,
     "score": 22.4
    },
    "GLM-4.7": {
-    "rank": 101,
+    "rank": 103,
     "score": 22.2
    },
    "Gemini 3.5 Flash-Lite": {
-    "rank": 102,
+    "rank": 104,
     "score": 22.2
    },
    "Kimi K2 Thinking": {
-    "rank": 103,
+    "rank": 105,
     "score": 22
    },
    "o3-pro": {
-    "rank": 104,
+    "rank": 106,
     "score": 21.9
    },
    "G9v3-39A5B": {
-    "rank": 105,
+    "rank": 107,
     "score": 21.8
    },
    "KAT Coder Pro V2": {
-    "rank": 106,
+    "rank": 108,
     "score": 21.7
    },
    "DeepSeek V3.2": {
-    "rank": 107,
+    "rank": 109,
     "score": 21.5
    },
    "Qwen3.5 397B A17B": {
-    "rank": 108,
+    "rank": 110,
     "score": 21.4
    },
    "Qwen3.6 27B": {
-    "rank": 109,
+    "rank": 111,
     "score": 21.4
    },
    "Qwen3 Max Thinking": {
-    "rank": 110,
+    "rank": 112,
     "score": 21.3
    },
    "MiniMax-M2.1": {
-    "rank": 111,
+    "rank": 113,
     "score": 20.9
    },
    "GPT-5.4 nano": {
-    "rank": 112,
+    "rank": 114,
     "score": 20.7
    },
    "Claude 4.5 Sonnet": {
-    "rank": 113,
+    "rank": 115,
     "score": 20.7
    },
    "Claude 4 Opus": {
-    "rank": 114,
-    "score": 20.6
-   },
-   "GPT-5 mini": {
-    "rank": 115,
-    "score": 20.6
-   },
-   "K2 Horizon 7B": {
     "rank": 116,
     "score": 20.6
    },
-   "Qwen3.5 Omni Plus": {
+   "GPT-5 mini": {
     "rank": 117,
-    "score": 20.4
+    "score": 20.6
    },
-   "GPT-5.1 Codex mini": {
+   "K2 Horizon 7B": {
     "rank": 118,
-    "score": 20.4
+    "score": 20.6
    },
-   "Grok 4.1 Fast": {
+   "Qwen3.5 Omni Plus": {
     "rank": 119,
     "score": 20.4
    },
-   "o3": {
+   "GPT-5.1 Codex mini": {
     "rank": 120,
+    "score": 20.4
+   },
+   "Grok 4.1 Fast": {
+    "rank": 121,
+    "score": 20.4
+   },
+   "o3": {
+    "rank": 122,
     "score": 20.2
    },
    "K-EXAONE 2.0 0803": {
-    "rank": 121,
+    "rank": 123,
     "score": 19.7
    },
    "Step 3.7 Flash": {
-    "rank": 122,
+    "rank": 124,
     "score": 19.5
    },
    "Qwen3.5 35B A3B": {
-    "rank": 123,
+    "rank": 125,
     "score": 19.3
    },
    "LongCat 2.0": {
-    "rank": 124,
+    "rank": 126,
     "score": 19.1
    },
    "Gemma 4 31B": {
-    "rank": 125,
+    "rank": 127,
     "score": 19
    },
    "Claude 4 Sonnet": {
-    "rank": 126,
+    "rank": 128,
     "score": 18.9
    },
    "JT-35B-Flash": {
-    "rank": 127,
+    "rank": 129,
     "score": 18.7
    },
    "MiniMax-M2": {
-    "rank": 128,
+    "rank": 130,
     "score": 18.6
    },
    "KAT-Coder-Pro V1": {
-    "rank": 129,
+    "rank": 131,
     "score": 18.6
    },
    "GLM-4.6": {
-    "rank": 130,
+    "rank": 132,
     "score": 18.5
    },
    "Qwen3.6 35B A3B": {
-    "rank": 131,
+    "rank": 133,
     "score": 18.2
    },
    "Grok 4 Fast": {
-    "rank": 132,
+    "rank": 134,
     "score": 17.9
    },
    "Qwen3.5 122B A10B": {
-    "rank": 133,
+    "rank": 135,
     "score": 17.7
    },
    "Claude 3.7 Sonnet": {
-    "rank": 134,
+    "rank": 136,
     "score": 17.7
    },
    "Muse Glimmer": {
-    "rank": 135,
+    "rank": 137,
     "score": 17.5
    },
    "Ling-2.6-1T": {
-    "rank": 136,
+    "rank": 138,
     "score": 17
    },
    "Step 3.5 Flash 2603": {
-    "rank": 137,
+    "rank": 139,
     "score": 17
    },
    "Doubao Seed Code": {
-    "rank": 138,
+    "rank": 140,
     "score": 16.9
    },
    "Claude 4.5 Haiku": {
-    "rank": 139,
+    "rank": 141,
     "score": 16.9
    },
    "Gemma 4 26B A4B": {
-    "rank": 140,
+    "rank": 142,
     "score": 16.7
    },
    "o4-mini": {
-    "rank": 141,
+    "rank": 143,
     "score": 16.7
    },
    "Ring-2.6-1T": {
-    "rank": 142,
-    "score": 16.6
-   },
-   "Step 3.5 Flash": {
-    "rank": 143,
-    "score": 16.6
-   },
-   "DeepSeek V3.2 Exp": {
     "rank": 144,
     "score": 16.6
    },
-   "Gemini 2.5 Pro": {
+   "Step 3.5 Flash": {
     "rank": 145,
+    "score": 16.6
+   },
+   "DeepSeek V3.2 Exp": {
+    "rank": 146,
+    "score": 16.6
+   },
+   "Gemini 2.5 Pro": {
+    "rank": 147,
     "score": 16.1
    },
    "K2 Horizon 3.7B": {
-    "rank": 146,
-    "score": 15.6
-   },
-   "Qwen3 Max": {
-    "rank": 147,
-    "score": 15.6
-   },
-   "Gemini 3.1 Flash-Lite": {
     "rank": 148,
     "score": 15.6
    },
-   "Gemini 2.5 Flash Preview": {
+   "Qwen3 Max": {
     "rank": 149,
+    "score": 15.6
+   },
+   "Gemini 3.1 Flash-Lite": {
+    "rank": 150,
+    "score": 15.6
+   },
+   "Gemini 2.5 Flash Preview": {
+    "rank": 151,
     "score": 15.5
    },
    "Kimi K2 0905": {
-    "rank": 150,
+    "rank": 152,
     "score": 15.3
    },
    "Ling 3.0 Tiny": {
-    "rank": 151,
+    "rank": 153,
     "score": 15.3
    },
    "o1": {
-    "rank": 152,
+    "rank": 154,
     "score": 15.2
    },
    "Gemini 2.5 Pro Preview": {
-    "rank": 153,
+    "rank": 155,
     "score": 15
    },
    "GLM-4.7-Flash": {
-    "rank": 154,
+    "rank": 156,
     "score": 14.9
    },
    "Granite 4.2 30B": {
-    "rank": 155,
+    "rank": 157,
     "score": 14.8
    },
    "DeepSeek V3.1 Terminus": {
-    "rank": 156,
+    "rank": 158,
     "score": 14.8
    },
    "Grok 3 mini Reasoning": {
-    "rank": 157,
+    "rank": 159,
     "score": 14.6
    },
    "DeepSeek V3.2 Speciale": {
-    "rank": 158,
+    "rank": 160,
     "score": 14.5
    },
    "K-EXAONE": {
-    "rank": 159,
+    "rank": 161,
     "score": 14.4
    },
    "ERNIE 5.0 Thinking Preview": {
-    "rank": 160,
+    "rank": 162,
     "score": 14.3
    },
    "Mistral Medium 3.5": {
-    "rank": 161,
-    "score": 14.2
-   },
-   "Gemma 4 12B": {
-    "rank": 162,
-    "score": 14.2
-   },
-   "Nova 2.0 Pro Preview": {
     "rank": 163,
     "score": 14.2
    },
-   "Grok Code Fast 1": {
+   "Gemma 4 12B": {
     "rank": 164,
+    "score": 14.2
+   },
+   "Nova 2.0 Pro Preview": {
+    "rank": 165,
+    "score": 14.2
+   },
+   "Grok Code Fast 1": {
+    "rank": 166,
     "score": 14.1
    },
    "Apriel-v1.5-15B-Thinker": {
-    "rank": 165,
+    "rank": 167,
     "score": 13.8
    },
    "Mercury 2": {
-    "rank": 166,
+    "rank": 168,
     "score": 13.8
    },
    "DeepSeek V3.1": {
-    "rank": 167,
+    "rank": 169,
     "score": 13.7
    },
    "Qwen3.5 9B": {
-    "rank": 168,
+    "rank": 170,
     "score": 13.7
    },
    "Nova 2.0 Omni": {
-    "rank": 169,
+    "rank": 171,
     "score": 13.6
    },
    "Qwen3 VL 235B A22B": {
-    "rank": 170,
-    "score": 13.4
-   },
-   "Apriel-v1.6-15B-Thinker": {
-    "rank": 171,
-    "score": 13.4
-   },
-   "Nova 2.0 Lite": {
     "rank": 172,
     "score": 13.4
    },
-   "EXAONE 4.5 33B": {
+   "Apriel-v1.6-15B-Thinker": {
     "rank": 173,
+    "score": 13.4
+   },
+   "Nova 2.0 Lite": {
+    "rank": 174,
+    "score": 13.4
+   },
+   "EXAONE 4.5 33B": {
+    "rank": 175,
     "score": 13.2
    },
    "Command A+": {
-    "rank": 174,
-    "score": 13.1
-   },
-   "Qwen3.5 4B": {
-    "rank": 175,
-    "score": 13.1
-   },
-   "DeepSeek R1 0528": {
     "rank": 176,
     "score": 13.1
    },
-   "Gemini 2.5 Flash": {
+   "Qwen3.5 4B": {
     "rank": 177,
     "score": 13.1
    },
-   "GPT-5 nano": {
+   "DeepSeek R1 0528": {
     "rank": 178,
+    "score": 13.1
+   },
+   "Gemini 2.5 Flash": {
+    "rank": 179,
+    "score": 13.1
+   },
+   "GPT-5 nano": {
+    "rank": 180,
     "score": 13
    },
    "Nemotron 3.5 Lightning": {
-    "rank": 179,
+    "rank": 181,
     "score": 12.9
    },
    "Nemotron 3 Super 120B A12B": {
-    "rank": 180,
+    "rank": 182,
     "score": 12.8
    },
    "GLM-4.5": {
-    "rank": 181,
+    "rank": 183,
     "score": 12.8
    },
    "Kimi K2": {
-    "rank": 182,
-    "score": 12.7
-   },
-   "Qwen3 235B A22B 2507": {
-    "rank": 183,
-    "score": 12.7
-   },
-   "GPT-4.1": {
     "rank": 184,
     "score": 12.7
    },
-   "Qwen3.5 Omni Flash": {
+   "Qwen3 235B A22B 2507": {
     "rank": 185,
-    "score": 12.5
+    "score": 12.7
    },
-   "o3-mini": {
+   "GPT-4.1": {
     "rank": 186,
-    "score": 12.5
+    "score": 12.7
    },
-   "MiniCPM5-2B": {
+   "Qwen3.5 Omni Flash": {
     "rank": 187,
     "score": 12.5
    },
-   "o1-pro": {
+   "o3-mini": {
     "rank": 188,
+    "score": 12.5
+   },
+   "MiniCPM5-2B": {
+    "rank": 189,
+    "score": 12.5
+   },
+   "o1-pro": {
+    "rank": 190,
     "score": 12.4
    },
+   "Mercury 2.5": {
+    "rank": 191,
+    "score": 12.3
+   },
    "JT-MINI": {
-    "rank": 189,
+    "rank": 192,
     "score": 12.2
    },
    "Grok 3": {
-    "rank": 190,
+    "rank": 193,
     "score": 12.1
    },
    "Seed-OSS-36B-Instruct": {
-    "rank": 191,
+    "rank": 194,
     "score": 12.1
    },
    "Qwen3 235B A22B 2507 Instruct": {
-    "rank": 192,
+    "rank": 195,
     "score": 12
    },
    "Qwen3 Coder 480B A35B Instruct": {
-    "rank": 193,
+    "rank": 196,
     "score": 11.9
    },
    "Qwen3 VL 32B": {
-    "rank": 194,
+    "rank": 197,
     "score": 11.9
    },
    "Magistral Medium 1.2": {
-    "rank": 195,
+    "rank": 198,
     "score": 11.8
    },
    "Sonar Reasoning Pro": {
-    "rank": 196,
+    "rank": 199,
     "score": 11.8
    },
    "HyperNova 60B 2605": {
-    "rank": 197,
+    "rank": 200,
     "score": 11.7
    },
    "MiniMax M1 80k": {
-    "rank": 198,
+    "rank": 201,
     "score": 11.7
    },
    "Nemotron Cascade 2 30B A3B": {
-    "rank": 199,
+    "rank": 202,
     "score": 11.7
    },
    "gpt-oss-120b": {
-    "rank": 200,
+    "rank": 203,
     "score": 11.6
    },
    "K2 Think V2": {
-    "rank": 201,
+    "rank": 204,
     "score": 11.5
    },
    "LongCat Flash Lite": {
-    "rank": 202,
+    "rank": 205,
     "score": 11.5
    },
    "DeepSeek R1": {
-    "rank": 203,
+    "rank": 206,
     "score": 11.4
    },
    "o1-preview": {
-    "rank": 204,
+    "rank": 207,
     "score": 11.4
    },
    "HyperCLOVA X SEED Think": {
-    "rank": 205,
+    "rank": 208,
     "score": 11.4
    },
    "Mistral Small 4": {
-    "rank": 206,
+    "rank": 209,
     "score": 11.3
    },
    "GLM-4.6V": {
-    "rank": 207,
+    "rank": 210,
     "score": 11.2
    },
    "Qwen3 Next 80B A3B": {
-    "rank": 208,
+    "rank": 211,
     "score": 11.2
    },
    "GLM-4.5-Air": {
-    "rank": 209,
+    "rank": 212,
     "score": 11.1
    },
    "Granite 4.2 8B": {
-    "rank": 210,
+    "rank": 213,
     "score": 11.1
    },
    "Mi:dm K 2.5 Pro": {
-    "rank": 211,
+    "rank": 214,
     "score": 11
    },
    "Ring-1T": {
-    "rank": 212,
+    "rank": 215,
     "score": 10.9
    },
    "G9v3-3B": {
-    "rank": 213,
+    "rank": 216,
     "score": 10.8
    },
    "Trinity Large Thinking": {
-    "rank": 214,
+    "rank": 217,
     "score": 10.8
    },
    "INTELLECT-3": {
-    "rank": 215,
+    "rank": 218,
     "score": 10.6
    },
    "Solar Open 100B": {
-    "rank": 216,
+    "rank": 219,
     "score": 10.4
    },
    "Grok 3 Reasoning Beta": {
-    "rank": 217,
+    "rank": 220,
     "score": 10.4
    },
    "Gemini 2.5 Flash-Lite Preview": {
-    "rank": 218,
+    "rank": 221,
     "score": 10.4
    },
    "Nemotron 3 Nano Omni 30B A3B Reasoning": {
-    "rank": 219,
+    "rank": 222,
     "score": 10.3
    },
    "GPT-4.1 mini": {
-    "rank": 220,
+    "rank": 223,
     "score": 10.2
    },
    "Llama 4 Maverick": {
-    "rank": 221,
+    "rank": 224,
     "score": 10
    },
    "MiniMax M1 40k": {
-    "rank": 222,
+    "rank": 225,
     "score": 10
    },
    "gpt-oss-20b": {
-    "rank": 223,
+    "rank": 226,
     "score": 10
    },
    "Qwen3 VL 235B A22B Instruct": {
-    "rank": 224,
+    "rank": 227,
     "score": 9.9
    },
    "North Mini Code": {
-    "rank": 225,
+    "rank": 228,
     "score": 9.9
    },
    "K2-V2": {
-    "rank": 226,
+    "rank": 229,
     "score": 9.9
    },
    "Qwen3 30B A3B 2507": {
-    "rank": 227,
+    "rank": 230,
     "score": 9.8
    },
    "o1-mini": {
-    "rank": 228,
+    "rank": 231,
     "score": 9.8
    },
    "DeepSeek V3 0324": {
-    "rank": 229,
+    "rank": 232,
     "score": 9.7
    },
    "Ling 2.6 Flash": {
-    "rank": 230,
+    "rank": 233,
     "score": 9.7
    },
    "Qwen3 Next 80B A3B Instruct": {
-    "rank": 231,
-    "score": 9.6
-   },
-   "Tri-21B-think Preview": {
-    "rank": 232,
-    "score": 9.6
-   },
-   "Qwen3 Coder 30B A3B Instruct": {
-    "rank": 233,
-    "score": 9.6
-   },
-   "GPT-4.5": {
     "rank": 234,
     "score": 9.6
    },
-   "DiffusionGemma 26B A4B": {
+   "Tri-21B-think Preview": {
     "rank": 235,
-    "score": 9.5
+    "score": 9.6
    },
-   "Qwen3 235B A22B": {
+   "Qwen3 Coder 30B A3B Instruct": {
     "rank": 236,
-    "score": 9.5
+    "score": 9.6
    },
-   "QwQ 32B": {
+   "GPT-4.5": {
     "rank": 237,
-    "score": 9.5
+    "score": 9.6
    },
-   "Qwen3 VL 30B A3B": {
+   "DiffusionGemma 26B A4B": {
     "rank": 238,
     "score": 9.5
    },
-   "Gemini 2.0 Flash Thinking Experimental": {
+   "Qwen3 235B A22B": {
     "rank": 239,
+    "score": 9.5
+   },
+   "QwQ 32B": {
+    "rank": 240,
+    "score": 9.5
+   },
+   "Qwen3 VL 30B A3B": {
+    "rank": 241,
+    "score": 9.5
+   },
+   "Gemini 2.0 Flash Thinking Experimental": {
+    "rank": 242,
     "score": 9.4
    },
    "Mistral Large 3": {
-    "rank": 240,
+    "rank": 243,
     "score": 9.3
    },
    "Qwen3 Coder Next": {
-    "rank": 241,
-    "score": 9.2
-   },
-   "Motif-2-12.7B-Reasoning": {
-    "rank": 242,
-    "score": 9.2
-   },
-   "Mistral Medium 3.1": {
-    "rank": 243,
-    "score": 9.2
-   },
-   "Ling-1T": {
     "rank": 244,
     "score": 9.2
    },
-   "Nova Premier": {
+   "Motif-2-12.7B-Reasoning": {
     "rank": 245,
     "score": 9.2
    },
-   "Solar Pro 2": {
+   "Mistral Medium 3.1": {
     "rank": 246,
+    "score": 9.2
+   },
+   "Ling-1T": {
+    "rank": 247,
+    "score": 9.2
+   },
+   "Nova Premier": {
+    "rank": 248,
+    "score": 9.2
+   },
+   "Solar Pro 2": {
+    "rank": 249,
     "score": 9.1
    },
    "Granite 4.2 3B": {
-    "rank": 247,
+    "rank": 250,
     "score": 9.1
    },
    "Magistral Medium 1": {
-    "rank": 248,
+    "rank": 251,
     "score": 9.1
    },
    "Mistral Medium 3": {
-    "rank": 249,
-    "score": 9
-   },
-   "Llama Nemotron Super 49B v1.5": {
-    "rank": 250,
-    "score": 9
-   },
-   "Devstral Medium": {
-    "rank": 251,
-    "score": 9
-   },
-   "Tri-21B-Think": {
     "rank": 252,
     "score": 9
    },
-   "GPT-4o": {
+   "Llama Nemotron Super 49B v1.5": {
     "rank": 253,
     "score": 9
    },
-   "Gemini 2.0 Flash": {
+   "Devstral Medium": {
     "rank": 254,
-    "score": 8.9
+    "score": 9
    },
-   "Claude 3.5 Haiku": {
+   "Tri-21B-Think": {
     "rank": 255,
-    "score": 8.9
+    "score": 9
    },
-   "Llama 3.3 Nemotron Super 49B v1": {
+   "GPT-4o": {
     "rank": 256,
-    "score": 8.9
+    "score": 9
    },
-   "Gemma 4 E4B": {
+   "Gemini 2.0 Flash": {
     "rank": 257,
     "score": 8.9
    },
-   "NVIDIA Nemotron 3 Nano 30B A3B": {
+   "Claude 3.5 Haiku": {
     "rank": 258,
     "score": 8.9
    },
-   "Qwen3 4B 2507": {
+   "Llama 3.3 Nemotron Super 49B v1": {
     "rank": 259,
+    "score": 8.9
+   },
+   "Gemma 4 E4B": {
+    "rank": 260,
+    "score": 8.9
+   },
+   "NVIDIA Nemotron 3 Nano 30B A3B": {
+    "rank": 261,
+    "score": 8.9
+   },
+   "Qwen3 4B 2507": {
+    "rank": 262,
     "score": 8.8
    },
    "MiniCPM5-1B": {
-    "rank": 260,
+    "rank": 263,
     "score": 8.8
    },
    "Sarvam 105B": {
-    "rank": 261,
+    "rank": 264,
     "score": 8.8
    },
    "Gemini 2.0 Pro Experimental": {
-    "rank": 262,
-    "score": 8.7
-   },
-   "Devstral Small": {
-    "rank": 263,
-    "score": 8.7
-   },
-   "Claude 3 Opus": {
-    "rank": 264,
-    "score": 8.7
-   },
-   "Sonar Reasoning": {
     "rank": 265,
     "score": 8.7
    },
-   "Devstral 2": {
+   "Devstral Small": {
     "rank": 266,
+    "score": 8.7
+   },
+   "Claude 3 Opus": {
+    "rank": 267,
+    "score": 8.7
+   },
+   "Sonar Reasoning": {
+    "rank": 268,
+    "score": 8.7
+   },
+   "Devstral 2": {
+    "rank": 269,
     "score": 8.6
    },
    "Magistral Small 1.2": {
-    "rank": 267,
+    "rank": 270,
     "score": 8.6
    },
    "Qwen3 32B": {
-    "rank": 268,
+    "rank": 271,
     "score": 8.6
    },
    "Gemini 2.5 Flash-Lite": {
-    "rank": 269,
+    "rank": 272,
     "score": 8.5
    },
    "DeepSeek V3": {
-    "rank": 270,
+    "rank": 273,
     "score": 8.5
    },
    "Nanbeige4.1-3B": {
-    "rank": 271,
-    "score": 8.4
-   },
-   "LFM2.5-2.6B": {
-    "rank": 272,
-    "score": 8.4
-   },
-   "Qwen3 VL 32B Instruct": {
-    "rank": 273,
-    "score": 8.4
-   },
-   "DeepSeek R1 Distill Qwen 32B": {
     "rank": 274,
     "score": 8.4
    },
-   "Mistral Small 3.2": {
+   "LFM2.5-2.6B": {
     "rank": 275,
-    "score": 8.2
+    "score": 8.4
    },
-   "Magistral Small 1": {
+   "Qwen3 VL 32B Instruct": {
     "rank": 276,
-    "score": 8.2
+    "score": 8.4
    },
-   "EXAONE 4.0 32B": {
+   "DeepSeek R1 Distill Qwen 32B": {
     "rank": 277,
-    "score": 8.2
+    "score": 8.4
    },
-   "Qwen3 VL 8B": {
+   "Mistral Small 3.2": {
     "rank": 278,
     "score": 8.2
    },
-   "Qwen3 14B": {
+   "Magistral Small 1": {
     "rank": 279,
     "score": 8.2
    },
-   "DeepSeek R1 0528 Qwen3 8B": {
+   "EXAONE 4.0 32B": {
     "rank": 280,
+    "score": 8.2
+   },
+   "Qwen3 VL 8B": {
+    "rank": 281,
+    "score": 8.2
+   },
+   "Qwen3 14B": {
+    "rank": 282,
+    "score": 8.2
+   },
+   "DeepSeek R1 0528 Qwen3 8B": {
+    "rank": 283,
     "score": 8.1
    },
    "Llama 4 Scout": {
-    "rank": 281,
+    "rank": 284,
     "score": 8.1
    },
    "Qwen2.5 Max": {
-    "rank": 282,
+    "rank": 285,
     "score": 8
    },
    "Qwen3 VL 30B A3B Instruct": {
-    "rank": 283,
-    "score": 7.9
-   },
-   "Hermes 4 - Llama-3.1 70B": {
-    "rank": 284,
-    "score": 7.9
-   },
-   "Gemini 1.5 Pro": {
-    "rank": 285,
-    "score": 7.9
-   },
-   "DeepSeek R1 Distill Llama 70B": {
     "rank": 286,
     "score": 7.9
    },
-   "Claude 3.5 Sonnet": {
+   "Hermes 4 - Llama-3.1 70B": {
     "rank": 287,
     "score": 7.9
    },
-   "DeepSeek R1 Distill Qwen 14B": {
+   "Gemini 1.5 Pro": {
     "rank": 288,
-    "score": 7.8
+    "score": 7.9
    },
-   "Falcon-H1R-7B": {
+   "DeepSeek R1 Distill Llama 70B": {
     "rank": 289,
-    "score": 7.8
+    "score": 7.9
    },
-   "GPT-4.1 nano": {
+   "Claude 3.5 Sonnet": {
     "rank": 290,
-    "score": 7.8
+    "score": 7.9
    },
-   "Solar Pro 3": {
+   "DeepSeek R1 Distill Qwen 14B": {
     "rank": 291,
     "score": 7.8
    },
-   "Ling-flash-2.0": {
+   "Falcon-H1R-7B": {
     "rank": 292,
     "score": 7.8
    },
-   "Gemma 4 E2B": {
+   "GPT-4.1 nano": {
     "rank": 293,
     "score": 7.8
    },
-   "Qwen3 Omni 30B A3B": {
+   "Solar Pro 3": {
     "rank": 294,
     "score": 7.8
    },
-   "Qwen2.5 Instruct 72B": {
+   "Ling-flash-2.0": {
     "rank": 295,
-    "score": 7.7
+    "score": 7.8
    },
-   "Sonar": {
+   "Gemma 4 E2B": {
     "rank": 296,
-    "score": 7.7
+    "score": 7.8
    },
-   "Step3 VL 10B": {
+   "Qwen3 Omni 30B A3B": {
     "rank": 297,
-    "score": 7.7
+    "score": 7.8
    },
-   "Llama 3.3 Instruct 70B": {
+   "Qwen2.5 Instruct 72B": {
     "rank": 298,
     "score": 7.7
    },
-   "Qwen3 30B A3B": {
+   "Sonar": {
     "rank": 299,
-    "score": 7.6
+    "score": 7.7
    },
-   "Sonar Pro": {
+   "Step3 VL 10B": {
     "rank": 300,
-    "score": 7.6
+    "score": 7.7
    },
-   "QwQ 32B-Preview": {
+   "Llama 3.3 Instruct 70B": {
     "rank": 301,
-    "score": 7.6
+    "score": 7.7
    },
-   "GLM-4.5V": {
+   "Qwen3 30B A3B": {
     "rank": 302,
     "score": 7.6
    },
-   "Mistral Large 2": {
+   "Sonar Pro": {
     "rank": 303,
     "score": 7.6
    },
-   "Devstral Small 2": {
+   "QwQ 32B-Preview": {
     "rank": 304,
-    "score": 7.5
+    "score": 7.6
    },
-   "Llama 3.1 Nemotron Ultra 253B v1": {
+   "GLM-4.5V": {
     "rank": 305,
-    "score": 7.5
+    "score": 7.6
    },
-   "Qwen3 30B A3B 2507 Instruct": {
+   "Mistral Large 2": {
     "rank": 306,
-    "score": 7.5
+    "score": 7.6
    },
-   "ERNIE 4.5 300B A47B": {
+   "Devstral Small 2": {
     "rank": 307,
     "score": 7.5
    },
-   "Hermes 4 - Llama-3.1 405B": {
+   "Llama 3.1 Nemotron Ultra 253B v1": {
     "rank": 308,
     "score": 7.5
    },
-   "NVIDIA Nemotron Nano 12B v2 VL": {
+   "Qwen3 30B A3B 2507 Instruct": {
     "rank": 309,
     "score": 7.5
    },
-   "Granite 4.1 30B": {
+   "ERNIE 4.5 300B A47B": {
     "rank": 310,
-    "score": 7.4
+    "score": 7.5
    },
-   "NVIDIA Nemotron Nano 9B V2": {
+   "Hermes 4 - Llama-3.1 405B": {
     "rank": 311,
-    "score": 7.4
+    "score": 7.5
    },
-   "Gemini 2.0 Flash-Lite": {
+   "NVIDIA Nemotron Nano 12B v2 VL": {
     "rank": 312,
-    "score": 7.4
+    "score": 7.5
    },
-   "NVIDIA Nemotron 3 Nano 4B": {
+   "Granite 4.1 30B": {
     "rank": 313,
     "score": 7.4
    },
-   "Llama 3.1 Nemotron Nano 4B v1.1": {
+   "NVIDIA Nemotron Nano 9B V2": {
     "rank": 314,
-    "score": 7.3
+    "score": 7.4
    },
-   "Kimi Linear 48B A3B Instruct": {
+   "Gemini 2.0 Flash-Lite": {
     "rank": 315,
-    "score": 7.3
+    "score": 7.4
    },
-   "Llama 3.1 Instruct 405B": {
+   "NVIDIA Nemotron 3 Nano 4B": {
     "rank": 316,
-    "score": 7.3
+    "score": 7.4
    },
-   "Qwen3 8B": {
+   "Llama 3.1 Nemotron Nano 4B v1.1": {
     "rank": 317,
     "score": 7.3
    },
-   "Qwen3 VL 8B Instruct": {
+   "Kimi Linear 48B A3B Instruct": {
     "rank": 318,
     "score": 7.3
    },
-   "Qwen3 4B": {
+   "Llama 3.1 Instruct 405B": {
     "rank": 319,
-    "score": 7.2
+    "score": 7.3
    },
-   "LFM2.5-8B-A1B": {
+   "Qwen3 8B": {
     "rank": 320,
-    "score": 7.2
+    "score": 7.3
    },
-   "Llama 3.1 Tulu3 405B": {
+   "Qwen3 VL 8B Instruct": {
     "rank": 321,
-    "score": 7.2
+    "score": 7.3
    },
-   "Ring-flash-2.0": {
+   "Qwen3 4B": {
     "rank": 322,
     "score": 7.2
    },
-   "Pixtral Large": {
+   "LFM2.5-8B-A1B": {
     "rank": 323,
-    "score": 7.1
+    "score": 7.2
    },
-   "Olmo 3.1 32B Think": {
+   "Llama 3.1 Tulu3 405B": {
     "rank": 324,
-    "score": 7.1
+    "score": 7.2
    },
-   "Mistral Small 3.1": {
+   "Ring-flash-2.0": {
     "rank": 325,
-    "score": 7.1
+    "score": 7.2
    },
-   "Grok 2": {
+   "Pixtral Large": {
     "rank": 326,
     "score": 7.1
    },
-   "Gemini 1.5 Flash": {
+   "Olmo 3.1 32B Think": {
     "rank": 327,
     "score": 7.1
    },
-   "Qwen3 VL 4B": {
+   "Mistral Small 3.1": {
     "rank": 328,
-    "score": 7
+    "score": 7.1
    },
-   "GPT-4 Turbo": {
+   "Grok 2": {
     "rank": 329,
-    "score": 7
+    "score": 7.1
    },
-   "Nova Pro": {
+   "Gemini 1.5 Flash": {
     "rank": 330,
-    "score": 7
+    "score": 7.1
    },
-   "Command A": {
+   "Qwen3 VL 4B": {
     "rank": 331,
     "score": 7
    },
-   "Qwen3.5 2B": {
+   "GPT-4 Turbo": {
     "rank": 332,
-    "score": 6.9
+    "score": 7
    },
-   "Llama 3.1 Nemotron Instruct 70B": {
+   "Nova Pro": {
     "rank": 333,
-    "score": 6.9
+    "score": 7
    },
-   "Llama 3.1 Instruct 8B": {
+   "Command A": {
     "rank": 334,
-    "score": 6.9
+    "score": 7
    },
-   "Grok Beta": {
+   "Qwen3.5 2B": {
     "rank": 335,
     "score": 6.9
    },
-   "Qwen2.5 Instruct 32B": {
+   "Llama 3.1 Nemotron Instruct 70B": {
     "rank": 336,
     "score": 6.9
    },
-   "Qwen3 4B 2507 Instruct": {
+   "Llama 3.1 Instruct 8B": {
     "rank": 337,
-    "score": 6.7
+    "score": 6.9
    },
-   "Qwen2.5 Coder Instruct 32B": {
+   "Grok Beta": {
     "rank": 338,
-    "score": 6.7
+    "score": 6.9
    },
-   "GPT-4": {
+   "Qwen2.5 Instruct 32B": {
     "rank": 339,
-    "score": 6.7
+    "score": 6.9
    },
-   "Mistral Small 3": {
+   "Qwen3 4B 2507 Instruct": {
     "rank": 340,
     "score": 6.7
    },
-   "Nova Lite": {
+   "Qwen2.5 Coder Instruct 32B": {
     "rank": 341,
     "score": 6.7
    },
-   "GPT-4o mini": {
+   "GPT-4": {
     "rank": 342,
     "score": 6.7
    },
-   "DeepSeek-V2.5": {
+   "Mistral Small 3": {
     "rank": 343,
-    "score": 6.6
+    "score": 6.7
    },
-   "Llama 3.1 Instruct 70B": {
+   "Nova Lite": {
     "rank": 344,
-    "score": 6.6
+    "score": 6.7
    },
-   "Granite 4.1 8B": {
+   "GPT-4o mini": {
     "rank": 345,
-    "score": 6.6
+    "score": 6.7
    },
-   "Sarvam 30B": {
+   "DeepSeek-V2.5": {
     "rank": 346,
     "score": 6.6
    },
-   "Olmo 3.1 32B Instruct": {
+   "Llama 3.1 Instruct 70B": {
     "rank": 347,
-    "score": 6.5
+    "score": 6.6
    },
-   "Mistral Saba": {
+   "Granite 4.1 8B": {
     "rank": 348,
-    "score": 6.5
+    "score": 6.6
    },
-   "DeepSeek R1 Distill Llama 8B": {
+   "Sarvam 30B": {
     "rank": 349,
-    "score": 6.5
+    "score": 6.6
    },
-   "Olmo 3 32B Think": {
+   "Olmo 3.1 32B Instruct": {
     "rank": 350,
     "score": 6.5
    },
-   "R1 1776": {
+   "Mistral Saba": {
     "rank": 351,
-    "score": 6.4
+    "score": 6.5
    },
-   "Qwen2.5 Turbo": {
+   "DeepSeek R1 Distill Llama 8B": {
     "rank": 352,
-    "score": 6.4
+    "score": 6.5
    },
-   "Reka Flash": {
+   "Olmo 3 32B Think": {
     "rank": 353,
-    "score": 6.4
+    "score": 6.5
    },
-   "Llama 3.2 Instruct 90B": {
+   "R1 1776": {
     "rank": 354,
     "score": 6.4
    },
-   "Solar Mini": {
+   "Qwen2.5 Turbo": {
     "rank": 355,
     "score": 6.4
    },
-   "Celeris-1": {
+   "Reka Flash": {
     "rank": 356,
-    "score": 6.3
+    "score": 6.4
    },
-   "Grok-1": {
+   "Llama 3.2 Instruct 90B": {
     "rank": 357,
-    "score": 6.3
+    "score": 6.4
    },
-   "Qwen2 Instruct 72B": {
+   "Solar Mini": {
     "rank": 358,
-    "score": 6.3
+    "score": 6.4
    },
-   "Phi-4 Mini Instruct": {
+   "Celeris-1": {
     "rank": 359,
     "score": 6.3
    },
-   "Gemini 1.5 Flash-8B": {
+   "Grok-1": {
     "rank": 360,
+    "score": 6.3
+   },
+   "Qwen2 Instruct 72B": {
+    "rank": 361,
+    "score": 6.3
+   },
+   "Phi-4 Mini Instruct": {
+    "rank": 362,
+    "score": 6.3
+   },
+   "Gemini 1.5 Flash-8B": {
+    "rank": 363,
     "score": 6.2
    },
    "Qwen3.5 0.8B": {
-    "rank": 361,
+    "rank": 364,
     "score": 6.1
    },
    "DeepHermes 3 - Mistral 24B Preview": {
-    "rank": 362,
+    "rank": 365,
     "score": 6.1
    },
    "Jamba 1.7 Large": {
-    "rank": 363,
+    "rank": 366,
     "score": 6.1
    },
    "Granite 4.0 H Small": {
-    "rank": 364,
-    "score": 6
-   },
-   "Ministral 3 14B": {
-    "rank": 365,
-    "score": 6
-   },
-   "Jamba 1.5 Large": {
-    "rank": 366,
-    "score": 6
-   },
-   "Qwen3 Omni 30B A3B Instruct": {
     "rank": 367,
     "score": 6
    },
-   "Hermes 3 - Llama-3.1 70B": {
+   "Ministral 3 14B": {
     "rank": 368,
     "score": 6
    },
-   "DeepSeek-Coder-V2": {
+   "Jamba 1.5 Large": {
     "rank": 369,
     "score": 6
    },
-   "OLMo 2 32B": {
+   "Qwen3 Omni 30B A3B Instruct": {
     "rank": 370,
     "score": 6
    },
-   "Jamba 1.6 Large": {
+   "Hermes 3 - Llama-3.1 70B": {
     "rank": 371,
     "score": 6
    },
-   "LFM2 24B A2B": {
+   "DeepSeek-Coder-V2": {
     "rank": 372,
-    "score": 5.9
+    "score": 6
    },
-   "Phi-4": {
+   "OLMo 2 32B": {
     "rank": 373,
-    "score": 5.9
+    "score": 6
    },
-   "Claude 3 Sonnet": {
+   "Jamba 1.6 Large": {
     "rank": 374,
-    "score": 5.9
+    "score": 6
    },
-   "Nova Micro": {
+   "LFM2 24B A2B": {
     "rank": 375,
     "score": 5.9
    },
-   "Granite 4.1 3B": {
+   "Phi-4": {
     "rank": 376,
     "score": 5.9
    },
-   "Mistral Small": {
+   "Claude 3 Sonnet": {
     "rank": 377,
-    "score": 5.8
+    "score": 5.9
    },
-   "Gemini 1.0 Ultra": {
+   "Nova Micro": {
     "rank": 378,
-    "score": 5.8
+    "score": 5.9
    },
-   "Phi-3 Mini Instruct 3.8B": {
+   "Granite 4.1 3B": {
     "rank": 379,
-    "score": 5.8
+    "score": 5.9
    },
-   "Gemma 3n E4B Instruct Preview": {
+   "Mistral Small": {
     "rank": 380,
     "score": 5.8
    },
-   "Phi-4 Multimodal Instruct": {
+   "Gemini 1.0 Ultra": {
     "rank": 381,
     "score": 5.8
    },
-   "Qwen2.5 Coder Instruct 7B": {
+   "Phi-3 Mini Instruct 3.8B": {
     "rank": 382,
     "score": 5.8
    },
-   "Mistral Large": {
+   "Gemma 3n E4B Instruct Preview": {
     "rank": 383,
     "score": 5.8
    },
-   "Mixtral 8x22B Instruct": {
+   "Phi-4 Multimodal Instruct": {
     "rank": 384,
-    "score": 5.7
+    "score": 5.8
    },
-   "Llama 2 Chat 7B": {
+   "Qwen2.5 Coder Instruct 7B": {
     "rank": 385,
-    "score": 5.7
+    "score": 5.8
    },
-   "Llama 3.2 Instruct 3B": {
+   "Mistral Large": {
     "rank": 386,
-    "score": 5.7
+    "score": 5.8
    },
-   "MiniCPM-V 4.6 1.3B": {
+   "Mixtral 8x22B Instruct": {
     "rank": 387,
     "score": 5.7
    },
-   "Jamba Reasoning 3B": {
+   "Llama 2 Chat 7B": {
     "rank": 388,
     "score": 5.7
    },
-   "Qwen3 VL 4B Instruct": {
+   "Llama 3.2 Instruct 3B": {
     "rank": 389,
     "score": 5.7
    },
-   "Qwen1.5 Chat 110B": {
+   "MiniCPM-V 4.6 1.3B": {
     "rank": 390,
     "score": 5.7
    },
-   "Reka Flash 3": {
+   "Jamba Reasoning 3B": {
     "rank": 391,
-    "score": 5.6
+    "score": 5.7
    },
-   "Olmo 3 7B Think": {
+   "Qwen3 VL 4B Instruct": {
     "rank": 392,
-    "score": 5.6
+    "score": 5.7
    },
-   "Claude 2.1": {
+   "Qwen1.5 Chat 110B": {
     "rank": 393,
-    "score": 5.6
+    "score": 5.7
    },
-   "Claude 3 Haiku": {
+   "Reka Flash 3": {
     "rank": 394,
     "score": 5.6
    },
-   "OLMo 2 7B": {
+   "Olmo 3 7B Think": {
     "rank": 395,
     "score": 5.6
    },
-   "Molmo 7B-D": {
+   "Claude 2.1": {
     "rank": 396,
     "score": 5.6
    },
-   "Ling-mini-2.0": {
+   "Claude 3 Haiku": {
     "rank": 397,
-    "score": 5.5
+    "score": 5.6
    },
-   "DeepSeek R1 Distill Qwen 1.5B": {
+   "OLMo 2 7B": {
     "rank": 398,
-    "score": 5.5
+    "score": 5.6
    },
-   "Claude 2.0": {
+   "Molmo 7B-D": {
     "rank": 399,
-    "score": 5.5
+    "score": 5.6
    },
-   "DeepSeek-V2-Chat": {
+   "Ling-mini-2.0": {
     "rank": 400,
     "score": 5.5
    },
-   "Mistral Medium": {
+   "DeepSeek R1 Distill Qwen 1.5B": {
     "rank": 401,
     "score": 5.5
    },
-   "GPT-3.5 Turbo": {
+   "Claude 2.0": {
     "rank": 402,
     "score": 5.5
    },
-   "Ministral 3 8B": {
+   "DeepSeek-V2-Chat": {
     "rank": 403,
     "score": 5.5
    },
-   "Llama 3 Instruct 70B": {
+   "Mistral Medium": {
     "rank": 404,
     "score": 5.5
    },
-   "Arctic Instruct": {
+   "GPT-3.5 Turbo": {
     "rank": 405,
-    "score": 5.4
+    "score": 5.5
    },
-   "Qwen Chat 72B": {
+   "Ministral 3 8B": {
     "rank": 406,
-    "score": 5.4
+    "score": 5.5
    },
-   "LFM 40B": {
+   "Llama 3 Instruct 70B": {
     "rank": 407,
-    "score": 5.4
+    "score": 5.5
    },
-   "Llama 3.2 Instruct 11B": {
+   "Arctic Instruct": {
     "rank": 408,
     "score": 5.4
    },
-   "PALM-2": {
+   "Qwen Chat 72B": {
     "rank": 409,
     "score": 5.4
    },
-   "Gemini 1.0 Pro": {
+   "LFM 40B": {
     "rank": 410,
-    "score": 5.3
+    "score": 5.4
    },
-   "DeepSeek Coder V2 Lite Instruct": {
+   "Llama 3.2 Instruct 11B": {
     "rank": 411,
-    "score": 5.3
+    "score": 5.4
    },
-   "Sarvam M": {
+   "PALM-2": {
     "rank": 412,
-    "score": 5.3
+    "score": 5.4
    },
-   "DeepSeek LLM 67B Chat": {
+   "Gemini 1.0 Pro": {
     "rank": 413,
     "score": 5.3
    },
-   "Llama 2 Chat 70B": {
+   "DeepSeek Coder V2 Lite Instruct": {
     "rank": 414,
     "score": 5.3
    },
-   "Llama 2 Chat 13B": {
+   "Sarvam M": {
     "rank": 415,
     "score": 5.3
    },
-   "Command-R+": {
+   "DeepSeek LLM 67B Chat": {
     "rank": 416,
     "score": 5.3
    },
-   "OpenChat 3.5": {
+   "Llama 2 Chat 70B": {
     "rank": 417,
     "score": 5.3
    },
-   "DBRX Instruct": {
+   "Llama 2 Chat 13B": {
     "rank": 418,
     "score": 5.3
    },
-   "Exaone 4.0 1.2B": {
+   "Command-R+": {
     "rank": 419,
     "score": 5.3
    },
-   "Olmo 3 7B Instruct": {
+   "OpenChat 3.5": {
     "rank": 420,
-    "score": 5.2
+    "score": 5.3
    },
-   "LFM2.5-1.2B-Thinking": {
+   "DBRX Instruct": {
     "rank": 421,
-    "score": 5.2
+    "score": 5.3
    },
-   "Jamba 1.7 Mini": {
+   "Exaone 4.0 1.2B": {
     "rank": 422,
-    "score": 5.2
+    "score": 5.3
    },
-   "LFM2 2.6B": {
+   "Olmo 3 7B Instruct": {
     "rank": 423,
     "score": 5.2
    },
-   "LFM2.5-1.2B-Instruct": {
+   "LFM2.5-1.2B-Thinking": {
     "rank": 424,
     "score": 5.2
    },
-   "Jamba 1.5 Mini": {
+   "Jamba 1.7 Mini": {
     "rank": 425,
     "score": 5.2
    },
-   "Granite 4.0 H 1B": {
+   "LFM2 2.6B": {
     "rank": 426,
     "score": 5.2
    },
-   "Qwen3 1.7B": {
+   "LFM2.5-1.2B-Instruct": {
     "rank": 427,
     "score": 5.2
    },
-   "Jamba 1.6 Mini": {
+   "Jamba 1.5 Mini": {
     "rank": 428,
     "score": 5.2
    },
-   "Mixtral 8x7B Instruct": {
+   "Granite 4.0 H 1B": {
     "rank": 429,
-    "score": 5.1
+    "score": 5.2
    },
-   "Gemma 3 270M": {
+   "Qwen3 1.7B": {
     "rank": 430,
-    "score": 5.1
+    "score": 5.2
    },
-   "Apertus 70B Instruct": {
+   "Jamba 1.6 Mini": {
     "rank": 431,
-    "score": 5.1
+    "score": 5.2
    },
-   "Granite 4.0 Micro": {
+   "Mixtral 8x7B Instruct": {
     "rank": 432,
     "score": 5.1
    },
-   "DeepHermes 3 - Llama-3.1 8B Preview": {
+   "Gemma 3 270M": {
     "rank": 433,
     "score": 5.1
    },
-   "Claude Instant": {
+   "Apertus 70B Instruct": {
     "rank": 434,
-    "score": 5
+    "score": 5.1
    },
-   "Command-R": {
+   "Granite 4.0 Micro": {
     "rank": 435,
-    "score": 5
+    "score": 5.1
    },
-   "Llama 65B": {
+   "DeepHermes 3 - Llama-3.1 8B Preview": {
     "rank": 436,
-    "score": 5
+    "score": 5.1
    },
-   "Mistral 7B Instruct": {
+   "Claude Instant": {
     "rank": 437,
     "score": 5
    },
-   "Qwen Chat 14B": {
+   "Command-R": {
     "rank": 438,
     "score": 5
    },
-   "Granite 4.0 1B": {
+   "Llama 65B": {
     "rank": 439,
     "score": 5
    },
-   "Molmo2-8B": {
+   "Mistral 7B Instruct": {
     "rank": 440,
     "score": 5
    },
-   "LFM2 8B A1B": {
+   "Qwen Chat 14B": {
     "rank": 441,
+    "score": 5
+   },
+   "Granite 4.0 1B": {
+    "rank": 442,
+    "score": 5
+   },
+   "Molmo2-8B": {
+    "rank": 443,
+    "score": 5
+   },
+   "LFM2 8B A1B": {
+    "rank": 444,
     "score": 4.9
    },
    "Granite 3.3 8B": {
-    "rank": 442,
+    "rank": 445,
     "score": 4.9
    },
    "Gemma 3 27B Instruct": {
-    "rank": 443,
+    "rank": 446,
     "score": 4.9
    },
    "Ministral 3 3B": {
-    "rank": 444,
-    "score": 4.8
-   },
-   "Apertus 8B Instruct": {
-    "rank": 445,
-    "score": 4.8
-   },
-   "Gemma 3 1B Instruct": {
-    "rank": 446,
-    "score": 4.8
-   },
-   "Gemma 3 4B Instruct": {
     "rank": 447,
     "score": 4.8
    },
-   "Gemma 3n E2B Instruct": {
+   "Apertus 8B Instruct": {
     "rank": 448,
     "score": 4.8
    },
-   "Gemma 3n E4B Instruct": {
+   "Gemma 3 1B Instruct": {
     "rank": 449,
     "score": 4.8
    },
-   "Granite 4.0 350M": {
+   "Gemma 3 4B Instruct": {
     "rank": 450,
     "score": 4.8
    },
-   "Granite 4.0 H 350M": {
+   "Gemma 3n E2B Instruct": {
     "rank": 451,
     "score": 4.8
    },
-   "LFM2 1.2B": {
+   "Gemma 3n E4B Instruct": {
     "rank": 452,
     "score": 4.8
    },
-   "LFM2.5-VL-1.6B": {
+   "Granite 4.0 350M": {
     "rank": 453,
     "score": 4.8
    },
-   "Llama 3 Instruct 8B": {
+   "Granite 4.0 H 350M": {
     "rank": 454,
     "score": 4.8
    },
-   "Llama 3.2 Instruct 1B": {
+   "LFM2 1.2B": {
     "rank": 455,
     "score": 4.8
    },
-   "Qwen3 0.6B": {
+   "LFM2.5-VL-1.6B": {
     "rank": 456,
     "score": 4.8
    },
-   "Tiny Aya Global": {
+   "Llama 3 Instruct 8B": {
     "rank": 457,
     "score": 4.8
    },
-   "Gemma 3 12B Instruct": {
+   "Llama 3.2 Instruct 1B": {
     "rank": 458,
+    "score": 4.8
+   },
+   "Qwen3 0.6B": {
+    "rank": 459,
+    "score": 4.8
+   },
+   "Tiny Aya Global": {
+    "rank": 460,
+    "score": 4.8
+   },
+   "Gemma 3 12B Instruct": {
+    "rank": 461,
     "score": 3.8
    },
    "K2 Horizon 0.9B": {
-    "rank": 459,
+    "rank": 462,
     "score": 3
    }
   }

@@ -11,6 +11,7 @@ tags:
 ## Core Concepts
 
 [[Index of Programming Language]] 
+[[Index of  Traditional CS]]
 [[Index of Algorithm]]
 [[Index of Math]]
 

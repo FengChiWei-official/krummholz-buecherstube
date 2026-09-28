@@ -1,9 +1,6 @@
 ---
 tags:
   - type/permanent
-	- type/permanent
-	- topic/learning
-	- attr/map
   - status/evergreen
 ---
 

@@ -11,9 +11,14 @@ Daily flow (see .agent/skills/trend-radar/SKILL.md):
 Artifacts (all under archives/, flat, no new zone layers):
 
     TR-raw-D-YYYY-MM-DD.md  原始清单（零 AI 改写，逐条可回溯到 API 快照）
-    TR-D-YYYY-MM-DD.md      当日精选报告
+    TR-D-YYYY-MM-DD.md      当日报告：精选 + 学术两节，条数随当日信号浮动
     TR-W-<ISOyear>-W<week>.md / TR-M-YYYY-MM.md / TR-Y-YYYY.md   滚动合并件
     a_sticker/todos/Trend Radar.md   索引（只链当前仍在的件）
+
+Academic layer: hf-papers / arxiv (cs.AI·LG·CL) / arxiv-ml (stat.ML·math.OC·cs.NA) /
+arxiv-plse (cs.SE·PL·AR·OS) / arxiv-ds (cs.DS·CG·CC) / s2 / openalex.
+The two report layers are disjoint: a pick from an academic source belongs to 学术, never to 精选.
+Academic picks are ML-algorithms-first: BUCKET_QUOTA caps the engineering and algorithms buckets.
 
 Rolling: 7 日报 → 周报；自然月内 ≥4 周报 → 月报；年 ≥12 月报 → 年报。被合并件删除。
 Raw merges on the same clock, capped per section (MERGE_RAW_CAP) so the archive stays bounded.
@@ -36,10 +41,31 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-MIN_ITEMS = 20          # per section floor in the raw list
+MIN_ITEMS = 20          # default per section floor in the raw list
+SECTION_FLOOR = {"openalex": 10}   # sections whose source is narrower than MIN_ITEMS
 OPENALEX_WINDOW = 7     # days back for the OpenAlex citation-velocity window
+S2_WINDOW = 7           # days back for the Semantic Scholar publication window
 GITHUB_WINDOW = 7       # days back for "new repositories" window
 MERGE_RAW_CAP = 50      # per-section cap inside merged raw files
+
+# Report size is adaptive — the day decides. These are sanity bounds, not targets.
+REPORT_MIN, REPORT_MAX = 4, 24
+# Academic layer + floating size landed on this date; dailies before it keep the old
+# contract (single 精选 section, 8–12 items) and are verified for provenance only.
+LAYER_CUTOVER = date(2026, 9, 21)
+# Sources that feed the report's 学术 section (curated 精选 may not borrow from them,
+# and academic items may not borrow outside them — keeping the two layers disjoint).
+ACADEMIC_SIDS = ("hf-papers", "arxiv", "arxiv-ml", "arxiv-plse", "arxiv-ds", "s2", "openalex")
+ARXIV_AI_CATS = ("cs.AI", "cs.LG", "cs.CL")
+ARXIV_ML_CATS = ("stat.ML", "math.OC", "cs.NA")          # 主偏好：ML 算法与优化
+ARXIV_PLSE_CATS = ("cs.SE", "cs.PL", "cs.AR", "cs.OS")   # 添头：工程向
+ARXIV_DS_CATS = ("cs.DS", "cs.CG", "cs.CC")              # 拓展：算法与复杂度
+ARXIV_MAX = 40
+# Report-level bias, enforced by cmd_report and verify: the academic section is
+# ML-algorithms-first, with the engineering bucket and the algorithms bucket capped.
+BUCKET_QUOTA = {"arxiv-ml": ("min", 2), "arxiv-plse": ("max", 2), "arxiv-ds": ("max", 2)}
+S2_FIELDS = ("title,venue,publicationDate,citationCount,influentialCitationCount,"
+             "externalIds,fieldsOfStudy")
 INDEX_NAME = "Trend Radar"
 INDEX_REL = Path("a_sticker/todos") / f"{INDEX_NAME}.md"
 TODOS_INDEX_REL = Path("a_sticker/todos/Index of Todos.md")
@@ -77,6 +103,10 @@ def http_get(url: str, timeout: int = 45, tries: int = 3, headers=None) -> bytes
 def json_get(url: str):
     raw = http_get(url)
     return json.loads(raw.decode("utf-8", "replace")), raw
+
+
+class SourceSkipped(RuntimeError):
+    """Source is intentionally not enabled (missing credential) — not a failure."""
 
 
 def item(url, prov, title, meta, score=None, when=None):
@@ -145,11 +175,10 @@ def fetch_hf_papers(day):
     return out, raw, api
 
 
-@source("arxiv", "arXiv cs.AI | cs.LG | cs.CL（按提交时间倒序）")
-def fetch_arxiv(day):
+def arxiv_fetch(day, cats):
     api = ("https://export.arxiv.org/api/query?search_query="
-           "cat:cs.AI+OR+cat:cs.LG+OR+cat:cs.CL"
-           "&sortBy=submittedDate&sortOrder=descending&max_results=40")
+           + "+OR+".join(f"cat:{c}" for c in cats)
+           + f"&sortBy=submittedDate&sortOrder=descending&max_results={ARXIV_MAX}")
     raw = http_get(api)
     ns = {"a": "http://www.w3.org/2005/Atom"}
     root = ET.fromstring(raw)
@@ -168,6 +197,100 @@ def fetch_arxiv(day):
                         f"{published[:16].replace('T', ' ')}Z · arXiv:{aid}",
                         None, published[:10]))
     return out, raw, api
+
+
+@source("arxiv", f"arXiv {' | '.join(ARXIV_AI_CATS)}（按提交时间倒序）")
+def fetch_arxiv(day):
+    return arxiv_fetch(day, ARXIV_AI_CATS)
+
+
+@source("arxiv-ml", f"arXiv {' | '.join(ARXIV_ML_CATS)}（ML 算法与优化，按提交时间倒序）")
+def fetch_arxiv_ml(day):
+    return arxiv_fetch(day, ARXIV_ML_CATS)
+
+
+@source("arxiv-plse", f"arXiv {' | '.join(ARXIV_PLSE_CATS)}（工程向添头，按提交时间倒序）")
+def fetch_arxiv_plse(day):
+    return arxiv_fetch(day, ARXIV_PLSE_CATS)
+
+
+@source("arxiv-ds", f"arXiv {' | '.join(ARXIV_DS_CATS)}（算法与复杂度拓展，按提交时间倒序）")
+def fetch_arxiv_ds(day):
+    return arxiv_fetch(day, ARXIV_DS_CATS)
+
+
+@source("s2", f"Semantic Scholar 近 {S2_WINDOW} 天 CS 论文（被引降序）")
+def fetch_s2(day):
+    """Keyed (x-api-key); unset key → 未启用 section, never a failure."""
+    key = os.environ.get("SEMANTIC_SCHOLAR_API_KEY", "").strip()
+    if not key:
+        raise SourceSkipped("未设置 SEMANTIC_SCHOLAR_API_KEY")
+    since = day - timedelta(days=S2_WINDOW)
+    api = ("https://api.semanticscholar.org/graph/v1/paper/search/bulk"
+           "?query=*&fieldsOfStudy=Computer%20Science"
+           f"&publicationDateOrYear={since.isoformat()}:"
+           "&sort=citationCount:desc"
+           f"&fields={S2_FIELDS}")
+    raw = http_get(api, headers={"x-api-key": key})
+    data = json.loads(raw.decode("utf-8", "replace"))
+    out = []
+    for paper in data.get("data", []):
+        title = str(paper.get("title") or "").strip()
+        pid = paper.get("paperId")
+        if not title or not pid:
+            continue
+        ext = paper.get("externalIds") or {}
+        arxiv_id, doi = ext.get("ArXiv"), ext.get("DOI")
+        if arxiv_id:
+            url, prov = f"https://arxiv.org/abs/{arxiv_id}", arxiv_id
+        elif doi:
+            url, prov = f"https://doi.org/{doi}", doi
+        else:
+            url, prov = f"https://www.semanticscholar.org/paper/{pid}", pid
+        pub = str(paper.get("publicationDate") or "")
+        out.append(item(url, prov, title,
+                        f"被引 {paper.get('citationCount')} · 影响力引用 "
+                        f"{paper.get('influentialCitationCount')} · {pub} · "
+                        f"{paper.get('venue') or 'n/a'}",
+                        paper.get("citationCount"), pub))
+    if not out:
+        raise RuntimeError("响应里没有可用的论文行（字段名可能已改，见快照）")
+    return out[:25], raw, api
+
+
+@source("openalex", f"OpenAlex 近 {OPENALEX_WINDOW} 天高被引 CS 论文（期刊/会议，被引降序）")
+def fetch_openalex(day):
+    key = os.environ.get("OPENALEX_API_KEY", "").strip()
+    if not key:
+        raise RuntimeError("环境变量 OPENALEX_API_KEY 未设置")
+    since = day - timedelta(days=OPENALEX_WINDOW)
+    api = ("https://api.openalex.org/works?filter="
+           f"from_publication_date:{since.isoformat()},to_publication_date:{day.isoformat()},"
+           "type:article,has_abstract:true,"
+           "primary_location.source.type:journal|conference,"
+           "primary_topic.field.id:fields/17"
+           "&sort=cited_by_count:desc&per-page=200"
+           f"&api_key={key}")
+    data, raw = json_get(api)
+    out, seen = [], set()
+    for work in data.get("results", []):
+        if not work.get("authorships") or not work.get("title"):
+            continue
+        doi = work.get("doi") or ""
+        prov = doi or work.get("id") or ""
+        key_ = (doi or work.get("id") or "").lower()
+        title_key = re.sub(r"[^a-z0-9]", "", work["title"].lower())[:80]
+        if key_ in seen or title_key in seen:
+            continue
+        seen.update({key_, title_key})
+        source = ((work.get("primary_location") or {}).get("source") or {})
+        venue = source.get("display_name")
+        kind = source.get("type")
+        out.append(item(doi or work["id"], prov, work["title"],
+                        f"被引 {work.get('cited_by_count')} · {work.get('publication_date')} · "
+                        f"{venue or 'n/a'}{f'（{kind}）' if kind else ''}",
+                        work.get("cited_by_count"), work.get("publication_date")))
+    return out[:25], raw, api
 
 
 @source("hackernews", "Hacker News Front Page（points 降序）")
@@ -238,39 +361,6 @@ def fetch_github(day):
     return out, raw, api
 
 
-@source("openalex", f"OpenAlex 近 {OPENALEX_WINDOW} 天高被引 CS 论文（被引降序）")
-def fetch_openalex(day):
-    key = os.environ.get("OPENALEX_API_KEY", "").strip()
-    if not key:
-        raise RuntimeError("环境变量 OPENALEX_API_KEY 未设置")
-    since = day - timedelta(days=OPENALEX_WINDOW)
-    api = ("https://api.openalex.org/works?filter="
-           f"from_publication_date:{since.isoformat()},to_publication_date:{day.isoformat()},"
-           "type:article,has_abstract:true&sort=cited_by_count:desc&per-page=200"
-           f"&api_key={key}")
-    data, raw = json_get(api)
-    out, seen = [], set()
-    for work in data.get("results", []):
-        topic = work.get("primary_topic") or {}
-        if ((topic.get("field") or {}).get("display_name")) != "Computer Science":
-            continue
-        if not work.get("authorships") or not work.get("title"):
-            continue
-        doi = work.get("doi") or ""
-        prov = doi or work.get("id") or ""
-        key_ = (doi or work.get("id") or "").lower()
-        title_key = re.sub(r"[^a-z0-9]", "", work["title"].lower())[:80]
-        if key_ in seen or title_key in seen:
-            continue
-        seen.update({key_, title_key})
-        venue = ((work.get("primary_location") or {}).get("source") or {}).get("display_name")
-        out.append(item(doi or work["id"], prov, work["title"],
-                        f"被引 {work.get('cited_by_count')} · {work.get('publication_date')} · "
-                        f"{venue or 'n/a'}",
-                        work.get("cited_by_count"), work.get("publication_date")))
-    return out[:25], raw, api
-
-
 # ---------------------------------------------------------------- provenance
 
 
@@ -305,8 +395,11 @@ def fm_block(lines) -> str:
     return "---\n" + "".join(f"{line}\n" for line in lines) + "---\n"
 
 
-def section_header(sid: str, label: str, count: int, degraded: str | None) -> str:
+def section_header(sid: str, label: str, count: int, degraded: str | None,
+                   skipped: bool = False) -> str:
     head = f"\n## {sid} — {label}\n"
+    if skipped:
+        return head + f"\n> [未启用] {degraded}\n"
     if degraded:
         return head + f"\n> [降级] 抓取失败：{degraded}\n"
     return head + f"\n> 共 {count} 条\n"
@@ -619,21 +712,21 @@ def redact(url: str) -> str:
 
 
 def write_raw_note(root: Path, day: date, payload, sna: Path):
-    """payload: {sid: (items, raw_bytes, api, error)}"""
+    """payload: {sid: (items, raw_bytes, api, error, skipped)}"""
     date_str = day.isoformat()
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     source_lines = [f'  - "原始清单 {date_str}：机器生成，零 AI 改写"']
-    hashes, degraded, hits, total = {}, [], 0, 0
+    hashes, degraded, skipped, hits, total = {}, [], [], 0, 0
     body = [f"\n# Trend Radar Raw {date_str}\n",
             "\n> 机器生成，零 AI 改写；每条 = 源侧返回字段的原样映射（标题/分数/时间戳取自响应）。\n",
             f"> 抓取时间 {now}；快照 {sna}/（`fetch --purge` 清理）。\n",
             "> 校验方式：每条 URL 的源侧原样字段必须出现在该源快照字节流中，命中率见文末 Provenance。\n"]
     for sid, label, _fn in SOURCES:
-        items, raw_bytes, api, err = payload[sid]
+        items, raw_bytes, api, err, skip = payload[sid]
         if err:
-            degraded.append(f"{sid}（{err}）")
-            body.append(section_header(sid, label, 0, err))
-            source_lines.append(f'  - "{label}：抓取失败（{err}）"')
+            (skipped if skip else degraded).append(f"{sid}（{err}）")
+            body.append(section_header(sid, label, 0, err, skip))
+            source_lines.append(f'  - "{label}：{err}"')
             continue
         hashes[sid] = hashlib.sha256(raw_bytes).hexdigest()[:12]
         hits += len(items)
@@ -646,6 +739,7 @@ def write_raw_note(root: Path, day: date, payload, sna: Path):
     body.append(f"- 抓取时间：{now}\n")
     body.append(f"- URL 命中：{hits}/{total}（源侧原样字段在快照字节流中命中）\n")
     body.append(f"- 降级源：{'、'.join(degraded) if degraded else '无'}\n")
+    body.append(f"- 未启用源：{'、'.join(skipped) if skipped else '无'}\n")
     if hashes:
         body.append("- 快照 sha256 前 12 位：" +
                     "，".join(f"{sid} {h}" for sid, h in hashes.items()) + "\n")
@@ -667,28 +761,32 @@ def cmd_fetch(args) -> int:
     day = args.date
     payload, pooled = {}, []
     for sid, label, fn in SOURCES:
+        floor = SECTION_FLOOR.get(sid, MIN_ITEMS)
         try:
             items, raw_bytes, api = fn(day)
             kept, dropped = provenance_check(sid, items, raw_bytes)
-            if len(kept) < MIN_ITEMS:
-                err = (f"仅 {len(kept)} 条通过快照校验（阈值 {MIN_ITEMS}）"
+            if len(kept) < floor:
+                err = (f"仅 {len(kept)} 条通过快照校验（阈值 {floor}）"
                        + (f"，{len(dropped)} 条未命中快照" if dropped else ""))
-                payload[sid] = ([], raw_bytes, api, err)
-                pooled.append((sid, label, [], err, dropped))
+                payload[sid] = ([], raw_bytes, api, err, False)
+                pooled.append((sid, label, [], err, dropped, False))
                 continue
-            payload[sid] = (kept, raw_bytes, api, None)
-            pooled.append((sid, label, kept, None, dropped))
+            payload[sid] = (kept, raw_bytes, api, None, False)
+            pooled.append((sid, label, kept, None, dropped, False))
+        except SourceSkipped as exc:
+            payload[sid] = ([], b"", "", str(exc), True)
+            pooled.append((sid, label, [], str(exc), [], True))
         except Exception as exc:                      # noqa: BLE001 — degrade, never abort
             msg = f"{type(exc).__name__}: {exc}"
-            payload[sid] = ([], b"", "", msg)
-            pooled.append((sid, label, [], msg, []))
+            payload[sid] = ([], b"", "", msg, False)
+            pooled.append((sid, label, [], msg, [], False))
     if args.purge:
         purge_snapshots(snapshot_dir(day.isoformat(), Path(args.snapshot_dir) if args.snapshot_dir else None))
         return 0
     sna = snapshot_dir(day.isoformat(), Path(args.snapshot_dir) if args.snapshot_dir else None)
     sna.mkdir(parents=True, exist_ok=True)
     for sid, _l, _f in SOURCES:
-        items, raw_bytes, _api, err = payload[sid]
+        items, raw_bytes, _api, err, _skip = payload[sid]
         if not err and raw_bytes:
             (sna / f"{sid}.raw").write_bytes(raw_bytes)
     path, existed, size = write_raw_note(root, day, payload, sna)
@@ -696,12 +794,14 @@ def cmd_fetch(args) -> int:
     fetch_leaderboards(root, day, sna)
     print(f"快照目录 {sna}")
     ok = sum(1 for sid, _l, _f in SOURCES if not payload[sid][3])
-    print(f"源 {ok}/{len(SOURCES)} 正常\n")
+    skipped_n = sum(1 for sid, _l, _f in SOURCES if payload[sid][4])
+    print(f"源 {ok}/{len(SOURCES)} 正常"
+          + (f"（{skipped_n} 未启用）" if skipped_n else "") + "\n")
     print("# 候选池（用于人工/AI 挑选，非最终报告）\n")
-    for sid, label, items, err, dropped in pooled:
+    for sid, label, items, err, dropped, skip in pooled:
         print(f"## {sid} — {label}")
         if err:
-            print(f"  [降级] {err}")
+            print(f"  [{'未启用' if skip else '降级'}] {err}")
             continue
         for it in items[:20]:
             print(f"  [{it['score']}] {it['title']} — {it['url']}")
@@ -724,16 +824,59 @@ def purge_snapshots(sna: Path) -> None:
 # ---------------------------------------------------------------- report
 
 
-def raw_urls(root: Path, date_str: str) -> dict:
+def raw_sections(root: Path, date_str: str) -> dict:
+    """{url: section id} for a daily raw note — the provenance layer of every pick."""
     path = root / "archives" / f"TR-raw-D-{date_str}.md"
     if not path.exists():
         return {}
-    found = {}
+    found, sid = {}, ""
     for line in path.read_text(encoding="utf-8").splitlines():
+        head = re.match(r"^## (\S+) — ", line)
+        if head:
+            sid = head.group(1)
+            continue
         m = re.match(r"^- \[.+\]\((?:<)?([^)>\s]+)(?:>)?\) — ", line)
-        if m:
-            found[m.group(1)] = line
+        if m and sid:
+            found[m.group(1)] = sid
     return found
+
+
+def section_counts(root: Path, date_str: str) -> dict:
+    """{sid: count} for the sections that returned items (raw note's Provenance line)."""
+    path = root / "archives" / f"TR-raw-D-{date_str}.md"
+    if not path.exists():
+        return {}
+    m = re.search(r"^- 各节条目数：(.+)$", path.read_text(encoding="utf-8"), re.M)
+    if not m:
+        return {}
+    counts = {}
+    for pair in m.group(1).split("，"):
+        sid, _sep, n = pair.rpartition(" ")
+        if sid and n.isdigit():
+            counts[sid] = int(n)
+    return counts
+
+
+def pool_size(root: Path, date_str: str) -> int:
+    """Candidate pool = every item of every non-degraded raw section that day."""
+    return sum(section_counts(root, date_str).values())
+
+
+def academic_available(root: Path, date_str: str) -> set:
+    """Academic sections that actually returned items today."""
+    return {sid for sid in section_counts(root, date_str) if sid in ACADEMIC_SIDS}
+
+
+def quota_problems(counts: dict) -> list:
+    """Academic-section bias: ML algorithms first, engineering/algorithms buckets capped."""
+    out = []
+    for sid, (kind, limit) in BUCKET_QUOTA.items():
+        got = counts.get(sid, 0)
+        if kind == "min" and got < limit:
+            out.append(f"学术节来自 {sid} 的条目 {got} < {limit}（ML 算法线是主偏好）")
+        elif kind == "max" and got > limit:
+            out.append(f"学术节来自 {sid} 的条目 {got} > {limit}（该桶只作添头/拓展）")
+    return out
 
 
 def cmd_report(args) -> int:
@@ -744,19 +887,22 @@ def cmd_report(args) -> int:
         print("ERROR: items 文件必须是 JSON 数组")
         return 2
     write_index(root, args.date, quiet=True)      # ensure Related targets resolve
-    errors, known = [], raw_urls(root, date_str)
-    if not known:
+    sections = raw_sections(root, date_str)
+    if not sections:
         print(f"ERROR: 缺少 {date_str} 的原始清单，先跑 fetch")
         return 2
-    if not (8 <= len(items) <= 12):
-        errors.append(f"精选条数 {len(items)} 不在 [8,12]")
-    queries, seen_urls = [], set()
+    pool = pool_size(root, date_str)
+    errors = []
+    if not (REPORT_MIN <= len(items) <= REPORT_MAX):
+        errors.append(f"条数 {len(items)} 超出 sanity 界 [{REPORT_MIN},{REPORT_MAX}]")
+    queries, seen_urls, picked = [], set(), {"精选": [], "学术": []}
     for idx, it in enumerate(items, 1):
         url = str(it.get("url", "")).strip()
         src = str(it.get("source", "")).strip()
         why = str(it.get("why", "")).strip()
         origin = str(it.get("from", "raw")).strip()
         query = str(it.get("query", "")).strip()
+        section = str(it.get("section", "精选")).strip() or "精选"
         if not url.startswith(("http://", "https://")):
             errors.append(f"#{idx} url 非法：{url!r}")
         if url in seen_urls:
@@ -766,9 +912,18 @@ def cmd_report(args) -> int:
             errors.append(f"#{idx} 缺 source")
         if not why:
             errors.append(f"#{idx} 缺 why")
+        if section not in picked:
+            errors.append(f"#{idx} section 只能是 {list(picked)}，得到 {section!r}")
+        else:
+            picked[section].append(url)
+        origin_sid = sections.get(url)
         if origin == "raw":
-            if url not in known:
+            if origin_sid is None:
                 errors.append(f"#{idx} 声称来自原始清单，但 URL 不在 TR-raw-D-{date_str}：{url}")
+            elif section == "学术" and origin_sid not in ACADEMIC_SIDS:
+                errors.append(f"#{idx} 学术节条目却来自非学术源 {origin_sid}：{url}")
+            elif section == "精选" and origin_sid in ACADEMIC_SIDS:
+                errors.append(f"#{idx} 来自学术源 {origin_sid} 的条目应放「学术」节：{url}")
         elif origin == "websearch":
             if not query:
                 errors.append(f"#{idx} from=websearch 必须提供 query")
@@ -776,34 +931,53 @@ def cmd_report(args) -> int:
                 queries.append(query)
         else:
             errors.append(f"#{idx} from 只能是 raw 或 websearch，得到 {origin!r}")
+    for layer in ("精选", "学术"):
+        if not picked[layer]:
+            errors.append(f"{layer} 节为空（两节都至少要有一条）")
+    cited = {}
+    for url in picked["学术"]:
+        sid = sections.get(url)
+        if sid:
+            cited[sid] = cited.get(sid, 0) + 1
+    available = academic_available(root, date_str)
+    if len(available) >= 2 and len(cited) < 2:
+        errors.append(f"学术节只用到 {len(cited)} 个学术源（今日可用 {sorted(available)}），需 ≥2")
+    errors += quota_problems(cited)
     if errors:
         print("ERROR: items 校验失败：")
         for e in errors:
             print(f"  - {e}")
         return 2
     raw_note = f"TR-raw-D-{date_str}"
-    degraded = []
+    degraded, degraded_sid = [], ""
     raw_path = root / "archives" / f"{raw_note}.md"
     for line in raw_path.read_text(encoding="utf-8").splitlines():
-        if line.startswith("> [降级]"):
-            degraded.append(line.removeprefix("> [降级] ").strip())
+        head = re.match(r"^## (\S+) — ", line)
+        if head:
+            degraded_sid = head.group(1)
+        elif line.startswith("> [降级]"):
+            degraded.append(f"{degraded_sid} {line.removeprefix('> [降级] ').strip()}")
     fm = fm_block(["tags:", "  - type/permanent", "  - status/archive", "  - topic/ai",
                    f"created: {date_str}", f"data-date: {date_str}", "source:",
                    f'  - "原始清单（API 快照逐条校验）：[[{raw_note}]]"']
                   + [f'  - "web_search：{q}"' for q in sorted(set(queries))])
     body = [f"\n# Trend Radar {date_str}\n",
-            f"\n> 当日精选 {len(items)} 条，取自 [[{raw_note}]] 与 web_search 补充；"
-            f"每条含来源与一句为什么值得看。\n"]
+            f"\n> 候选池 {pool} 条（原始清单正常节合计）/ 入选 {len(items)} 条"
+            f"（精选 {len(picked['精选'])} + 学术 {len(picked['学术'])}）；"
+            f"条数随当日信号浮动，不设固定配额；每条含来源与一句为什么值得看。\n"]
     if note_exists(root, "TR-leaderboards"):
         body.append("> 榜单快照（每日覆盖，含较昨日 Δ）：[[TR-leaderboards]]\n")
     if degraded:
         body.append("> 降级：<br>" + "<br>".join(degraded) + "\n")
-    body.append("\n## 精选\n\n")
-    for it in items:
-        tail = f"{it['source']} · {it['why']}"
-        if str(it.get("from")) == "websearch":
-            tail += f" ⟦ws: {it['query']}⟧"
-        body.append(f"- [ ] {md_link(it['title'], it['url'])} — {tail}\n")
+    for layer, heading in (("精选", "## 精选"), ("学术", "## 学术")):
+        body.append(f"\n{heading}\n\n")
+        for it in items:
+            if (str(it.get("section", "精选")).strip() or "精选") != layer:
+                continue
+            tail = f"{it['source']} · {it['why']}"
+            if str(it.get("from")) == "websearch":
+                tail += f" ⟦ws: {it['query']}⟧"
+            body.append(f"- [ ] {md_link(it['title'], it['url'])} — {tail}\n")
     body.append("\n---\n## Related\n\n")
     body.append(f"- [[{raw_note}]]\n")
     body += related_links(root)
@@ -812,7 +986,9 @@ def cmd_report(args) -> int:
         print(f"ERROR: {path.name} 已存在（加 --force 覆盖）")
         return 2
     path.write_text(fm + "".join(body), encoding="utf-8")
-    print(f"写入 {path.relative_to(root)}（精选 {len(items)} 条，web_search {len(set(queries))} 查询）")
+    print(f"写入 {path.relative_to(root)}（候选池 {pool} / 入选 {len(items)} 条："
+          f"精选 {len(picked['精选'])} + 学术 {len(picked['学术'])}，"
+          f"web_search {len(set(queries))} 查询）")
     write_index(root, args.date)
     return 0
 
@@ -859,6 +1035,19 @@ def related_links(root: Path, extra=(), exclude=()) -> list:
     return [f"- [[{name}]]\n" for name in dict.fromkeys(names) if note_exists(root, name)]
 
 
+def leaderboard_labels(root: Path) -> list:
+    """Board names in the current TR-leaderboards snapshot, in file order."""
+    path = root / "archives" / "TR-leaderboards.md"
+    if not path.exists():
+        return []
+    out = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        m = re.match(r"^## \S+ — (.+)$", line)
+        if m:
+            out.append(m.group(1).split("（")[0].strip())
+    return out
+
+
 def write_index(root: Path, day: date, quiet: bool = False) -> Path:
     reports = current_reports(root)
     lines = [fm_block(["tags:", "  - todo"]),
@@ -871,20 +1060,25 @@ def write_index(root: Path, day: date, quiet: bool = False) -> Path:
         for rep in reports:
             raw = raw_for(rep.stem, root)
             kind = {"D": "日报", "W": "周报", "M": "月报", "Y": "年报"}[rep.stem[3]]
-            tail = f"（{kind}，{item_count(rep)} 条精选）"
+            tail = f"（{kind}，{item_count(rep)} 条）"
             if raw:
                 tail += f" — 原始 [[{raw.stem}]]"
             lines.append(f"- [ ] [[{rep.stem}]]{tail}\n")
     else:
         lines.append("- [ ] （尚无报告：跑一次 `python3 tools/trend_radar.py fetch`）\n")
     if note_exists(root, "TR-leaderboards"):
-        lines.append("- [ ] [[TR-leaderboards]]（当前榜单快照：Arena AI 文本/代码 + "
-                     "SWE-bench Verified；每日覆盖）\n")
+        labels = leaderboard_labels(root)
+        tail = "、".join(labels) if labels else "每榜前 10"
+        lines.append(f"- [ ] [[TR-leaderboards]]（当前榜单快照：{tail}；每日覆盖）\n")
     lines += ["\n## Key Methods\n\n",
               "- 调用：让 AI 跑 skill `trend-radar`（`.agent/skills/trend-radar/SKILL.md`）\n",
-              "- 抓取层：HuggingFace / arXiv / Hacker News / Lobsters / GitHub / OpenAlex，"
-              "原始清单零 AI 改写、逐条可回溯到 API 快照\n",
-              "- 精选层：~10 条，每条一句为什么值得看；空白处用 web_search 补漏\n",
+              "- 抓取层：HuggingFace（模型/数据集/Space/日报论文）/ arXiv（AI 桶 cs.AI·LG·CL + "
+              "ML 算法桶 stat.ML·math.OC·cs.NA + 工程桶 cs.SE·PL·AR·OS + 算法桶 cs.DS·CG·CC）/ "
+              "Semantic Scholar / OpenAlex（期刊会议）/ Hacker News / "
+              "Lobsters / GitHub，原始清单零 AI 改写、逐条可回溯到 API 快照\n",
+              "- 精选层：分「精选 + 学术」两节，条数随当日信号浮动（不设固定配额）；"
+              "学术节以 ML 算法/优化为主（≥2 条），工程桶与算法桶各 ≤2；"
+              "每条一句为什么值得看，空白处用 web_search 补漏\n",
               "\n## Applications\n\n---\n## **Related**\n\n",
               *related_links(root, ("Index of Todos",), exclude=INDEX_NAME)]
     path = root / INDEX_REL
@@ -950,6 +1144,24 @@ def parse_items_in(text: str):
     return out
 
 
+def parse_sections_in(text: str):
+    """[{"head": "精选", "items": [...]}] — item bullets grouped under their `## ` heading."""
+    out, cur = [], None
+    for line in text.splitlines():
+        head = re.match(r"^## (\S+)$", line)
+        if head:
+            cur = {"head": head.group(1), "items": []}
+            out.append(cur)
+            continue
+        m = ITEM_LINE_RE.match(line)
+        if m:
+            if cur is None:
+                cur = {"head": "条目", "items": []}
+                out.append(cur)
+            cur["items"].append({"title": m.group(1), "url": m.group(2), "tail": m.group(3)})
+    return out
+
+
 def coverage_of(path: Path):
     """(start, end) ISO dates covered by one artifact."""
     text = path.read_text(encoding="utf-8")
@@ -986,13 +1198,19 @@ def merge_family(root: Path, family: str, kind: str, label: str, children, day: 
         if start:
             dates.extend([start, end])
         child_date = start if start == end else ""
-        for e in parse_items(child):
+        child_text = child.read_text(encoding="utf-8")
+        layers = {e["url"]: sec["head"] for sec in parse_sections_in(child_text)
+                  for e in sec["items"]}
+        for e in parse_items_in(child_text):
             if e["url"] in index:
                 if child_date and f"⟦{child_date}⟧" not in entries[index[e["url"]]]["tail"]:
                     entries[index[e["url"]]]["tail"] += f" ⟦{child_date}⟧"
                 continue
             index[e["url"]] = len(entries)
-            entries.append(dict(e))
+            fold = dict(e)
+            if family == "report" and "学术" in layers.get(e["url"], ""):
+                fold["tail"] += " ⟦学术⟧"
+            entries.append(fold)
     if family == "raw":
         entries = entries[:MERGE_RAW_CAP]
     span = f"{min(dates)}..{max(dates)}" if dates else f"{day.isoformat()}..{day.isoformat()}"
@@ -1129,16 +1347,27 @@ def cmd_verify(args) -> int:
     else:
         text = raw_path.read_text(encoding="utf-8")
         if raw_kind == "D":
+            legacy_raw = day < LAYER_CUTOVER
             sections = re.findall(r"^## (\S+) — (.+)$", text, re.M)
-            if len(sections) != len(SOURCES):
+            present = {sid for sid, _label in sections}
+            if len(sections) != len(SOURCES) and not legacy_raw:
                 problems.append(f"原始清单节数 {len(sections)} ≠ 源数 {len(SOURCES)}")
+            if legacy_raw:
+                notes.append(f"旧契约原始清单（< {LAYER_CUTOVER}）：{len(sections)} 节，"
+                             f"新增的 arXiv 桶/s2 不要求存在")
             for sid, _label, _fn in SOURCES:
+                if legacy_raw and sid not in present:
+                    continue
                 block = re.search(rf"^## {re.escape(sid)} — [^\n]*\n(.*?)(?=^## |\Z)",
                                   text, re.M | re.S)
                 if not block:
                     problems.append(f"原始清单缺 {sid} 节")
                     continue
                 body = block.group(1)
+                if "[未启用]" in body:
+                    reason = re.search(r"\[未启用\] (.+)", body)
+                    notes.append(f"{sid} 未启用：{reason.group(1) if reason else '未写明原因'}")
+                    continue
                 if "[降级]" in body:
                     reason = re.search(r"\[降级\] 抓取失败：(.+)", body)
                     if reason:
@@ -1147,8 +1376,9 @@ def cmd_verify(args) -> int:
                         problems.append(f"{sid} 标了降级但未写原因")
                     continue
                 n = len(parse_items_in(body))
-                if n < MIN_ITEMS:
-                    problems.append(f"{sid} 条目 {n} < {MIN_ITEMS}")
+                floor = SECTION_FLOOR.get(sid, MIN_ITEMS)
+                if n < floor:
+                    problems.append(f"{sid} 条目 {n} < {floor}")
                 else:
                     notes.append(f"{sid} {n} 条")
             prov = re.search(r"URL 命中：(\d+)/(\d+)", text)
@@ -1171,30 +1401,85 @@ def cmd_verify(args) -> int:
     if not rep_path.exists():
         problems.append(f"缺当日报告 archives/TR-*-{date_str}")
     else:
-        lines = [ln for ln in rep_path.read_text(encoding="utf-8").splitlines()
-                 if ln.startswith("- [ ] ")]
+        rep_text = rep_path.read_text(encoding="utf-8")
+        lines = [ln for ln in rep_text.splitlines() if ln.startswith("- [ ] ")]
         if rep_kind == "D":
-            if not (8 <= len(lines) <= 12):
-                problems.append(f"报告精选 {len(lines)} 条，不在 [8,12]")
-            known = set(raw_urls(root, date_str)) if raw_kind == "D" else set()
-            for ln in lines:
+            legacy = day < LAYER_CUTOVER
+            if legacy:
+                notes.append(f"旧契约日报（< {LAYER_CUTOVER}）：只查条目可回溯性，"
+                             f"不套两节/条数规则")
+            elif not (REPORT_MIN <= len(lines) <= REPORT_MAX):
+                problems.append(f"报告条数 {len(lines)} 不在 sanity 界 "
+                                f"[{REPORT_MIN},{REPORT_MAX}]")
+            picked, cur = {}, None
+            for ln in rep_text.splitlines():
+                head = re.match(r"^## (\S+)", ln)
+                if head:
+                    cur = head.group(1)
+                    picked.setdefault(cur, [])
+                    continue
                 m = re.match(r"^- \[ \] \[.+\]\((?:<)?([^)>\s]+)(?:>)?\) — (.+)$", ln)
                 if not m:
-                    problems.append(f"报告行格式不合规：{ln[:70]}")
+                    if ln.startswith("- [ ] "):
+                        problems.append(f"报告行格式不合规：{ln[:70]}")
                     continue
-                url, tail = m.group(1), m.group(2)
-                ws = re.search(r"⟦ws: (.+?)⟧$", tail)
-                if "·" not in tail:
-                    problems.append(f"报告行缺 why：{ln[:70]}")
-                if known and url not in known and not ws:
-                    problems.append(f"报告 URL 既不在原始清单也无 web_search 标注：{url}")
-                if ws and not ws.group(1).strip():
-                    problems.append(f"web_search 标注为空：{url}")
+                if cur:
+                    picked[cur].append((m.group(1), m.group(2)))
+            for layer in ("精选", "学术"):
+                if not legacy and not picked.get(layer):
+                    problems.append(f"报告缺「{layer}」节或该节无条目")
+            sections = raw_sections(root, date_str) if raw_kind == "D" else {}
+            cited = {}
+            for layer, rows in picked.items():
+                if layer == "Related":
+                    continue
+                for url, tail in rows:
+                    ws = re.search(r"⟦ws: (.+?)⟧$", tail)
+                    if "·" not in tail:
+                        problems.append(f"报告行缺 why：{url}")
+                    if ws and not ws.group(1).strip():
+                        problems.append(f"web_search 标注为空：{url}")
+                    sid = sections.get(url)
+                    if sections and sid is None and not ws:
+                        problems.append(f"报告 URL 既不在原始清单也无 web_search 标注：{url}")
+                        continue
+                    if legacy or not sid or layer not in ("精选", "学术"):
+                        continue
+                    if layer == "学术" and sid not in ACADEMIC_SIDS:
+                        problems.append(f"报告学术节含非学术源条目（{sid}）：{url}")
+                    if layer == "精选" and sid in ACADEMIC_SIDS:
+                        problems.append(f"报告精选节含学术源条目（{sid}）：{url}")
+                    if layer == "学术":
+                        cited[sid] = cited.get(sid, 0) + 1
+            if raw_kind == "D" and not legacy:
+                pool = pool_size(root, date_str)
+                m = re.search(r"候选池 (\d+) 条.*?入选 (\d+) 条", rep_text)
+                if not m:
+                    problems.append("报告缺「候选池 N / 入选 M」一行")
+                else:
+                    n_pool, n_pick = int(m.group(1)), int(m.group(2))
+                    if n_pool != pool:
+                        problems.append(f"报告候选池 {n_pool} ≠ 原始清单合计 {pool}")
+                    if n_pick != len(lines):
+                        problems.append(f"报告入选 {n_pick} ≠ 实际条目 {len(lines)}")
+                    if n_pick > n_pool:
+                        problems.append(f"报告入选 {n_pick} > 候选池 {n_pool}")
+                available = academic_available(root, date_str)
+                if len(available) >= 2 and len(cited) < 2:
+                    problems.append(f"报告学术节只用到 {len(cited)} 个学术源"
+                                    f"（今日可用 {sorted(available)}），需 ≥2")
+                quota = quota_problems(cited)
+                if quota:
+                    problems += [f"配额：{p}" for p in quota]
+                else:
+                    notes.append("学术配额 ok（" + "，".join(
+                        f"{sid} {cited.get(sid, 0)}" for sid in BUCKET_QUOTA) + "）")
         else:
             if not lines:
                 problems.append(f"滚动报告件 {rep_path.name} 无条目")
             notes.append(f"滚动报告件 {rep_path.name}（{len(lines)} 条，含 {date_str}）")
-        notes.append(f"报告精选 {len(lines)} 条")
+        notes.append(f"报告 {len(lines)} 条（候选池 "
+                     f"{pool_size(root, date_str) if raw_kind == 'D' else '—'}）")
 
     index_path = root / INDEX_REL
     if not index_path.exists():
@@ -1362,7 +1647,7 @@ def main() -> int:
                         default=date.today(), help="run date (YYYY-MM-DD)")
     sub = parser.add_subparsers(dest="cmd", required=True)
 
-    p = sub.add_parser("fetch", parents=[common], help="抓取 6 源，写原始清单，打印候选池")
+    p = sub.add_parser("fetch", parents=[common], help="抓取全部源，写原始清单，打印候选池")
     p.add_argument("--purge", action="store_true", help="删除当天快照后退出（不抓取）")
     p.set_defaults(func=cmd_fetch)
 
