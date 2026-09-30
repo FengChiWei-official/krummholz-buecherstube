@@ -16,15 +16,15 @@ Were they genuinely **amused at my wit**, or just **being rather patronising**.
 > **patron** (n.) 赞助人；老顾客- 
 > **patronage** (n.) 赞助，资助；光顾；居高临下的态度
 
-that is the sort of chap I'm.
+That is the sort of chap I'm.
 >chap 英国口语词，中产化的 guy，特指男人
 >chapman 小贩
 
-cut a great **swathe** through all this  **stuffy** whitehall bureaucrazy
+Cut a great **swathe** through all this  **stuffy** Whitehall bureaucracy.
 > a swathe of/swathes of
 > cut a great swathe through 表示大刀阔斧地改革
 
-we are fully seized **of** the need **for** reform
+We are fully seized **of** the need **for** reform.
 
 delusions of grandeur
 > delusions 错觉

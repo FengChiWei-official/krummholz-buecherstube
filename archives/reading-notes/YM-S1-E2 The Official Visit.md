@@ -68,7 +68,6 @@ a squalid vote grubbing exercise
 > campaign则是真正用心的活动
 
 > squalid 肮脏的
-> [[
 
 **What has he got against the idea？**
 > He has got nothing against me.
