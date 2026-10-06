@@ -21,7 +21,7 @@ tags:
 [[Trajectory Equation]]
 [[Velocity]]
 [[Average velocity]]
-[[Instantaneous velocity]]
+[[Instantaneous Velocity]]
 [[Speed]]
 [[Average speed]]
 [[Instantaneous Speed]]
