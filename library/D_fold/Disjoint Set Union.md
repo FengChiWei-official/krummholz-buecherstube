@@ -1,9 +1,4 @@
 ---
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/evergreen
 aliases:
   - 并查集
   - DSU

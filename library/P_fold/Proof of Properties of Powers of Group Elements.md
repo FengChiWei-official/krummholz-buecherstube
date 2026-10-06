@@ -1,10 +1,3 @@
----
-tags:
-  - type/lit
-  - topic/learning
-  - status/archive
----
-
 ## Text
 ### Let
 Let x be a element of **finite order** $n$, *which means $<x>$ has n distinct elements*.

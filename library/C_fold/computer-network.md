@@ -1,9 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
----
-
 #entity/virtual #cs 
 ## Definition
 a structure of a group of computer for **comunication**

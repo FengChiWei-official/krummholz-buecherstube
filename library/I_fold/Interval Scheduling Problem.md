@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/in-progress
----
-
 ## Define
 [[435. Non-overlapping Intervals]]
 [[56. Merge Intervals]]

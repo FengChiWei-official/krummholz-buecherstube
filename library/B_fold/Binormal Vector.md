@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - topic/learning
-  - attr/concept
-  - status/in-progress
----
-
 ## Definition
 
 The Binormal Vector is defined by both [[Unit Tangential Vector]] and [[Binormal Vector]].

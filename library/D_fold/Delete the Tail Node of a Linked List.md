@@ -1,10 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/technique
----
 ## Time Optimization
 
 ### [[Doubly Linked List]]

@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/technique
----
-
 ### Type 1: Fraction (degree difference = +1)
 
 $$

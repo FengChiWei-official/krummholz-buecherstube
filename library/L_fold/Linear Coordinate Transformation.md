@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/technique
----
-
 ## Definition
 
 A linear coordinate transformation is a mapping between coordinate representations of vectors induced by a linear map. Concretely, if `A` is an n×n matrix and `x` is a coordinate column vector in R^n, the transformed coordinates `x'` are given by

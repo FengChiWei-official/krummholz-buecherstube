@@ -1,9 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
----
-
 #principle #math/algebra/abstract 
 
 ## background

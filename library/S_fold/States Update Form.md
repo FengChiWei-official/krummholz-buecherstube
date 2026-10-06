@@ -1,10 +1,3 @@
----
-tags:
-  - type/lit
-  - topic/learning
-  - status/archive
----
-
 ## Text
 
 When initializing any state variable, do write down where should it update.

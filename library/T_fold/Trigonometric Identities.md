@@ -1,10 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/in-progress
-  - topic/learning
-  - attr/concept
----
 ## Definition
 
 $\sin^2 x + \cos^2 x = 1$

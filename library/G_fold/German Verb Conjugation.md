@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/in-progress
-  - topic/learning
-  - attr/concept
----
-
 ## Definition
 
 German verb conjugation covers person and number agreement in finite forms, tense and mood marking, and participle formation (for compound tenses). Verbs are classified as regular (weak), irregular (strong), and mixed.

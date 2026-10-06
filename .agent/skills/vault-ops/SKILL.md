@@ -1,6 +1,6 @@
 ---
 name: vault-ops
-description: "Krummholz vault operating procedures: note placement, promotion, todo-hooking, health checks, retrieval by association. Use when working in this Obsidian vault — filing, moving, renaming, triaging, or diagnosing vault structure."
+description: "Krummholz vault operating procedures: note placement, trunk registration (rawindex), todo-hooking, health checks (two-tier invariants), cluster grouping, rhythm monitoring. Use when working in this Obsidian vault — filing, moving, renaming, triaging, or diagnosing vault structure."
 ---
 
 # vault-ops
@@ -13,117 +13,98 @@ Read in this order before acting:
 
 1. `AGENTS.md`
 2. `README.md`
-3. `library/K_fold/Knowledge Base Operating Rules.md`
-4. `library/K_fold/Vault System Design.md`
-5. `library/K_fold/Collaboration Workflow Spec.md`
+3. `doctrine/Vault Design.md`
+4. `doctrine/Vault Workflow.md`
 
-These five files are the truth. This skill restates them operationally.
+These four files are the truth. This skill restates them operationally.
 
 ## Session entry (state machine)
 
-At the start of every session — cold or warm — run `python3 tools/vault.py status`. Report the state to the owner in plain language, then present the next-moves options from its output with a short plan per option. The owner decides; you execute. Never skip this: repo state, not memory, decides what is possible.
+At the start of every session — cold or warm — run `python3 tools/vault.py status`. It prints the **rhythm line** (上次整理 / 上次聚簇 / 上次问箱 / 上次产出 — days since, derived from git log + mtime, zero manual records). A stalled number (e.g. 聚簇 > 14 days) is a standing warning, same failure class as the trend-radar 9-day stall. Report state in plain language, present next-moves as numbered options; owner decides, you execute. Repo state, not memory, decides what is possible.
 
 ### Cold start
 
-A fresh clone/pull is fully operational: all procedures live in this skill, all tools in `tools/`, all doctrine in the four source-of-truth notes. No state outside git. First session on a new machine: run `status`, then normal session entry. Note: `.obsidian/` (plugin config, incl. tag-wrangler) is gitignored — Obsidian-side conveniences are per-machine; all agent-side behavior is repo-contained.
-
-If the owner opens with a new item ('我有一个新东西'), fold S1 into the options: tidy first if state requires, then sharpening questions + main-tree mount proposal per Spec §S7/S1.
+Fresh clone is fully operational: procedures in this skill, tools in `tools/`, doctrine in `doctrine/`. No state outside git. `.obsidian/` is gitignored (per-machine conveniences only).
 
 ### Resuming half-done work
 
-A dirty tree or untracked files usually mean the last session ended mid-work. Cross-check them against the todo tree (`a_sticker/todos/`): grep each dirty/untracked note name for `- [ ] [[NAME]]` hooks and inbound links. Found → resume from the continuation note (S5). Not found → they are unsaved new work: ask the owner which todo owns them, or offer S1.
-
-### Ambiguity → ask, never guess
-
-If a note carries no state signal (no tags, no links, no todo hook) and no rule determines its zone or type — as with a bare one-line capture — the correct move is to ask the owner. Doctrine cannot attribute what has no attributes; guessing violates "repo state, not memory".
+Dirty tree / untracked files = likely mid-work. Cross-check against the todo tree: grep for `- [ ] [[NAME]]` hooks. Found → resume from the continuation note. Not found → ask the owner; a note with zero signals (no links, no todo hook, no registration) cannot be attributed by doctrine — never guess.
 
 ### Tool signals vs content
 
-`check`/`triage`/`status` findings are signals, not verdicts. A "promote candidate" only means the evergreen tag is present — content may be empty or unstable; verify before acting. The same holds for stale and untagged findings (mtime heuristics). When a signal contradicts the note's actual content, the content wins; report the contradiction instead of forcing an action.
+`check`/`triage`/`status` findings are signals, not verdicts. A "疑似半成品" flag is a time-windowed heuristic (created ≤7d + zero outbound links + no todo hook); content wins over the signal — report contradictions, don't force actions.
 
 ## Hard mechanics
 
-- Crossrefs are relative: `goal::` (the aim a card serves), `object::` (the shape it acts on), `bridge::` (an isomorphic idea elsewhere). Kind set is closed; targets resolve through note names **and** `aliases:`. Aim nodes need no card — they emerge from inbound `goal::` edges (doctrine detail: `a_sticker/other/Graph of Math - 类型化边方案.md`).
-- Wikilinks resolve by **note name, not path**. Renaming requires updating every `[[Old Name]]` inbound link — grep `[[Old` first.
-- Root is the entry queue (Obsidian default landing). Allowed root files: `README.md`, `AGENTS.md`. Everything else gets filed.
-- Tags are a closed set: `type/{permanent,lit}`, `status/{in-progress,evergreen,archive}`, `attr/{map,links,principle,concept,technique,method}`, plus bare `todo` on todo notes only.
-- Lit notes need a real `source:` — never leave it empty (except `template/lit-temp.md`).
-- Never touch `zzz_output/` contents (owner's finished work) or `.obsidian/`. `zzz_output/` links and git-state may be checked/diagnosed (`vault.py status` reports them); content is never drafted or edited by AI.
-- Never write own-voice body content for the owner — skeleton, questions, checks, and link-proposals only; AI-generated prose belongs in `a_sticker/or/` for the owner to digest.
+- Wikilinks resolve by **note name, not path**. Renaming: `grep -rn '\[\[Old Name'` first, update every form (incl. `|alias`, path-style), `git mv`, then `check`.
+- Root is the entry queue. Allowed root files: `README.md`, `AGENTS.md`. Everything else gets drained by `triage`.
+- Zones: `archives/material/` (external, `source:` mandatory — hard gate), `archives/work/` (owner archives / AI reports), `library/` (own-voice), root (queue).
+- Genre by name: `Raw Index*` → `library/Raw/`; `Index of*` → `library/Index/`; `Links of*` → `library/Links/`; else `<letter>_fold`.
+- **No tags, no frontmatter** beyond `aliases:` / `source:`. Notes are plain markdown.
+- State lives only in the todo tree: unfinished work carries `- [ ] [[NAME]] — continuation note (5–10 words)` in the owning todo. Resolve the owning todo dynamically from topic/name; create `a_sticker/todos/<Topic> Todo.md` and register in `Index of Todos.md` if none fits. A todo entry without a continuation note is forbidden.
+- **Registration edges (Raw Index → Node) are structural actions — you may append them directly** (e.g. `rawindex --sync`, L0 归队 with ≥90% confidence, coarse-index grouping). `Node↔Node` and `Index→Node` new links need owner approval — links change meaning. Structure fixes (renames, re-homing, dangling repair) you do directly.
+- Never touch `zzz_output/` contents; never write own-voice prose (skeleton/questions/checks only; AI prose goes to `a_sticker/or/`).
+- Deletions/renames: owner sign-off first.
+
+## The trunk workflow (rawindex)
+
+The weekly core loop — 聚簇 (cluster) → 归组 (group) → 登记 (register):
+
+1. `python3 tools/vault.py rawindex` — the registration queue (未登记 Nodes) + L0 affiliation proposals (queue notes whose neighbors' registrations vote ≥90% for one Raw Index).
+2. `python3 tools/vault.py rawindex --clusters` — L1 coarse components (direct interlinks), L2 fine clusters (shared-neighbor θ=P97, with binding evidence = common neighbors), L3 isolated points.
+3. **Group clusters into coarse Raw Indexes** (D10-P3): one coarse Raw Index holds several clusters — AI proposes the grouping, owner confirms names. Never create one Raw Index per cluster (68 clusters ≠ 68 files).
+4. Registration is append-only bookkeeping: you add `[[Node]]` lines to the Raw Index (structural, direct). Cluster共性 (commonality) goes into the Index note as a draft for owner sign-off — one sentence per cluster, owner's words, or the cluster does not enter the Index (D16).
+5. `python3 tools/vault.py rawindex --check` — I1–I3 report-level increments (未登记 / 多重登记 / Links 区域 / 零出链).
+6. `python3 tools/vault.py rawindex --sync` — keep `library/Raw/Raw Index of Everything.md` member list current (structural, direct).
+
+Convergence is bounded (measured: 674 queue → 6 rounds → 108; first round eats 25%).
 
 ## Common problems → exact procedures
 
 ### Session start / unsure what to do
 
-1. `python3 tools/vault.py status`
-2. Report state + present next-moves as options per §Session entry.
-3. Execute the owner's choice per Spec §S1–S6.
-
-### Growing the graph / wiring a note (math or any topic)
-
-1. `python3 tools/vault.py graph` — aims ← means (thinnest first), objects ← users with their aims, connective holes, dangling names, unwired drafts.
-2. Unwired draft: read it, then ask the owner what aim it serves and what shape it acts on. Owner names it, then insert the edge — one body line `goal:: [[Name]] — why`. Edges change meaning, so the owner approves them.
-3. Holes (aim without object, object without aim, shape no aim reaches) are **proposal material**, not orders: turn each into a question for the owner; never auto-fill.
-4. An aim needs no card. If a synonym already exists, write the existing card's name or one of its `aliases:` — `graph` reports how many edges landed through aliases. Never let two names grow into two nodes for one idea.
-5. One name's neighborhood: `python3 tools/vault.py graph --around <name>` (Chinese aliases work directly).
-6. Index notes are **output, not scaffolding**: grow edges first; write/fill an `Index of ...` when an aim has accumulated means and the owner wants prose navigation. Making this doctrine (Spec §S3) is a proposal in `a_sticker/other/Graph of Math - 类型化边方案.md` §九 — Spec stands unchanged until the owner approves.
+1. `python3 tools/vault.py status` → rhythm line + numbered options.
+2. Execute owner's choice per [[Vault Workflow]] scenarios.
 
 ### New note in root
 
-1. Run `python3 tools/vault.py triage` to see standing placement debt.
-2. Decide zone by state: `archives/` (external), `mailbox/` (drafting), `library/` (stable own-voice).
-3. Move with edit tools; if already evergreen in mailbox, use `python3 tools/vault.py promote NAME`.
+1. `python3 tools/vault.py triage` — standing debt.
+2. Decide zone by state; move; genre by name (see Hard mechanics).
+3. If unfinished → todo-hook (S5).
+
+### Note has zero outbound links (I3 / 捕获规则)
+
+At capture time S2 applies: **give 3 candidate links with a why-line each; owner picks one; you insert it.** Old zero-link inventory is not batch-fixed — I3 gives weekly increments, no hard gate (B5 honesty item).
+
+### Suspected half-done work (A1)
+
+`triage` lists 疑似半成品: created ≤7 days + zero outbound links + no todo hook. Report to owner; hook or finish — never bulk-guess.
+
+### Todo aging (B1)
+
+`triage` reports todo entries untouched >90 days. Weekly cleanup: review, resolve, or archive into `a_sticker/todos/archived/` (manual GC already happens there — the report makes it systematic).
+
+### Where is this material's extraction state? (D21)
+
+`rawindex --check` reports zero-outlink material = 未拆. A material note with outbound links to Nodes has been拆过. No status fields — the links are the state.
 
 ### Note feels lost / can't find related
 
-Three retrieval routes, in order:
-
 1. Backlinks (Obsidian).
 2. `grep -rn '[[NAME'` across the vault.
-3. Tag search (intersection).
-
-If truly orphaned, link it into the nearest `Index of` hub.
-
-### Systematic new topic
-
-1. Create `library/Index/Index of <Topic>.md` from `template/map-temp.md`.
-2. Create `Raw Index of <Topic>` stubs from the same template.
-3. Todo-hook in the relevant todo note, or create `a_sticker/todos/<Topic> Todo.md` from `template/Todo Template.md` and add a link in `Index of Todos.md`.
-
-### Unfinished work session
-
-Insert `- [ ] [[NAME]]` in the owning todo note (never leave work unhooked). Resolve the owning todo dynamically from the note's topic/name: hook into the matching topic todo, or create `a_sticker/todos/<Topic> Todo.md` from `template/Todo Template.md`, register it in `Index of Todos.md`, then insert.
+3. `python3 tools/vault.py rawindex --around NAME`.
 
 ### Renaming
 
-1. `grep -rn '\[\[Old Name'` first.
-2. Update all `[[Old` including `|alias` forms and path-style `[[dir/Old|...`.
-3. `git mv`.
-4. Run `python3 tools/vault.py check`.
-
-### Suspected duplicate
-
-Compare content; if dup, keep the better-placed one, move inbound links, delete.
+1. `grep -rn '\[\[Old Name'`.
+2. Update every form; `git mv`; `python3 tools/vault.py check`.
 
 ### Health audit
 
-- `python3 tools/vault.py check` — invariants.
-- `python3 tools/vault.py triage` — placement debt.
+- `python3 tools/vault.py check` — hard gates (exit code) + report-level increments.
+- `python3 tools/vault.py triage` — placement debt + todo aging + suspected half-done.
+- `python3 tools/vault.py status` — all of the above + rhythm line.
 
 ## When unsure
 
-The default is always mailbox (reversible) over library (commitment). A wrong folder costs a move; a wrong promotion costs doctrine drift.
-
-## Collaboration scenarios
-
-Scenario-by-scenario protocols live in `library/K_fold/Collaboration Workflow Spec.md` (also reachable as `[[Collaboration Workflow Spec]]`). Match the trigger, follow the protocol:
-
-| Scenario | Trigger | omp role | Protocol |
-|---|---|---|---|
-| S1 idea polish | owner has a new idea | ask sharpening questions, propose skeleton + related notes; never write body | Spec §S1 |
-| S2 post-writing review | owner finished a note | run check, verify tags/source, propose 3–8 new links (owner approves inserts) | Spec §S2 |
-| S3 systematic ingestion | starting a curriculum topic | create Index + Raw Index stubs, triage per session, enforce ≥1 cross-topic link | Spec §S3 |
-| S4 output timing | topic cluster feels mature | assemble reading list; owner writes output; omp checks links + backlink | Spec §S4 |
-| S5 todo fast-save | session interrupted | insert hook + continuation note into owning todo; resolve/create owning todo dynamically by topic/name | Spec §S5 |
-| S6 tag maintenance | promotion / review / taxonomy change | validate at promote, check at review, planned grep-rewrite on taxonomy change | Spec §S6 |
-| S7 session entry | owner unsure what to do / opens with a new thing | run `python3 tools/vault.py status`, report state, present numbered next-move options; owner picks, omp executes per S1–S6 | Spec §S7 |
+Ask the owner — never guess attribution for signal-less notes. The default for drafts is the root queue (reversible) over library (commitment).

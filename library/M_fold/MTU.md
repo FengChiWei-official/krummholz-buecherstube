@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/evergreen
----
-
 ## qwq
 
 - **層級**：MTU 通常發生在 **數據鏈路層 (Layer 2)**，最常見的是乙太網路（Ethernet）的 MTU。

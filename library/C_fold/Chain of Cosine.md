@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/technique
----
-
 ## Definition
 
 $$\prod_{k=0}^{n-1} \cos(2^k x) = \frac{\sin(2^n x)}{2^n \sin x}$$

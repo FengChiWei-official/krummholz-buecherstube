@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/concept
-  - topic/math
-  - status/evergreen
----
-
 ## Definition 
 [[Definition of Homomprphism]]
 

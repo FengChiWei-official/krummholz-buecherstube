@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/in-progress
-  - topic/learning
-  - attr/concept
----
-
 ## Definition
 
 The four grammatical cases in German — Nominative, Accusative, Dative, and Genitive — mark the syntactic and semantic roles of noun phrases (subject, direct object, indirect object, and possessive relationships).

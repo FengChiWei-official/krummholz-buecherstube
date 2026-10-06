@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/technique
----
-
 ## Definition
 
 If $\sqrt{a} - \sqrt{b} = 0$ and $\sqrt{a} + \sqrt{b} \ne 0$, we got

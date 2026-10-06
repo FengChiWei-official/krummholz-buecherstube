@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/links
----
-
 ## Definition
 That broke [[Loop Invariant Principle]]. the end of the loop is running with the `state` `j`.
 here is your guideline [[Looper Design Normal Form]]

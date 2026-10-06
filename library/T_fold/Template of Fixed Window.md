@@ -1,10 +1,3 @@
----
-tags:
-  - type/lit
-  - topic/learning
-  - status/archive
----
-
 ## Text
 ```cpp
 class Solution {

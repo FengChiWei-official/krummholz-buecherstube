@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/evergreen
----
-
 ## define
 ``` cpp
 //for (int i = 2; i<sqrt(n); i++){}

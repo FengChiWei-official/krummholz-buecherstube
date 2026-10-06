@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/in-progress
-  - topic/learning
-  - attr/concept
----
-
 ## Definition
 
 German word order is characterized by the V2 (verb-second) constraint in main clauses and verb-final order in subordinate clauses. Positioning of objects, adverbials, and separable prefixes follows systematic patterns that affect emphasis and meaning.

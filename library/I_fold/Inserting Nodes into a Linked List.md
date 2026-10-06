@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/technique
----
-
 ## Definition
 
 Insertion is one of the most important operations in a [[Linked List]].

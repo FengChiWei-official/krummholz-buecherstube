@@ -1,9 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
----
-
 #principle #math/algebra 
 ## preparation
 Let $\phi$ a [[Homomorphism]] of Group $G$ and $G^{\prime}$

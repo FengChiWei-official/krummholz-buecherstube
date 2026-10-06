@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/map
----
-
 ## Definition
 Scaling and Normalization organizes expressions by dominant factor, denominator form, and dimensionless ratio.
 

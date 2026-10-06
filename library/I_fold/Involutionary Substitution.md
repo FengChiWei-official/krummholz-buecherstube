@@ -1,9 +1,4 @@
 ---
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/concept
 aliases:
   - 对合代换
 ---

@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/in-progress
----
-
 ## Definition
 
 1. 声明后立即初始化

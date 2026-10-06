@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/concept
-  - topic/math
-  - status/evergreen
----
-
 ## define
 A [[Subgroup]] $\mathbf{N}$ of Group $mathbf{G}$ is a [[Normal Subgroup]],  if
 $\forall a \in N$, $\forall g \in \mathbf{G}$, then the [[Conjugate]] $gag^{-1} \in N$

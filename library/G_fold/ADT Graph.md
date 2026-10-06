@@ -1,7 +1,4 @@
 ---
-tags:
-  - type/permanent
-  - status/evergreen
 aliases:
   - Graph
 ---

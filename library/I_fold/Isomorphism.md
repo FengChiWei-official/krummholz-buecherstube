@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/evergreen
----
-
 ## Definition
 **Isomorphism** is a [[Bijective Map]], a Bijective [[Homomorphism]]
 

@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/in-progress
----
-
 ## Definition
 let a, b **not both 0**,  $d = \gcd (a, b)$, 
 $\mathbf{S} = \mathbb{Z}a + \mathbb{Z}b$, so $\mathbb{Z}d = \mathbb{Z}a + \mathbb{Z}b$.

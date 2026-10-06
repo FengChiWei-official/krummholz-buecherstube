@@ -1,10 +1,3 @@
----
-tags:
-  - type/lit
-  - topic/learning
-  - status/archive
----
-
 ## Text
 
 $f(x) = \lim_{t \to +\infty} \frac{x+e^{tx}}{1+ e^{tx}}$ ,

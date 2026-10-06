@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/evergreen
----
-
 ## Definition
 This note gives implementation principles for DFS. There are two common DFS modes: connectivity-style (global visited) and backtracking/full-path (path-local visited). See [[Connectivity DFS]] and [[Backtracking DFS]] for the recommended templates and examples.
 > [[Different Types of State]]

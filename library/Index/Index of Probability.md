@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - attr/map
-  - topic/math
----
-
 ## Definition
 
 Probability theory as a discipline — the developing map of its concepts. Read it not as a static catalog but as the successive answers to successive problems: each era confronted a limit in the concepts it had, invented a new one, and thereby opened the next question. The six canonical notes are the stations where this development settled.

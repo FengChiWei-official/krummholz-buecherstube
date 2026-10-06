@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - topic/learning
-  - attr/links
-  - status/in-progress
----
-
 ## Definition
 
 [[The relationship between the number of vertices and edges in a tree]]

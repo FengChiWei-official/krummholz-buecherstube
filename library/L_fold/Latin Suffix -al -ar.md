@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/in-progress
-  - topic/learning
-  - attr/concept
----
-
 ## Definition
 
 抽象名词[[Latin Suffix -t-ion]] + `-al-is`

@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/evergreen
----
-
 ## qwq
 - **Step 1: Learning (學習)**  
     當一個 [[ETH Frame]] 進入埠口 (Port) 1，交換機會查看其 **Source MAC**。如果表中沒有，就將 `MAC A <-> Port 1` 存入 **CAM Table**（內容定址記憶體表）。

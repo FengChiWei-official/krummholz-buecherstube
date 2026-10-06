@@ -1,10 +1,3 @@
----
-tags:
-  - type/lit
-  - topic/learning
-  - status/archive
----
-
 ## BFS Templates
 
 Notes: Use "mark on enqueue" (visited when pushing to queue) to avoid duplicate enqueues. BFS is typically used for unweighted shortest paths and level-order traversal.

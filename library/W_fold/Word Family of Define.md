@@ -1,0 +1,16 @@
+## Text
+- Verb
+	- define
+	- redefine
+- Noun
+	- definition
+	- definability
+- Adjective
+	- definite
+	- definable
+	- definitive
+
+
+---
+
+## Thoughts

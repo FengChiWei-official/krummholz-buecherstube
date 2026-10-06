@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/in-progress
-  - topic/learning
-  - attr/concept
----
-
 ## Definition
 
 In [[Natural coordinate system]]

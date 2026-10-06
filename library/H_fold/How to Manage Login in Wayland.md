@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - topic/learning
-  - attr/technique
-  - status/in-progress
----
-
 ## Definition
 
 It is managed by [[SDDM]].([[Wayland]] default?)

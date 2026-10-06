@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/map
-  - topic/learning
-  - status/evergreen
----
-
 ## Definition
 
 This map organizes key entry notes for binary tree learning.

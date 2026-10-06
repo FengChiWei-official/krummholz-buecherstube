@@ -1,10 +1,3 @@
----
-tags:
-  - type/permanent
-  - topic/learning
-  - attr/links
-  - status/in-progress
----
 ## Definition
 
 ### 1. The Geometric Foundation & Parametrization

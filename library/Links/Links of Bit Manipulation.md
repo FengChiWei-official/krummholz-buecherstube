@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/in-progress
-  - topic/learning
-  - attr/links
----
-
 ## Definition
 
 1. **Basic Properties (基本性质)**

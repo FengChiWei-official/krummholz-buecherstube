@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/in-progress
-  - topic/learning
-  - attr/concept
----
-
 ## Definition
 For a [[Homogeneous Fraction]], all [[Variable]]s can be unified as n-1 Ratio.
 

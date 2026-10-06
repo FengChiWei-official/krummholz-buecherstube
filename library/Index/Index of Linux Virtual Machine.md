@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/map
-  - topic/learning
-  - status/evergreen
----
-
 ## Definition
 
 This map gives a quick navigation path for Linux virtualization components.

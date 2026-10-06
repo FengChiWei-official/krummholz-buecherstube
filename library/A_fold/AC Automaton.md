@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/in-progress
-  - topic/learning
-  - attr/concept
----
-
 ## Definition
 
 In algorithm contests (e.g., CSP, NOIP), the problem "given length N, fill positions with 26 letters, count the number of strings that satisfy or do not satisfy certain substring conditions" is a very classic pattern.

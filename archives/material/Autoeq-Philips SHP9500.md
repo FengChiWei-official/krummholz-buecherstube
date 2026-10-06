@@ -1,0 +1,26 @@
+---
+source: https://autoeq.app/
+---
+from https://autoeq.app/
+## Text
+
+```apo
+Preamp: -13.22 dB
+Filter 1: ON LSC Fc 105.0 Hz Gain 7.7 dB Q 0.70
+Filter 2: ON PK Fc 20.4 Hz Gain 3.4 dB Q 5.77
+Filter 3: ON PK Fc 28.0 Hz Gain 5.0 dB Q 1.35
+Filter 4: ON PK Fc 83.0 Hz Gain -3.9 dB Q 0.55
+Filter 5: ON PK Fc 453.1 Hz Gain 1.1 dB Q 1.10
+Filter 6: ON PK Fc 1181.8 Hz Gain -0.9 dB Q 1.86
+Filter 7: ON PK Fc 2073.1 Hz Gain 3.9 dB Q 2.35
+Filter 8: ON PK Fc 5898.4 Hz Gain -6.0 dB Q 2.41
+Filter 9: ON PK Fc 7276.1 Hz Gain 3.3 dB Q 5.50
+Filter 10: ON HSC Fc 10000.0 Hz Gain -2.4 dB Q 0.70
+
+
+```
+
+
+---
+
+## Thoughts

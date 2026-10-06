@@ -1,9 +1,4 @@
 ---
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/in-progress
 aliases:
   - Additive Subgroup of Integers is In shape of Za
 ---

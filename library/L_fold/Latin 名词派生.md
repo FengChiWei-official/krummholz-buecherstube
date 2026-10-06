@@ -1,10 +1,3 @@
----
-tags:
-  - type/lit
-  - topic/learning
-  - status/archive
----
-
 ## Text
 
 [[Latin Suffix -al -ar]] -> [[Latin Suffix -itat]]

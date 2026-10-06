@@ -1,9 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
----
-
 - let $G$ and $G^{\prime}$ are two groups
 - Let $\phi: G \to G^{\prime}$ a map
 

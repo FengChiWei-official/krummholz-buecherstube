@@ -1,10 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/concept
-  - status/in-progress
----
-
 ## Definition
 
 I would like to name it as **Merge DP**. [[Interval]]

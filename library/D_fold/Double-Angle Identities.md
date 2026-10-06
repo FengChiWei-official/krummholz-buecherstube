@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/in-progress
-  - topic/learning
-  - attr/concept
----
-
 ## Definition
 $\sin 2x = 2\sin x \cos x$
 $cos 2x = \cos^2 x - \sin^2 x$

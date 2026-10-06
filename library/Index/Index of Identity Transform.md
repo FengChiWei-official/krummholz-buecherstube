@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/map
----
-
 ## Definition
 Identity Transform focuses on exact rewrites that preserve equality and create cancelable structure.
 

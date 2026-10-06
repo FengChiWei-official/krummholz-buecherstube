@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/links
----
-
 ## 1. Core Properties & Linear Transformations
 Given that $f(x)$ is an **increasing** function:
 

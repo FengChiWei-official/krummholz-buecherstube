@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/evergreen
----
-
 ## qwq
 [[State Space]] is Linear. And the [[Transition Logic]] is based on immediate or aggregate past.
 ### Feature

@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/links
-  - topic/learning
-  - status/in-progress
----
-
 ## Definition
 [[Vector-valued Function]]
 

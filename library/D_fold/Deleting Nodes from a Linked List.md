@@ -1,10 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/technique
----
 ## Definition
 
 Deletion in a singly linked list generally involves 3 steps:

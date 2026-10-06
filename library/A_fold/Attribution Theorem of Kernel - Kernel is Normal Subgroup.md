@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/evergreen
----
-
 ## Definition
 [[Kernel of Homomorphism|Kernel]] is a [[Normal Subgroup]]
 

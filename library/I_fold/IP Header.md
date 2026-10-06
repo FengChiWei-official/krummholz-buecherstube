@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/evergreen
----
-
 ## ## frontpage
 a standard IPv4 Datagram header is **20Bytes**. there can be Options.
 ## Fields

@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/map
-  - topic/learning
-  - status/evergreen
----
-
 ## 4 stages
 
 ### 真空管和穿孔卡片

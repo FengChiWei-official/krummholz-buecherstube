@@ -1,9 +1,4 @@
 ---
-tags:
-  - type/permanent
-  - topic/learning
-  - attr/concept
-  - status/archive
 aliases:
   - Address Resolution Protocol
 ---

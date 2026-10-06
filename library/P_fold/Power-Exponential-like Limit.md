@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/technique
----
-
 ## Definition
 
 [[Power-Exponential Functions]] is $f(x)= a(x)^{b(x)}$.

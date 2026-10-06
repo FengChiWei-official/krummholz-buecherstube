@@ -1,9 +1,4 @@
 ---
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/in-progress
 aliases:
   - How to prove p or q statements
 ---

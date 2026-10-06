@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/in-progress
-  - topic/learning
-  - attr/concept
----
-
 ## Definition
 
 $\mid a + b \mid \: \le \: \mid a \mid + \mid b \mid$

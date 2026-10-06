@@ -1,0 +1,6 @@
+## Definition
+
+[[Geometric Object]]
+
+---
+## **Related**

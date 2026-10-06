@@ -13,11 +13,11 @@ One call = one day. Nothing runs in the background; there is no daemon, no watch
 
 | Layer | Path | Nature |
 |---|---|---|
-| 原始清单 | `archives/TR-raw-D-<YYYY-MM-DD>.md` | 机器生成，零 AI 改写，每条 = 源侧字段原样映射，逐条可回溯到 API 快照 |
-| 报告 | `archives/TR-D-<YYYY-MM-DD>.md` | 两节：`## 精选`（工业/社区热点）+ `## 学术`（论文）。条数随当日信号浮动（sanity 界 4–24，无固定配额），每条 = 链接 + 来源 + 一句"为什么值得看" |
-| 榜单快照 | `archives/TR-leaderboards.md` | **每次抓取整体覆盖**，只留当前榜单 + Δ 列；`TR-leaderboards.state.json` 存上一份用于算 Δ。两者都不参与滚动合并 |
-| 索引 | `a_sticker/todos/Trend Radar.md` | 裸 `todo` 标签；只链当前仍在的件 |
-| 滚动件 | `archives/TR-{W,M,Y}-*.md` 与 `TR-raw-{W,M,Y}-*.md` | 7 日报→周报、月内 ≥4 周报→月报、年内 ≥12 月报→年报；**被合并件删除，不保留** |
+| 原始清单 | `archives/work/TR-raw-D-<YYYY-MM-DD>.md` | 机器生成，零 AI 改写，每条 = 源侧字段原样映射，逐条可回溯到 API 快照 |
+| 报告 | `archives/work/TR-D-<YYYY-MM-DD>.md` | 两节：`## 精选`（工业/社区热点）+ `## 学术`（论文）。条数随当日信号浮动（sanity 界 4–24，无固定配额），每条 = 链接 + 来源 + 一句"为什么值得看" |
+| 榜单快照 | `archives/work/TR-leaderboards.md` | **每次抓取整体覆盖**，只留当前榜单 + Δ 列；`TR-leaderboards.state.json` 存上一份用于算 Δ。两者都不参与滚动合并 |
+| 索引 | `a_sticker/todos/Trend Radar.md` | v5：无 frontmatter（tags 已退役）；只链当前仍在的件 |
+| 滚动件 | `archives/work/TR-{W,M,Y}-*.md` 与 `TR-raw-{W,M,Y}-*.md` | 7 日报→周报、月内 ≥4 周报→月报、年内 ≥12 月报→年报；**被合并件删除，不保留** |
 
 Tool: `tools/trend_radar.py`（stdlib only）。
 
@@ -122,15 +122,15 @@ python3 tools/vault.py check                            # 结构不变量（本�
 
 `verify` asserts: every non-降级/未启用 section meets its floor (`MIN_ITEMS` 20，openalex 10), provenance hit rate N/N, 报告两节都存在且条数落在 sanity 界内，`候选池 N / 入选 M` 一行且 N 等于原始清单正常节合计、M ≤ N, 每条 URL 都能回溯到 raw（或带 `⟦ws⟧`），学术节的 raw 条目全部来自学术源、精选节的 raw 条目全不来自学术源，学术节覆盖 ≥2 个可用学术源**且满足 ML 算法优先的配额（`arxiv-ml` ≥2 / `arxiv-plse` ≤2 / `arxiv-ds` ≤2）**, index links resolve and cover every current artifact (+ the leaderboard note), leaderboard tables each have ≥10 rows with a source line and snapshot hash, the Δ state file parses, and no ISO week holds ≥7 unmerged dailies.
 
-`vault.py check` already fails on a **pre-existing** baseline (root-drain, legacy lit-without-source, 2 unresolved links). The requirement is only: no new finding mentioning `TR-`/`Trend Radar`.
+`vault.py check` under the new two-tier doctrine: hard gates (root drain / material source / new dangling wikilinks) must stay clean; report-level I1–I4 give weekly increments and never block. The requirement here: no hard-gate finding, and no new finding mentioning `TR-`/`Trend Radar`.
 
 旧契约日报（`date < LAYER_CUTOVER` = 2026-09-21）不套两节/条数/候选池/配额规则，也不要求原始清单里存在新增的 arXiv 桶或 `s2`——那时它们还不存在。**不回填历史日报**：HF trending / HN 前排这类源只能取"此刻"，补跑过去的日子只会用今天的数据污染旧日期。
 
 ## Boundaries
 
-Write: `archives/TR-*.md` 与 `archives/TR-leaderboards.state.json`、`a_sticker/todos/Trend Radar.md`、`a_sticker/todos/Index of Todos.md`（一行登记）、`tools/trend_radar.py`、本 SKILL。
+Write: `archives/work/TR-*.md` 与 `archives/work/TR-leaderboards.state.json`、`a_sticker/todos/Trend Radar.md`、`a_sticker/todos/Index of Todos.md`（一行登记）、`tools/trend_radar.py`、本 SKILL。
 
-Never: `zzz_output/` contents, `.obsidian/`, `library/`, `README.md`, `AGENTS.md`, any note this flow did not create; no new zone layers (artifacts stay flat in `archives/`); no commit, no push. Deletion is limited to TR- files this flow merged away.
+Never: `zzz_output/` contents, `.obsidian/`, `library/`, `README.md`, `AGENTS.md`, any note this flow did not create; artifacts stay flat in `archives/work/`; no commit, no push. Deletion is limited to TR- files this flow merged away.
 
 ## Stop and ask the owner when
 

@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/in-progress
-  - topic/learning
-  - attr/concept
----
-
 ## Definition
 
 Noun declension in German is the set of morphological changes (endings, articles, and sometimes stem changes) that mark case, number, and sometimes gender for nouns and their modifiers.

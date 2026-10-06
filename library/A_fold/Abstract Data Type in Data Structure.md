@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/in-progress
-  - topic/learning
-  - attr/concept
----
-
 ## Definition
 
 An [[Abstract Data Type in Data Structure]] is an [[Interface]] that defines how a data type logically behaves. 

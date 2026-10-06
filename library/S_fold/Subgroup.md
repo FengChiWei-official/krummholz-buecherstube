@@ -1,10 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/in-progress
----
 ## Notation:
 $\mathbf{H}$
 ## Definition

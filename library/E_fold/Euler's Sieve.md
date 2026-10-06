@@ -1,10 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/evergreen
----
 ## background
 based on the rule [[Most of algorithm is try to traverse without duplication]]. **better** then [[Eratosthenes' Sieve]], means less duplication in sieving.
 
