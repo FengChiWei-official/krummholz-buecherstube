@@ -12,9 +12,6 @@ tags:
 ## Core Concepts
 
 
-System: [[VAULT_CLEANUP_FIX_PLAN]] — completed cleanup/restructure record (archived)
-
-
 ## Key Methods
 
 ## Applications
