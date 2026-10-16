@@ -35,6 +35,15 @@ A pointer table of means. The body — solving taste, route order, and the techn
 
 ## Applications
 
+<!-- L2 2026-10-06: 簇登记 (D22) -->
+[[Power-Exponential-like Limit]]
+[[Reciprocal Substitution]]
+
+
+<!-- L2 2026-10-06: 簇登记 (D22) -->
+[[Power-Exponential-like Limit Examples]]
+
+
 ---
 ## **Related**
 

@@ -51,9 +51,7 @@ ROOT_ALLOWED = {"README.md", "AGENTS.md"}
 
 # Pre-existing unresolved wikilinks (baseline snapshot; owner doctrine:
 # dangling links are allowed as new-note hooks; check flags only NEW unresolved).
-# Baseline updated 2026-10-06 (post-migration): the 2026-09 baseline list plus
-# `Object -- Identify the form of the limit` (note deleted by owner commit
-# 7ad8baf 2026-09-11; content recoverable from git history).
+# Baseline updated 2026-10-06 (post-migration).
 WHITELIST_UNRESOLVED = {
     "Functional",
     "Pure",
@@ -299,7 +297,6 @@ _BASELINE_UNRESOLVED_NAMES = [
     '用韵',
     '甲种句',
     '黏对',
-    'Object -- Identify the form of the limit',
 ]
 WHITELIST_UNRESOLVED |= set(_BASELINE_UNRESOLVED_NAMES)
 # External overrides (one entry per line, # comments)

@@ -44,5 +44,9 @@
 
 ## Applications
 
+<!-- L0 2026-10-06: ≥90% 归队提议自动登记 (D22) -->
+[[Definition of Function]]
+
+
 ---
 ## **Related**

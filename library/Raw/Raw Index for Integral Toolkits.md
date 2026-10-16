@@ -33,5 +33,11 @@ Integration by Parts
 
 ## Applications
 
+<!-- L0 2026-10-06: ≥90% 归队提议自动登记 (D22) -->
+[[Table Method for Integration by Parts]]
+[[双元法拓展]]
+[[Table of Trigonometric Function Integrals]]
+
+
 ---
 ## **Related**

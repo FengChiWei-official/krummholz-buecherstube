@@ -13,5 +13,11 @@
 
 [[Chain of Cosine]]
 
+<!-- L0 2026-10-06: ≥90% 归队提议自动登记 (D22) -->
+[[De Moivre's Formula]]
+[[Half-Angle Identities]]
+[[Trigonometric Identities]]
+
+
 ---
 ## **Related**
