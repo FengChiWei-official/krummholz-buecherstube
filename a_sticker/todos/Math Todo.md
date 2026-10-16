@@ -24,3 +24,30 @@
 - [x] [[Telescoping Sum]] — 与 Toolkits 互链后评估 promote
 - [x] [[Sequence]] — 收敛数列工具卡后评估 promote
 - [x] [[Graph of Math - 类型化边方案]] — 试插 3 张已落地;铺开:不等式簇挂 [[Boundedness]] + 建对象卡
+- [ ] [[D1 Ordinary Operations]] — 补定义:与 D23 化归的边界
+- [ ] [[D23 Reducing into Known Froms]] — 补定义与化归例子
+- [ ] [[Equivalent Infinitesimals]] — 内容已近成卡,评估 promote
+- [ ] [[Focus on the Dominant]] — 补定义与主部提取例子
+- [ ] [[L'Hospital Rule]] — 补定义与使用条件
+- [ ] [[Mean Value theorem]] — 补三类中值定理与用法
+- [ ] [[Absolute Function Toolkits]] — 补定义与不等式工具
+- [ ] [[Absolute Inequality]] — 补定义与常见形式
+- [ ] [[Comparison Test]] — 补定义与适用场景
+- [ ] [[Graphs of  Functions]] — 补各函数图像要点
+- [ ] [[Inequality]] — 补定义与分类,挂 [[Inequality Sheet]]
+- [ ] [[Logarithmic Inequality]] — 补证明与用法
+- [ ] [[Range Inequality]] — 补与极限定义的联系
+- [ ] [[Series]] — 补定义与审敛法
+- [ ] [[Links of Boundedness' Entry]] — 补 Perspectives 与例子
+- [ ] [[Links of Standard Function Analysis]] — 补 Perspectives/Distinctions
+- [ ] [[The OPD Problem-Solving Framework]] — 补 OPD 框架正文
+- [ ] [[Object -- Identify the form of the limit]] — 补正文:未定式识别
+- [ ] [[Object -- Determine continuity and discontinuity]] — 补正文:间断点判定
+- [ ] [[Object -- Investigate the microscopic behavior of the function as x tends to some point]] — 补正文:局部性态
+- [ ] [[Memorylessness, Time and Aging]] — 内容已近成卡,评估 promote
+- [ ] [[Poisson Process and the Count-Waiting Duality]] — 内容已近成卡,评估 promote
+- [ ] [[Probability Spaces and the Universal Source]] — 内容已近成卡,评估 promote
+- [ ] [[Probability System and Random Variables]] — 内容已近成卡,评估 promote
+- [ ] [[The Scenes and Processes of Probability]] — 内容已近成卡,评估 promote
+- [ ] [[Universal Limit Theorems]] — 内容已近成卡,评估 promote
+- [ ] [[Standard Limits]] — 补正文:除 Definition-of-E 外的标准极限

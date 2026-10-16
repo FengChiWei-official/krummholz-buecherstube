@@ -1,1 +1,2 @@
 - [ ] [[Fix -ance -ence]]
+- [ ] [[希腊字母到英语字母演变 (Greek-Latin-English Letters)]] — 消化 AI 材料后用自己的话写成卡:传导链 + 描述性名字

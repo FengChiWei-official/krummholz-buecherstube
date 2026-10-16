@@ -18,6 +18,7 @@
 - [ ] [[System Todo]]
 - [ ] [[AI 报告挂载 Todo]]
 - [ ] [[Trend Radar]]
+- [ ] [[Philo todo]]
 
 ## Key Methods
 
