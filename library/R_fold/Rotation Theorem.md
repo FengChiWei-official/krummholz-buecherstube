@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - topic/learning
-  - attr/principle
-  - status/in-progress
----
-
 ## Definition
 
 $$

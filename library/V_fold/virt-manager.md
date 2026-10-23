@@ -1,12 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - attr/technique
-  - status/evergreen
----
-
 ## installation
 `yay -S virt-manager`
 `yay -Syu qemu-full libvirt dnsmasq virt-viewer edk2-ovmf bridge-utils swtpm

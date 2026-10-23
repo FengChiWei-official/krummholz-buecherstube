@@ -1,10 +1,3 @@
----
-tags:
-  - type/permanent
-  - topic/learning
-  - attr/map
-  - status/in-progress
----
 ## Definition
 
 Objects:

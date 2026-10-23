@@ -1,10 +1,3 @@
----
-tags:
-  - type/lit
-  - topic/learning
-  - status/archive
----
-
 ## Text
 
 > [!summary] Algorithm Knowledge MOC (complete)

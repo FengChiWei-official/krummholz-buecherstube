@@ -1,9 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
----
-
 #concept/virtual #math/algebra/abstract 
 
 ## define

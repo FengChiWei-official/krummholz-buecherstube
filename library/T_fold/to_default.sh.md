@@ -1,10 +1,3 @@
----
-tags:
-  - status/in-progress
-  - type/permanent
-  - topic/hyprland
----
-
 # to_default.sh — 切换回物理屏
 
 🌳 **导航**: [[Hyprland Workspace System - Tree Navigation]] > **脚本实现** > **阶段1** > **切换回物理屏**

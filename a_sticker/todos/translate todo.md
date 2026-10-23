@@ -1,8 +1,3 @@
----
-tags:
-  - todo
----
-
 This file indexes mailbox notes translated from Chinese to English.
 
 Each entry lists the original file and the English companion file created.

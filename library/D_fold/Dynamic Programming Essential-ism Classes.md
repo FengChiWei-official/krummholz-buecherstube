@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/evergreen
----
-
 ## Front page
 [[Dynamic Programming]] has only 2 CORE Factors: [[State Space]] and [[Transition Logic]].
 

@@ -1,9 +1,3 @@
----
-tags:
-  - todo
----
-
-
 - [x] zhihu problem set of Limit
 - [x] 基础30讲习题梳理
 - [x] 常见函数如$f(x) = xe^{-x}$的图像 -> [[]]

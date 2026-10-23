@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/in-progress
-  - topic/learning
-  - attr/concept
----
-
 ## Definition
 
 A [[Linear List]] is an [[Abstract Data Type in Data Structure]] representing a finite sequence of data elements. 

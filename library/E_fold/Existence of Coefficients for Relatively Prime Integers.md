@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/in-progress
----
-
 ## Definition
 
 A pair a,b of integers is [[Relatively Prime]] **if and only if** there are integers r and s such that $ra + sb = 1$.

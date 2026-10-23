@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/evergreen
----
-
 ## Definition
 - $Z$ is a **subgroup**
 - $\mathbf{Z} = \{z \in \mathbf{G} \mid zx = xz, \forall x \in \mathbf{G}\}$

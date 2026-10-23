@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/evergreen
----
-
 ## **Definition**
 
 The **Parallel Axis Theorem** relates the [[Moment of Inertia]] of a rigid body about any axis to its moment of inertia about a parallel axis through its center of mass.

@@ -1,9 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
----
-
 ## history
 [[history-of-dynamic-partitioning]]
 

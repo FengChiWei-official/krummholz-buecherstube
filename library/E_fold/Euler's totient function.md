@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/algorithm
-  - status/evergreen
----
-
 ## Totient
 totient is the name of function counting in specific rules.
 

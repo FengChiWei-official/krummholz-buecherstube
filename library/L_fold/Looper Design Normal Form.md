@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/evergreen
----
-
 ## State shifting
 if you have a state i, and you want to traversal all available state, use this pattern.
 ```

@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/in-progress
----
-
 ## Definition
 1. When you try to **Read Top** or **Pop**, you should check if it is **empty**!
 2. You can use [[Sentinel Node]] to avoid **Empty Check**.

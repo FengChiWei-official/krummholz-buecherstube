@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - topic/learning
-  - attr/concept
-  - status/in-progress
----
-
 ## Definition
 
 A [[Stack]] where elements are always in a specific order.

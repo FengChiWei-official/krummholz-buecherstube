@@ -1,12 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/map
-  - todo
----
-
 ## Definition
 
 ## Core Concepts

@@ -1,7 +1,3 @@
----
-tags:
-  - todo
----
 ## Aim
 
 ## Items

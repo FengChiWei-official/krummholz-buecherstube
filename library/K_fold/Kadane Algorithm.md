@@ -1,10 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/evergreen
----
 it is a [[Dynamic Programming|DP]] algorithm
 
 ## Definition

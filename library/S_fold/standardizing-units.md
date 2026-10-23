@@ -1,9 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
----
-
 ## user-wise
 ### abstraction
 keep logical relationship.

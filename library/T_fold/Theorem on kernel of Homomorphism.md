@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/math
-  - status/evergreen
----
-
 ## Let
 - $\phi: \mathbf{G} \to \mathbf{G^{\prime}}$ is a homomorphism of these groups
 - $a,b$ is element of $\mathbf{G}$

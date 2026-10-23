@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/map
----
-
 ## Definition
 
 All uncertainty shall fall with [[Raw Index of Everything]].

@@ -1,10 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/evergreen
----
 ### Key Points
 - [[Contiguous]]:  Subarray,yes; subsequence, no.
 - [[Monotonicity in PC]], when you expand your window, your state shift should be [[Monotonicity in PC]].

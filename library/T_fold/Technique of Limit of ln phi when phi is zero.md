@@ -1,9 +1,4 @@
 ---
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/technique
 aliases:
   - $\ln (0)$
 ---

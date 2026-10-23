@@ -1,9 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
----
-
 [[Declension]] of Deutsch.
 
 | 格位          | Der                              | Das                                      | Die                                  | Die(pl)                                      |

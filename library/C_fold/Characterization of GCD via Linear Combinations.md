@@ -1,9 +1,4 @@
 ---
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/in-progress
 aliases:
   - theorem Z(a + b)
   - The Bézout Identity for Integers

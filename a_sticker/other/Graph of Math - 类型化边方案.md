@@ -1,8 +1,4 @@
 ---
-tags:
-  - type/lit
-  - topic/learning
-  - status/archive
 source: "本仓库实现 tools/vault.py graph(2026-09-17)+ 原文抽取:archives/Raw math idea.md、library/Index/*、mailbox/*"
 ---
 

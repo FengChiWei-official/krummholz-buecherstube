@@ -1,10 +1,3 @@
----
-tags:
-  - status/in-progress
-  - type/permanent
-  - topic/hyprland
----
-
 # to_headless.sh — 切换到虚拟屏
 
 🌳 **导航**: [[Hyprland Workspace System - Tree Navigation]] > **脚本实现** > **阶段1** > **切换到虚拟屏**

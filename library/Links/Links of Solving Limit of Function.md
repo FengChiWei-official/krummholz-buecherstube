@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/links
----
-
 ## Definition
 [[Rational Limit]]
 [[Power-Exponential-like Limit]]

@@ -1,10 +1,3 @@
----
-tags:
-  - type/lit
-  - topic/learning
-  - status/archive
----
-
 ## Text
 
 $\lim_{x \to \infty} e^{-x} (1+\frac{1}{x})^{x^2} = e^{-\frac{1}{2}}$

@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - topic/learning
-  - attr/technique
-  - status/in-progress
----
-
 ## Definition
 
 - **不要在 `for` 循环内部直接修改循环变量 `i`**：比如在 `for` 里又写 `i++` 或者 `i--`。这会让你很难追踪当前到底走到了哪。

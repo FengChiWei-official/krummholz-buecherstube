@@ -1,10 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/links
----
 ## Definition
 
 A Strictly Monotonic Function $g: A \to B$ is an Order Isomorphism of the variable $x$. It preserves the total ordering of the real line, meaning:  

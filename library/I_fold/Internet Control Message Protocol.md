@@ -1,9 +1,4 @@
 ---
-tags:
-  - type/permanent
-  - attr/technique
-  - topic/cs
-  - status/evergreen
 aliases:
   - ICMP
 ---

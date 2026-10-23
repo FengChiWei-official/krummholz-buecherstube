@@ -1,9 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
----
-
 ## subnet analysis
 
 how many do I need to allocate to the subnet?

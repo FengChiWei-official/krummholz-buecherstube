@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/map
----
-
 ## Definition
 
 ## Core Concepts
@@ -21,7 +13,7 @@ tags:
 [[Trajectory Equation]]
 [[Velocity]]
 [[Average velocity]]
-[[Instantaneous velocity]]
+[[Instantaneous Velocity]]
 [[Speed]]
 [[Average speed]]
 [[Instantaneous Speed]]

@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - topic/learning
-  - attr/concept
-  - status/evergreen
----
-
 ## Definition
 notation: $(1, 2, 3,... ,n)$, which means
 $$

@@ -1,9 +1,4 @@
 ---
-tags:
-  - type/permanent
-  - topic/learning
-  - attr/principle
-  - status/evergreen
 aliases:
   - CRT
   - 中国剩余定理

@@ -1,10 +1,3 @@
----
-tags:
-  - type/lit
-  - topic/learning
-  - status/archive
----
-
 ## Topic: [[Boundedness]] of $f(x) = \frac{x}{1+x^2}$
 
 ## 1. Problem Analysis 

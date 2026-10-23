@@ -1,10 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/evergreen
----
 ## Definition
 a coset denote $aH$,where
 $$

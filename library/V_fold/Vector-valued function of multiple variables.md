@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - topic/learning
-  - attr/concept
-  - status/evergreen
----
-
 ## Definition
 $$
 f: \mathbb{R}^n \to \mathbb{R}^m

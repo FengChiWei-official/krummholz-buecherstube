@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/evergreen
----
-
 ## qwq
 A set or a array(`size is n`) can be mapped into a integer, where whole set is `(1<<n)-1`.
 

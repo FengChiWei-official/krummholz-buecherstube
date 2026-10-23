@@ -1,12 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/map
-  - cs/llm
-  - ml/fine-tuning
-  - status/evergreen
----
-
 # 大模型微调完整指南 (MOC)
 
 这是关于 LLM 微调的知识索引与导航地图。详细内容见 [[LLM Fine Tune]]。

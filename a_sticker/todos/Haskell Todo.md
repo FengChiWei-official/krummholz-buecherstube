@@ -1,7 +1,3 @@
----
-tags:
-  - todo
----
 ## Aim
 
 Haskell / functional programming card cluster.

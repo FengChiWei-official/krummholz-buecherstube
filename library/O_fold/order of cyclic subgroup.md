@@ -1,9 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
----
-
 ## define
 Let $\mathbf{G}$ a group, $x\in \mathbf{G}$ 
 if $\exists n \text{ s.t. } x^n = 1$

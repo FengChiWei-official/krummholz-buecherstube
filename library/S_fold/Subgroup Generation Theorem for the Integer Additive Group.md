@@ -1,9 +1,4 @@
 ---
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/in-progress
 aliases:
   - Zd = Za + Zb
   - Theorem2.3.3

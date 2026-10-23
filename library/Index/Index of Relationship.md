@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/map
----
-
 ## Definition
 
 建立自己的人格为第一要务。

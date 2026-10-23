@@ -1,10 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/map
-  - topic/learning
-  - status/evergreen
----
 ## Life of Process
 ![[ProcessState.jpg]]
 ### birth

@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/in-progress
-  - topic/learning
-  - attr/concept
----
-
 ## Definition
 Pre-condition check
 Pattern: before entering any local, high-risk pattern decomposition/matching, perform a coarse boundary check first.

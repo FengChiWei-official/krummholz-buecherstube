@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/map
----
-
 ## Definition
 代数学是研究集合与运算性质的学科。本索引组织了群论、同态、同构等核心概念的系统化知识框架。
 

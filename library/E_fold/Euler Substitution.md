@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/concept
----
-
 ## Definition
 
 You need Euler Substitution I only.

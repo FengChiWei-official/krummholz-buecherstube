@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - topic/learning
-  - attr/concept
-  - status/in-progress
----
-
 ## Definition
 Its notation is $\kappa$.
 

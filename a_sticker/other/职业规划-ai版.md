@@ -1,6 +1,4 @@
 ---
-tags:
-  - type/lit
 source: "AI 生成(职业规划对话整理)"
 ---
 

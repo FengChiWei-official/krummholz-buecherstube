@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/in-progress
----
-
 ## Definition
 It is a [[Operator]] on [[Differentiable Function Space]].
 

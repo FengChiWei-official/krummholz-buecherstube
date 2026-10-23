@@ -1,30 +1,38 @@
 #!/usr/bin/env python3
-"""Vault operating procedures: invariant check, placement triage, promotion,
-session-entry status.
+"""Vault operating procedures for the v5 system: two-tier invariant check,
+placement triage (todo aging + suspected half-done), trunk registration
+(rawindex), session-entry status with rhythm line.
 
 Usage:
     python3 tools/vault.py check
     python3 tools/vault.py triage
     python3 tools/vault.py status
-    python3 tools/vault.py graph [--around NAME] [--unwired PATH...]
-    python3 tools/vault.py promote NAME [--dry-run] [--force]
+    python3 tools/vault.py rawindex [--clusters] [--check] [--sync] [--around NAME] [--top N]
+
+Doctrine (see doctrine/Vault Design.md, doctrine/Vault Workflow.md):
+    - Two trees: Raw Index = trunk (registration), Index = semantic areas.
+    - Two-tier invariants: hard gates exit 1; I1-I4 are report-level.
+    - Registration edges (Raw Index -> Node) are structural: --sync appends them.
+    - State lives only in the todo tree; tags are retired.
 
 Stdlib only. Vault root = parent of tools/. Works from any cwd.
 """
 
 import argparse
+import collections
+import math
 import re
-import shutil
 import subprocess
 import sys
 import time
+from itertools import combinations
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def _load_extra_lines(path: Path) -> set[str]:
+def _load_extra_lines(path: Path) -> set:
     """Read one-entry-per-line file, skipping blanks and # comments."""
     if not path.exists():
         return set()
@@ -38,19 +46,12 @@ def _load_extra_lines(path: Path) -> set[str]:
 
 # ---------------------------------------------------------------- constants
 
-TYPE_TAGS = {"type/permanent", "type/lit"}
-STATUS_TAGS = {"status/in-progress", "status/evergreen", "status/archive"}
-ATTR_TAGS = {"attr/map", "attr/links", "attr/principle",
-             "attr/concept", "attr/technique", "attr/method"}
-
-VALID_TAGS = TYPE_TAGS | STATUS_TAGS | ATTR_TAGS
-
-# Root files that are allowed to live outside the three zones.
+# Root files that are allowed to live outside the zones.
 ROOT_ALLOWED = {"README.md", "AGENTS.md"}
 
-# Pre-existing unresolved wikilinks. The 17 cleanup-verified placeholders plus
-# the 2026-09 baseline snapshot of intentional dangling hooks (owner doctrine:
+# Pre-existing unresolved wikilinks (baseline snapshot; owner doctrine:
 # dangling links are allowed as new-note hooks; check flags only NEW unresolved).
+# Baseline updated 2026-10-06 (post-migration).
 WHITELIST_UNRESOLVED = {
     "Functional",
     "Pure",
@@ -302,130 +303,94 @@ WHITELIST_UNRESOLVED |= set(_BASELINE_UNRESOLVED_NAMES)
 WHITELIST_UNRESOLVED |= _load_extra_lines(ROOT / "tools" / "whitelist_unresolved.txt")
 
 # Legacy lit notes that already lacked a real source at the 2026-09 baseline.
-# check reports these informationally; NEW un-sourced lit notes still fail hard.
-_BASELINE_LIT_NOSOURCE = {
-    'a_sticker/or/对制度的一点思考.md',
-    'a_sticker/or/职业规划-ai版.md',
-    'a_sticker/or/风险评估.md',
-    'archives/reading/algorithm/raw index of Number-theoretic.md',
-    'archives/reading/kaggle_biomass/GUIDE.md',
-    'a_sticker/new_terms/terms sheet.md',
-    'a_sticker/or/Can we Learn about Semantic Space.md',
-    'a_sticker/or/Hypernetwork.md',
-    'archives/CiS 03.md',
-    'archives/Latin Root -Nomial.md',
-    'archives/Prefix Poly-.md',
-    'archives/Project vs. Protrude vs. Stand out.md',
-    'archives/Prominent.md',
-    'archives/Recognizance of Hook Function.md',
-    'archives/Self-generated ANN.md',
-    'archives/Surplus Society.md',
-    'archives/Term Polynomial.md',
-    'archives/Turn to the definition of differentiability.md',
-    'archives/Word Family of Define.md',
-    'archives/algorithms/01 Knapsack DP Classes.md',
-    'archives/algorithms/2D Cost Knapsack Template.md',
-    'archives/algorithms/Algorithm Decision Tree.md',
-    'archives/algorithms/CSP 42.md',
-    'archives/algorithms/CSP Difficulty 1.md',
-    'archives/algorithms/CSP Difficulty 3.md',
-    'archives/algorithms/CSP Math.md',
-    'archives/algorithms/CSP Simulation.md',
-    'archives/algorithms/CSP-2020-06.md',
-    'archives/algorithms/CSP202006C. Markdown 渲染器.md',
-    'archives/algorithms/CSP202104.md',
-    'archives/algorithms/Equivalence Class Proof.md',
-    'archives/algorithms/How do you Implement Unbounded Knapsack DP.md',
-    'archives/algorithms/Implement of Regular Expression Matching.md',
-    'archives/algorithms/数量级判断.md',
-    'archives/engineering/Clash.md',
-    'archives/engineering/How to tech Backend.md',
-    'archives/engineering/Tip ml4w kitty fish config error oh-my-posh.md',
-    'archives/finding the projection of the line onto the plane.md',
-    'archives/latin/Fix -ance -ence.md',
-    'archives/projects/Gynecological AI.md',
-    'archives/projects/Gynecological Agent Backend Todo.md',
-    'archives/projects/Gynecological Experiment Design.md',
-    'archives/projects/How do you handle a cartesian movement equation for a_theta.md',
-    'archives/projects/How to Implement a Openclaw for yourself.md',
-    'archives/projects/TODO polar coordinate.md',
-    'archives/projects/Term Asynchronicity.md',
-    'archives/projects/Two Pointers TODO.md',
-    'archives/projects/t2 Robot and coffee.md',
-    'archives/projects/延毕条件.md',
-    'archives/reading-notes/Lyrics 13番目の彼女.md',
-    'archives/reading-notes/Raw Vocabularies Sheet.md',
-    'archives/reading-notes/YM-S1-E1 Open Government.md',
-    'archives/reading-notes/YM-S1-E2 The Official Visit.md',
-    'archives/reading-notes/YM-S1-E5 The Writing on the Wall.md',
-    'archives/reading-notes/YM-S1-E6 The Right to Know.md',
-    'archives/reading-notes/命运石之门 序章.md',
-    'archives/reading-notes/看过的番剧.md',
-    'archives/tricks/MPD Installing.md',
-    'archives/tricks/Trick Can not Find ISO of Windows 11.md',
-    'archives/tricks/Trick Clash verge rev bin Kernel IO error.md',
-    'archives/tricks/Trick Install Windows via Libvirt.md',
-    'archives/tricks/Trick Neo vim for vs code.md',
-    'archives/tricks/Trick Solve confliction between swaync and KDE on D-bus.md',
-    'archives/tricks/Trick UMU set up.md',
-    'archives/tricks/Trick Windows ISO Fall back.md',
-    'archives/tricks/Trick fix can not open virt-manager.md',
-    'archives/tricks/Trick for VirtIO FS in windows.md',
-    'archives/tricks/Trick for install virtio nic driver.md',
-    'archives/tricks/Trick for installing all virtio driver.md',
-    'archives/tricks/Trick install Win Fsp.md',
-    'archives/tricks/Trick keep hyprland and wayland plasma.md',
-    'archives/tricks/Trick mount ntfs.md',
-    'archives/tricks/Trick qemu.md',
-    'archives/tricks/Trick rotate-before-login-with-sddm.md',
-    'archives/tricks/script toggle_workspace_conf.md',
-    'archives/番剧 机动战士Z高达.md',
-    'archives/聊天.md',
-    'library/B_fold/BFS Templates.md',
-    'library/C_fold/C++ algorithm start up.md',
-    'library/D_fold/DFS Template.md',
-    'library/D_fold/DP problems todo.md',
-    'library/F_fold/fix -ory -atory.md',
-    'library/G_fold/Gynecological AI.md',
-    'library/G_fold/Gynecological Experiment Design.md',
-    'library/I_fold/Improved-DP (Greedy).md',
-    'library/I_fold/Instance of Fraction Hook Function.md',
-    'library/I_fold/Instance of Function defined via Limit.md',
-    'library/L_fold/Latin 动词现在时词干 的派生.md',
-    'library/L_fold/Latin 变位中的主题元音.md',
-    'library/L_fold/Latin 名词派生.md',
-    'library/L_fold/Legacy View of Algorithm.md',
-    'library/N_fold/Next Greater Elements.md',
-    'library/P_fold/Power-Exponential-like Limit Examples.md',
-    'library/P_fold/Prep Notwithstanding.md',
-    'library/P_fold/Proof of Properties of Powers of Group Elements.md',
-    'library/P_fold/Proof of Reversed Trigonometric Inequality.md',
-    'library/P_fold/Proving the Given Function is Bounded.md',
-    'library/R_fold/Reference Sheet of Series.md',
-    'library/R_fold/Rock and Roll Road Map.md',
-    'library/R_fold/roots and fixes sheet.md',
-    'library/S_fold/States Update Form.md',
-    'library/T_fold/Template of Fixed Window.md',
-    'library/T_fold/Template of Sliding Window.md',
-    'library/T_fold/Term Hyponym.md',
-    'library/T_fold/Traversal Index to Traversal Object.md',
-    'library/Template of BFS with Cycles.md',
-    'archives/Raw math idea.md',
+# check reports these informationally; NEW un-sourced material still fails hard.
+# Paths below are PRE-migration; we match by stem so the split into
+# archives/material/ keeps working without rewriting the list.
+_BASELINE_LIT_NOSOURCE_STEMS = {
+    '对制度的一点思考', '职业规划-ai版', '风险评估', 'raw index of Number-theoretic',
+    'GUIDE', 'terms sheet', 'Can we Learn about Semantic Space', 'Hypernetwork',
+    'CiS 03', 'Latin Root -Nomial', 'Prefix Poly-', 'Project vs. Protrude vs. Stand out',
+    'Prominent', 'Recognizance of Hook Function', 'Self-generated ANN',
+    'Surplus Society', 'Term Polynomial', 'Turn to the definition of differentiability',
+    'Word Family of Define', '01 Knapsack DP Classes', '2D Cost Knapsack Template',
+    'Algorithm Decision Tree', 'CSP 42', 'CSP Difficulty 1', 'CSP Difficulty 3',
+    'CSP Math', 'CSP Simulation', 'CSP-2020-06', 'CSP202006C. Markdown 渲染器',
+    'CSP202104', 'Equivalence Class Proof', 'How do you Implement Unbounded Knapsack DP',
+    'Implement of Regular Expression Matching', '数量级判断', 'Clash',
+    'How to tech Backend', 'Tip ml4w kitty fish config error oh-my-posh',
+    'finding the projection of the line onto the plane', 'Fix -ance -ence',
+    'Gynecological AI', 'Gynecological Agent Backend Todo',
+    'Gynecological Experiment Design',
+    'How do you handle a cartesian movement equation for a_theta',
+    'How to Implement a Openclaw for yourself', 'TODO polar coordinate',
+    'Term Asynchronicity', 'Two Pointers TODO', 't2 Robot and coffee', '延毕条件',
+    'Lyrics 13番目の彼女', 'Raw Vocabularies Sheet', 'YM-S1-E1 Open Government',
+    'YM-S1-E2 The Official Visit', 'YM-S1-E5 The Writing on the Wall',
+    'YM-S1-E6 The Right to Know', '命运石之门 序章', '看过的番剧',
+    'MPD Installing', 'Trick Can not Find ISO of Windows 11',
+    'Trick Clash verge rev bin Kernel IO error', 'Trick Install Windows via Libvirt',
+    'Trick Neo vim for vs code', 'Trick Solve confliction between swaync and KDE on D-bus',
+    'Trick UMU set up', 'Trick Windows ISO Fall back',
+    'Trick fix can not open virt-manager', 'Trick for VirtIO FS in windows',
+    'Trick for install virtio nic driver', 'Trick for installing all virtio driver',
+    'Trick install Win Fsp', 'Trick keep hyprland and wayland plasma',
+    'Trick mount ntfs', 'Trick qemu', 'Trick rotate-before-login-with-sddm',
+    'Trick script toggle_workspace_conf', '番剧 机动战士Z高达', '聊天',
+    'BFS Templates', 'C++ algorithm start up', 'DFS Template', 'DP problems todo',
+    'fix -ory -atory', 'Gynecological AI', 'Gynecological Experiment Design',
+    'Improved-DP (Greedy)', 'Instance of Fraction Hook Function',
+    'Instance of Function defined via Limit', 'Latin 动词现在时词干 的派生',
+    'Latin 变位中的主题元音', 'Latin 名词派生', 'Legacy View of Algorithm',
+    'Next Greater Elements', 'Power-Exponential-like Limit Examples',
+    'Prep Notwithstanding', 'Proof of Properties of Powers of Group Elements',
+    'Proof of Reversed Trigonometric Inequality', 'Proving the Given Function is Bounded',
+    'Reference Sheet of Series', 'Rock and Roll Road Map', 'roots and fixes sheet',
+    'States Update Form', 'Template of Fixed Window', 'Template of Sliding Window',
+    'Term Hyponym', 'Traversal Index to Traversal Object',
+    'Template of BFS with Cycles', 'Raw math idea',
 }
-# External overrides (one entry per line, # comments)
-_BASELINE_LIT_NOSOURCE |= _load_extra_lines(ROOT / "tools" / "baseline_lit_nosource.txt")
+# External overrides (one entry per line, # comments) — pre-migration paths,
+# reduced to stems on load.
+for _p in _load_extra_lines(ROOT / "tools" / "baseline_lit_nosource.txt"):
+    _BASELINE_LIT_NOSOURCE_STEMS.add(Path(_p).stem)
 
-SKIP_DIRS = {".git", ".obsidian", "zzz_output", ".agent"}
+SKIP_DIRS = {".git", ".obsidian", ".agent"}
+
+# Notes/latex areas of the vault. zzz_output is skipped for note-loading
+# (owner content) but its stems still resolve wikilinks.
+NOTES_SKIP_DIRS = SKIP_DIRS | {"zzz_output"}
+
+TODO_STALE_DAYS = 90       # B1: todo entries older than this get reported
+HALFDONE_WINDOW_DAYS = 7   # A1: recent + zero-outlink + unhooked = suspected half-done
+
+
+def _git_first_seen(path: Path):
+    """First commit time a path was tracked, or None. Creation time that
+    survives moves/migrations (unlike mtime)."""
+    try:
+        proc = subprocess.run(
+ ["git", "-C", str(ROOT), "log", "--diff-filter=A", "--follow",
+             "--format=%ct", "--", str(path.relative_to(ROOT))],
+            capture_output=True, text=True, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if proc.returncode != 0:
+        return None
+    stamps = [ln for ln in proc.stdout.splitlines() if ln.strip()]
+    return float(stamps[-1]) if stamps else None
+
+TRUNK_ROOT_STEM = "Raw Index of Everything"
 
 _notes_cache: dict | None = None
 
 # ---------------------------------------------------------------- helpers
 
 
-def iter_notes(root: Path = ROOT):
+def iter_notes(root: Path = ROOT, skip=NOTES_SKIP_DIRS):
     """Yield every *.md under root, skipping showcase/config dirs."""
     for path in root.rglob("*.md"):
-        if any(part in SKIP_DIRS for part in path.parts):
+        rel = path.relative_to(root)
+        if any(part in skip for part in rel.parts):
             continue
         yield path
 
@@ -450,7 +415,6 @@ def parse_frontmatter(text: str) -> dict:
     if not text.startswith("---"):
         return fm
     lines = text.splitlines()
-    # find closing ---
     try:
         end = next(i for i in range(1, len(lines)) if lines[i].strip() == "---")
     except StopIteration:
@@ -468,19 +432,12 @@ def parse_frontmatter(text: str) -> dict:
             elif value:
                 fm[key] = value
             else:
-                fm[key] = []          # bare "key:" -> list items follow
+                fm[key] = []
         elif re.match(r"^\s+-\s+", line) and key is not None:
             fm.setdefault(key, [])
             if isinstance(fm[key], list):
                 fm[key].append(re.sub(r"^\s+-\s+", "", line).strip().strip("'\""))
     return fm
-
-
-def get_tags(fm: dict) -> list:
-    tags = fm.get("tags", [])
-    if isinstance(tags, str):
-        tags = [tags]
-    return [t for t in tags if t]
 
 
 _WIKILINK_RE = re.compile(r"(!?)\[\[([^\]\n]+?)(\|[^\]\n]*)?\]\]")
@@ -489,17 +446,13 @@ _WIKILINK_RE = re.compile(r"(!?)\[\[([^\]\n]+?)(\|[^\]\n]*)?\]\]")
 def extract_wikilinks(text: str):
     """Yield (target, line_no) for every [[...]] in text (embeds included).
 
-    Skips inline code spans (`...`) and fenced code blocks (```...```)
-    so command literals and code examples are not parsed as links.
+    Skips inline code spans and fenced code blocks.
     """
-    # Strip fenced code blocks so wikilinks inside code examples
-    # are not parsed as unresolved references.
     text = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
     for line_no, line in enumerate(text.splitlines(), start=1):
         line = re.sub(r"`[^`]*`", "", line)
         for match in _WIKILINK_RE.finditer(line):
             target = match.group(2)
-            # strip heading/anchor, then path prefix up to last /
             target = target.split("#")[0]
             target = target.split("/")[-1]
             target = target.strip()
@@ -509,6 +462,20 @@ def extract_wikilinks(text: str):
 
 def is_image_embed(target: str) -> bool:
     return target.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".svg"))
+
+
+def _alias_map(texts: dict) -> dict:
+    """{alias: note Path} — Obsidian resolves wikilinks through `aliases:`."""
+    out = {}
+    for p, t in texts.items():
+        b = parse_frontmatter(t)
+        aliases = b.get("aliases", [])
+        if isinstance(aliases, str):
+            aliases = [aliases]
+        for a in aliases:
+            if a:
+                out.setdefault(a.strip(), p)
+    return out
 
 
 def report(title: str, findings: list) -> bool:
@@ -522,61 +489,70 @@ def report(title: str, findings: list) -> bool:
     return bool(findings)
 
 
+def _genre(path: Path) -> str:
+    """Genre by NAME (doctrine: name > path)."""
+    stem = path.stem
+    if stem.startswith("Raw Index"):
+        return "raw"
+    if stem.startswith("Index of") or stem.endswith("-MOC"):
+        return "index"
+    if stem.startswith("Links "):
+        return "links"
+    return "node"
+
+
+def _zone(path: Path) -> str | None:
+    """library sub-zone: Raw / Index / Links / <fold>, else None."""
+    rel = path.relative_to(ROOT)
+    parts = rel.parts
+    if parts[0] != "library" or len(parts) < 3:
+        return None
+    return parts[1]
+
+
 # ---------------------------------------------------------------- check
 
 
 def _collect_check():
-    """Gather all check findings. Shared by `check` and `status`.
+    """Gather all check findings, two-tier (D20).
 
-    Returns an ordered list of (title, findings, hard): hard sections count
-    toward check's PROBLEMS total; informational ones never do.
+    Returns an ordered list of (tier, title, findings):
+    tier "gate"    -> hard gate: any finding makes check exit 1.
+    tier "report"  -> report-level: weekly increments, never blocks.
+    tier "info"    -> informational baseline, never blocks.
     """
     texts = _load_notes()
     notes = sorted(texts.keys())
     basenames = {p.stem for p in notes}
     basenames |= {p.stem for p in (ROOT / "zzz_output").rglob("*.md")}
-    basenames |= set(_alias_map(texts))  # Obsidian resolves aliases too
+    basenames |= {p.stem for p in (ROOT / ".agent").rglob("*.md")}
+    basenames |= set(_alias_map(texts))
 
-    # 1. root drained
+    # ---- G1 (gate): root drained
     root_findings = [f"{p.name}: file me (root is the entry queue)"
                      for p in ROOT.glob("*.md") if p.name not in ROOT_ALLOWED]
 
-    # 2. lit notes carry a real source
-    # template/lit-temp.md keeps `source:` empty by design (AGENTS.md rule 4).
-    # Legacy lit notes with genuinely un-derivable sources are a known baseline
-    # (owner sign-off pending on sourcing/retagging) — reported, not failing.
+    # ---- G2 (gate): every archives/material/ note has a real source:
+    # lit detection by PATH (doctrine v5: material/ is the lit zone).
     lit_findings = []
     lit_baseline = []
     for p, text in texts.items():
-        if p.is_relative_to(ROOT / "template"):
+        try:
+            rel = p.relative_to(ROOT)
+        except ValueError:
+            continue
+        if not str(rel).startswith("archives/material/"):
             continue
         fm = parse_frontmatter(text)
-        if "type/lit" in get_tags(fm):
-            source = fm.get("source", "")
-            if not source or str(source).strip() in ("", '""', "''"):
-                entry = f"{p.relative_to(ROOT)}: type/lit without real source:"
-                if str(p.relative_to(ROOT)) in _BASELINE_LIT_NOSOURCE:
-                    lit_baseline.append(entry)
-                else:
-                    lit_findings.append(entry)
+        source = fm.get("source", "")
+        if not source or str(source).strip() in ("", '""', "''"):
+            entry = f"{rel}: no real source:"
+            if p.stem in _BASELINE_LIT_NOSOURCE_STEMS:
+                lit_baseline.append(entry)
+            else:
+                lit_findings.append(entry)
 
-    # 3. tag vocabulary
-    tag_findings = []
-    for p, text in texts.items():
-        if p.is_relative_to(ROOT / "template"):
-            continue
-        fm = parse_frontmatter(text)
-        for tag in get_tags(fm):
-            if tag.startswith("topic/"):
-                # open vocabulary — prefix check only (AGENTS.md Tags section)
-                if not tag[len("topic/"):]:
-                    tag_findings.append(f"{p.relative_to(ROOT)}: empty topic tag 'topic/'")
-            elif tag.startswith(("type/", "status/", "attr/")) and tag not in VALID_TAGS:
-                tag_findings.append(f"{p.relative_to(ROOT)}: invalid tag '{tag}'")
-            elif tag == "todo" and not str(p).startswith(str(ROOT / "a_sticker/todos")):
-                tag_findings.append(f"{p.relative_to(ROOT)}: bare 'todo' tag outside a_sticker/todos/")
-
-    # 4. wikilink integrity
+    # ---- G3 (gate): wikilink integrity (NEW unresolved only)
     unresolved_findings = []
     for p, text in texts.items():
         for target, line_no in extract_wikilinks(text):
@@ -587,119 +563,446 @@ def _collect_check():
             unresolved_findings.append(
                 f"{p.relative_to(ROOT)}:{line_no}: unresolved [[{target}]]")
 
-    # 5. orphans (zero inbound AND zero outbound)
-    outbound = {}
-    inbound = {}
-    for p, text in texts.items():
-        links = {t for t, _ in extract_wikilinks(text)}
-        outbound[p] = links
-        for t in links:
-            inbound.setdefault(t, set()).add(p)
-    orphan_findings = []
-    for p in notes:
-        rel = p.relative_to(ROOT)
-        if not str(rel).startswith(("mailbox/", "library/")):
-            continue
-        if str(rel).startswith(("library/Index/", "library/Links/")):
-            continue
-        fm = parse_frontmatter(texts[p])
-        if "attr/map" in get_tags(fm):
-            continue
-        if not outbound[p] and not inbound.get(p.stem):
-            orphan_findings.append(f"{rel}: no inbound and no outbound wikilinks")
+    # ---- R-I1..R-I4 (report): the weekly increments
+    graph = _trunk_graph(texts)
+    nodes = graph["nodes"]
+    reg = graph["reg"]
+
+    i1_unregistered = [n for n in nodes if not reg[n]]
+    i1_multi = {n.stem: [r.stem for r in sorted(reg[n], key=lambda x: x.stem)]
+                for n in nodes if len(reg[n]) > 1}
+    i1_lines = [f"未登记: {len(i1_unregistered)}  (queue — see rawindex L0)"]
+    for stem, raws in sorted(i1_multi.items())[:8]:
+        i1_lines.append(f"  多重登记: {stem} -> {raws}")
+
+    area = graph["area"]
+    i2_lines = []
+    cross = intra = noarea = 0
+    for L in graph["linksn"]:
+        members = [q for q in graph["out"][L] if q in area]
+        areas = set().union(*[area[q] for q in members]) if members else set()
+        if len(areas) >= 2:
+            cross += 1
+        elif areas:
+            intra += 1
+            i2_lines.append(f"  同区域(违规): {L.stem} ({len(members)} 成员)")
+        else:
+            noarea += 1
+    i2_lines.insert(0, f"跨界 {cross} | 同区域 {intra}(违规) | 无区域 {noarea}(提示)")
+
+    zero = [n for n in nodes if not graph["out"][n]]
+    i3_lines = [f"零出链: {len(zero)}/{len(nodes)} ({len(zero) * 100 // max(1, len(nodes))}%)"
+                " — 捕获规则增量,不阻断 (B5)"]
+
+    i4_lines = []  # I4: doctrine & Raw excluded from binding neighbors —
+    # enforced structurally by the trunk-graph builder (zones Raw/Index/Links
+    # never counted as binding neighbors); violations are impossible by
+    # construction. Report the exclusion counts.
+    i4_lines.append(f"绑定邻居排除 doctrine({len(graph['doctrine'])}) 与 Raw({len(graph['raws'])}) — 结构性排除,无违规")
 
     return [
-        ("Root drained", root_findings, True),
-        ("Lit notes have real source", lit_findings, True),
-        ("Lit without source — informational (2026-09 baseline; owner sign-off pending)",
-         lit_baseline, False),
-        ("Tag vocabulary", tag_findings, True),
-        ("Wikilink integrity (NEW unresolved only; whitelist = known placeholders)",
-         unresolved_findings, True),
-        ("Orphans — informational (invisible-to-association risk; link them when touched)",
-         orphan_findings, False),
+        ("gate", "G1 root drained (hard gate)", root_findings),
+        ("gate", "G2 archives/material/ has real source (hard gate)", lit_findings),
+        ("info", "G2-baseline material without source (2026-09 baseline, informational)",
+         lit_baseline),
+        ("gate", "G3 wikilink integrity — NEW unresolved only (hard gate)",
+         unresolved_findings),
+        ("report", "I1 唯一归属 (report: weekly increment)", i1_lines),
+        ("report", "I2 Links 跨区域 — 同区域=违规 无区域=提示 (report)", i2_lines),
+        ("report", "I3 Node ≥1 出链 (report: weekly increment)", i3_lines),
+        ("report", "I4 doctrine/Raw 不做绑定邻居 (report)", i4_lines),
     ]
 
 
 def cmd_check(args) -> int:
     problems = 0
-    for title, findings, hard in _collect_check():
-        if hard:
-            problems += report(title, findings)
+    print("# vault check — two-tier (D20): hard gates exit 1; I1–I4 report-level\n")
+    for tier, title, findings in _collect_check():
+        if tier == "gate":
+            if report(title, findings):
+                problems += 1
+        elif tier == "report":
+            print(f"## {title}")
+            for item in findings:
+                print(f"  {item}")
+            print()
         else:
             report(title, findings)
-    print("CLEAN — all invariants hold" if problems == 0 else f"PROBLEMS: {problems}")
+    print("CLEAN — hard gates hold; report-level numbers above are weekly increments"
+          if problems == 0 else f"PROBLEMS: {problems} (hard gates failed)")
     _clear_notes_cache()
     return 1 if problems else 0
+
+
+# ---------------------------------------------------------------- trunk graph
+
+
+def _trunk_graph(texts: dict) -> dict:
+    """Build the two-tree graph shared by check/rawindex/status.
+
+    out[n]      -> set of notes n links to (resolved)
+    reg[n]      -> {RawIndex} registrations (Raw -> Node edges)
+    area[n]     -> {Index} semantic areas (Index -> Node edges)
+    nodes/raws/idxs/linksn/doctrine -> zone member lists
+    """
+    texts = texts or _load_notes()
+    stems = {}
+    for p in texts:
+        stems.setdefault(p.stem, p)
+    aliases = _alias_map(texts)
+
+    def resolve(name):
+        s = name.split("|")[0].split("#")[0].strip().split("/")[-1].strip()
+        return stems.get(s) or aliases.get(s)
+
+    out = {}
+    for p, t in texts.items():
+        links = set()
+        for m in re.finditer(r"\[\[([^\]\n]+)\]\]", t):
+            q = resolve(m.group(1))
+            if q and q != p:
+                links.add(q)
+        out[p] = links
+
+    zone = _zone
+    nodes = [p for p in texts if zone(p) and zone(p).endswith("_fold")]
+    raws = [p for p in texts if zone(p) == "Raw"]
+    idxs = [p for p in texts if zone(p) == "Index"]
+    linksn = [p for p in texts if zone(p) == "Links"]
+    doctrine = [p for p in texts
+                if p.relative_to(ROOT).parts[0] == "doctrine"]
+
+    reg = collections.defaultdict(set)      # node -> {raw}
+    for r in raws:
+        for q in out[r]:
+            if zone(q) and zone(q).endswith("_fold"):
+                reg[q].add(r)
+    area = collections.defaultdict(set)      # note -> {index}
+    for i in idxs:
+        for q in out[i]:
+            area[q].add(i)
+
+    return dict(out=out, reg=reg, area=area, nodes=nodes, raws=raws,
+                idxs=idxs, linksn=linksn, doctrine=doctrine, stems=stems)
+
+
+# ---------------------------------------------------------------- rawindex
+
+
+def cmd_rawindex(args) -> int:
+    """Trunk operations: queue + L0 proposals; --clusters / --check / --sync / --around."""
+    texts = _load_notes()
+    g = _trunk_graph(texts)
+    out, reg = g["out"], g["reg"]
+    nodes, raws = g["nodes"], g["raws"]
+
+    # neighbor map over ALL notes (undirected)
+    nbr = collections.defaultdict(set)
+    for p, qs in out.items():
+        for q in qs:
+            nbr[p].add(q)
+            nbr[q].add(p)
+
+    registered = [n for n in nodes if reg[n]]
+    queue = [n for n in nodes if not reg[n]]
+    print(f"nodes {len(nodes)} | Raw Index {len(raws)} | Index {len(g['idxs'])} "
+          f"| Links {len(g['linksn'])}")
+    print(f"registered {len(registered)} | queue {len(queue)}")
+
+    # ---------------- --check: I1-I3 (report-level, same numbers as check)
+    if args.check:
+        multi = {n.stem: [r.stem for r in sorted(reg[n], key=lambda x: x.stem)]
+                 for n in nodes if len(reg[n]) > 1}
+        print("\n## I1 每个 Node 恰好登记在一个 Raw Index")
+        print(f"  未登记: {len(queue)}   多重登记: {len(multi)}")
+        for stem, rs in sorted(multi.items())[:5]:
+            print(f"    {stem}: {rs}")
+        print("\n## I2 Links 必须横跨 >=2 个 Index 区域")
+        area = g["area"]
+        intra, cross, noarea = [], [], []
+        for L in g["linksn"]:
+            mem = [q for q in out[L] if q in area]
+            ar = set().union(*[area[q] for q in mem]) if mem else set()
+            (cross if len(ar) >= 2 else (intra if ar else noarea)).append((L, len(mem), len(ar)))
+        print(f"  跨界 {len(cross)} | 同区域 {len(intra)}(违规) | 无区域 {len(noarea)}(提示)")
+        for L, m, x in intra[:6]:
+            print(f"    同区域: {L.stem} ({m} 成员, {x} 区域)")
+        print("\n## I3 Node 必须 >=1 条出链（捕获规则）")
+        zero = [n for n in nodes if not out[n]]
+        print(f"  零出链: {len(zero)}/{len(nodes)}  ({len(zero)*100//max(1,len(nodes))}%)")
+        print("\n## 材料 出链=已拆 (D21)")
+        materials = [p for p in texts
+                     if str(p.relative_to(ROOT)).startswith("archives/material/")
+                     and p.suffix == ".md"]
+        unsplit = [p for p in materials if not out[p]]
+        print(f"  未拆材料: {len(unsplit)}/{len(materials)}  (零出链 = 未拆)")
+        for p in unsplit[:8]:
+            print(f"    {p.relative_to(ROOT)}")
+
+    # ---------------- --sync: keep the trunk root's member list current
+    if args.sync:
+        _rawindex_sync(g)
+
+    # ---------------- --around: one node's neighborhood
+    if args.around:
+        return _rawindex_around(args.around, g, nbr)
+
+    # ---------------- L0: affiliation proposals for the queue
+    print(f"\n## L0 归队提议（队列 {len(queue)} 条中，能定归属的）")
+    props = []
+    for v in queue:
+        nb = nbr[v]
+        if not nb:
+            continue
+        sc = collections.Counter()
+        for z in nb:
+            for r in reg.get(z, ()):
+                sc[r] += 1
+        if sc:
+            r, n = sc.most_common(1)[0]
+            props.append((n / len(nb), n, len(nb), v, r))
+    props.sort(reverse=True)
+    for s, n, tot, v, r in props[:args.top]:
+        print(f"  {s:.0%} ({n}/{tot})  {v.stem}  ->  {r.stem}")
+    if props:
+        conf = sum(1 for p in props if p[0] >= 0.9)
+        print(f"\n  ≥90% 置信的提议: {conf} 条 — 登记边是结构动作, AI 可直接追加 (D22); "
+              "其余照人机分工: 共性/命名你定 (D16)")
+
+    if args.clusters:
+        Q = set(queue)
+        dadj = collections.defaultdict(set)
+        for v in Q:
+            for q in out[v]:
+                if q in Q:
+                    dadj[v].add(q)
+                    dadj[q].add(v)
+        seen, comps = set(), []
+        for n in dadj:
+            if n in seen:
+                continue
+            st, c = [n], set()
+            while st:
+                x = st.pop()
+                if x in c:
+                    continue
+                c.add(x)
+                st += list(dadj[x])
+            seen |= c
+            comps.append(c)
+        comps.sort(key=len, reverse=True)
+        print(f"\n## L1 直接互链粗簇: {len(comps)} 个, 覆盖 {len(seen)}/{len(Q)}")
+        for c in comps[:6]:
+            print(f"  ({len(c)}) " + " / ".join(sorted(x.stem for x in c)[:6]))
+
+        z2u = collections.defaultdict(set)
+        for v in Q:
+            for z in nbr[v]:
+                z2u[z].add(v)
+        w = collections.defaultdict(float)
+        ev = collections.defaultdict(collections.Counter)
+        for z, us in z2u.items():
+            us = sorted(us)
+            if len(us) < 2:
+                continue
+            inc = 1.0 / math.log(max(3, len(nbr[z]) + 1))
+            for x, y in combinations(us, 2):
+                w[(x, y)] += inc
+                ev[(x, y)][z.stem] += 1
+        vals = sorted(w.values())
+        th = vals[int(len(vals) * 0.97)] if vals else 0
+        adj2 = collections.defaultdict(set)
+        for (x, y), ww in w.items():
+            if ww >= th:
+                adj2[x].add(y)
+                adj2[y].add(x)
+        seen2, cs = set(), []
+        for n in adj2:
+            if n in seen2:
+                continue
+            st, c = [n], set()
+            while st:
+                x = st.pop()
+                if x in c:
+                    continue
+                c.add(x)
+                st += list(adj2[x])
+            seen2 |= c
+            cs.append(c)
+        cs.sort(key=len, reverse=True)
+        print(f"\n## L2 共享邻居细分 θ=P97={th:.2f}: {len(cs)} 簇, 最大 {len(cs[0]) if cs else 0}")
+        for c in cs[:5]:
+            sh = collections.Counter()
+            for x, y in combinations(sorted(c), 2):
+                sh.update(nbr[x] & nbr[y])
+            print(f"  ({len(c)}) " + " / ".join(sorted(x.stem for x in c)[:5]))
+            print(f"      绑定证据: {[s.stem for s, _ in sh.most_common(3)]}")
+        print(f"\n## L3 孤点: {len(Q) - len(seen | seen2)}")
+        print("\n## 粗主干归组 (D10-P3): AI 把簇归组进粗 Raw Index (一个含几个簇),")
+        print("   细结构(簇+共性)进 Index — 绝不每簇一个 Raw Index。归组方案 AI 提,命名你定。")
+
+    _clear_notes_cache()
+    return 0
+
+
+def _rawindex_sync(g) -> int:
+    """B6: maintain the trunk root's member list (registration edges).
+
+    Structural action per D22 — AI may append directly. The root's
+    `## Core Concepts` section lists one [[Node]] line per registered member
+    grouped under each child Raw Index; existing prose is left alone.
+    """
+    root_note = None
+    for r in g["raws"]:
+        if r.stem == TRUNK_ROOT_STEM:
+            root_note = r
+            break
+    if root_note is None:
+        print(f"rawindex --sync: trunk root `{TRUNK_ROOT_STEM}.md` not found in library/Raw/")
+        return 1
+
+    # Child Raw Indexes = raws other than the root; members registered there.
+    children = sorted((r for r in g["raws"] if r is not root_note),
+                      key=lambda p: p.stem)
+    lines = []
+    for r in children:
+        members = sorted((n for n in g["nodes"] if r in g["reg"][n]),
+                         key=lambda p: p.stem)
+        lines.append(f"- [[{r.stem}]] ({len(members)})")
+    body = "\n".join(lines)
+
+    text = root_note.read_text(encoding="utf-8")
+    marker = "## Core Concepts"
+    if marker in text:
+        head, _, tail = text.partition(marker)
+        # drop everything from the marker to the next ## section (or EOF)
+        rest = tail.split("\n## ", 1)
+        after = "\n## " + rest[1] if len(rest) > 1 else ""
+        new = head + marker + "\n\n" + body + "\n" + after
+    else:
+        new = text.rstrip("\n") + "\n\n" + marker + "\n\n" + body + "\n"
+    root_note.write_text(new, encoding="utf-8")
+    print(f"rawindex --sync: {TRUNK_ROOT_STEM} — {len(children)} child Raw Indexes registered")
+    for ln in lines[:10]:
+        print(f"  {ln}")
+    if len(lines) > 10:
+        print(f"  … ({len(lines) - 10} more)")
+    return 0
+
+
+def _rawindex_around(name: str, g, nbr) -> int:
+    """One node's neighborhood: registrations, areas, links, neighbors."""
+    stems = g["stems"]
+    target = stems.get(name)
+    if target is None:
+        low = name.lower()
+        cands = [s for s in stems if low in s.lower()][:10]
+        print(f"rawindex --around: `{name}` not found.")
+        if cands:
+            print("  did you mean: " + " / ".join(cands))
+        return 1
+    print(f"## {target.stem}")
+    print(f"  path: {target.relative_to(ROOT)}")
+    if target in g["reg"]:
+        print(f"  登记: {[r.stem for r in g['reg'][target]]}")
+    else:
+        print("  登记: (queue — 未登记)")
+    if target in g["area"]:
+        print(f"  区域: {[i.stem for i in g['area'][target]]}")
+    outs = g["out"].get(target, set())
+    print(f"  出链 {len(outs)}: {[q.stem for q in sorted(outs, key=lambda p: p.stem)][:12]}")
+    ins = [p for p, qs in g["out"].items() if target in qs]
+    print(f"  入链 {len(ins)}: {[p.stem for p in sorted(ins, key=lambda p: p.stem)][:12]}")
+    nb = nbr.get(target, set())
+    print(f"  邻居 {len(nb)} (绑定证据候选: "
+          f"{[p.stem for p in sorted(nb, key=lambda p: p.stem)][:8]})")
+    return 0
 
 
 # ---------------------------------------------------------------- triage
 
 
 def _collect_triage():
-    """Gather placement-debt findings per category. Shared by `triage` and `status`."""
+    """Gather placement-debt findings per category. Shared by `triage` and `status`.
+
+    v5: todo aging (B1) + suspected half-done (A1) added; promote/stale-tag
+    categories retired (no more status tags).
+    """
     now = time.time()
-    notes = sorted(_load_notes().keys())
     texts = _load_notes()
-    findings = {"root": [], "promote": [], "stale": [], "untagged": [], "unhooked": [], "dead_todo": []}
+    notes = sorted(texts.keys())
+    findings = {"root": [], "todo_stale": [], "halfdone": [], "unhooked": [],
+                "genre": [], "dead_todo": []}
 
     # 1. root files beyond allowed set
     for p in sorted(ROOT.glob("*.md")):
         if p.name not in ROOT_ALLOWED:
             findings["root"].append(f"file me: {p.name} (root is the entry queue)")
 
-    # 2. mailbox evergreen = stalled promotions
-    for p in sorted((ROOT / "mailbox").glob("*.md")):
-        fm = parse_frontmatter(texts[p])
-        if "status/evergreen" in get_tags(fm):
-            findings["promote"].append(
-                f"promote candidate: {p.stem} (evergreen tag only — content may not be stable)")
-    for p in notes:
-        rel = str(p.relative_to(ROOT))
-        if not rel.startswith("library/"):
-            continue
-        fm = parse_frontmatter(texts[p])
-        if "status/in-progress" in get_tags(fm):
-            age_days = (now - p.stat().st_mtime) / 86400
-            if age_days > 90:
-                findings["stale"].append(f"stale in-progress: {rel} ({int(age_days)} days old)")
-    # 3.5 mailbox in-progress notes without any todo entry (S5 anti-loss rule).
-    # Any wikilink to the note from any file in a_sticker/todos/ counts as
-    # hooked (todo item or Index of Todos registration).
-    todo_targets = set()
+    # 2. todo aging (B1): todo-note entries untouched > 90 days
     for p in sorted((ROOT / "a_sticker" / "todos").glob("*.md")):
-        for t, _ in extract_wikilinks(texts[p]):
+        age_days = (now - p.stat().st_mtime) / 86400
+        if age_days > TODO_STALE_DAYS:
+            findings["todo_stale"].append(
+                f"todo 老化: {p.name} — {int(age_days)} 天未动 → 报告并清理 (B1)")
+
+    # 3. suspected half-done (A1): created <= 7d + zero outbound + no todo hook
+    todo_targets = set()
+    for p in sorted((ROOT / "a_sticker" / "todos").rglob("*.md")):
+        for t, _ in extract_wikilinks(texts.get(p, "")):
             todo_targets.add(t)
-    for p in sorted((ROOT / "mailbox").glob("*.md")):
-        fm = parse_frontmatter(texts[p])
-        if "status/in-progress" in get_tags(fm) and p.stem not in todo_targets:
-            findings["unhooked"].append(
-                f"unhooked in-progress: mailbox/{p.name} — no todo entry (Spec §S5)")
-
-    # 4. untagged notes (no type/* tag). By design untagged: root infra files,
-    # todo notes (bare `todo` tag), templates.
+    root_queue = {p for p in notes
+                  if len(p.relative_to(ROOT).parts) == 1
+                  and p.name not in ROOT_ALLOWED}
+    # A1 scope: own-voice candidates only (library notes + root queue);
+    # archives are reference material, a_sticker/or is AI-raw, doctrine is system.
+    # Age = git first-commit time (creation), NOT mtime — mv/migration resets mtime.
     for p in notes:
-        rel_path = str(p.relative_to(ROOT))
-        if rel_path in ("AGENTS.md", "README.md"):
+        rel = p.relative_to(ROOT)
+        in_scope = str(rel).startswith("library/") and _zone(p) and _zone(p).endswith("_fold")
+        in_scope = in_scope or p in root_queue
+        if not in_scope:
             continue
-        if rel_path.startswith(("a_sticker/todos/", "template/")):
+        created = _git_first_seen(p)
+        if created is None:
             continue
-        fm = parse_frontmatter(texts[p])
-        if not any(t.startswith("type/") for t in get_tags(fm)):
-            findings["untagged"].append(f"untagged: {rel_path}")
+        age_days = (now - created) / 86400
+        if age_days > HALFDONE_WINDOW_DAYS:
+            continue
+        has_out = any(True for _ in extract_wikilinks(texts[p]))
+        if not has_out and p.stem not in todo_targets:
+            findings["halfdone"].append(
+                f"疑似半成品: {rel} — git 创建 {int(age_days)} 天前, 零出链, 无 todo 挂钩 (A1)")
 
-    # 5. dead todo links
+    # 4. unhooked notes in root queue without todo entry (S5 anti-loss)
+    for p in sorted(root_queue):
+        if p.stem not in todo_targets:
+            findings["unhooked"].append(
+                f"unhooked: {p.name} — root 队列且无 todo 挂钩 (S5)")
+
+    # 5. genre placement: name says Raw/Index/Links but not in its home
+    for p in notes:
+        rel = p.relative_to(ROOT)
+        if not str(rel).startswith("library/") or len(rel.parts) < 3:
+            continue
+        gname = _genre(p)
+        home = {"raw": "Raw", "index": "Index", "links": "Links"}.get(gname)
+        sub = rel.parts[1]
+        if home and sub != home:
+            findings["genre"].append(f"体裁错位: {rel} ({gname} 应在 library/{home}/)")
+        if gname == "node" and not sub.endswith("_fold"):
+            findings["genre"].append(f"体裁错位: {rel} (node 应在 <fold>)")
+
+    # 6. dead todo links
     basenames = {p.stem for p in notes}
     basenames |= {p.stem for p in (ROOT / "zzz_output").rglob("*.md")}
-    basenames |= set(_alias_map(texts))  # a todo pointing at an alias is not dead
+    basenames |= set(_alias_map(texts))
     for p in sorted((ROOT / "a_sticker/todos").glob("*.md")):
         text = texts[p]
         lines = text.splitlines()
         for target, line_no in extract_wikilinks(text):
             if target in basenames or "Index of Todos" in str(p.name):
                 continue
-            # unchecked items are future-note hooks (vault doctrine) — fine;
-            # a checked item pointing at a missing note is dead.
             if re.search(r"-\s*\[x\]", lines[line_no - 1], re.IGNORECASE):
                 findings["dead_todo"].append(
                     f"dead todo reference: {p.name}:{line_no}: [[{target}]]")
@@ -710,369 +1013,13 @@ def _collect_triage():
 def cmd_triage(args) -> int:
     findings = _collect_triage()
     print("# mtime heuristic — treat as prompt, not verdict\n")
-    for category in ("root", "promote", "stale", "untagged", "unhooked", "dead_todo"):
+    for category in ("root", "todo_stale", "halfdone", "unhooked", "genre", "dead_todo"):
         items = findings[category]
         print(f"# {category}: {len(items)}")
         for line in items:
             print(line)
+        print()
     _clear_notes_cache()
-    return 0
-
-
-# ---------------------------------------------------------------- graph
-
-# The graph struct. A note is a node; a typed-edge line in its body is an
-# edge. Nothing is scaffolded in advance — studying writes edges, the queried
-# structure falls out. Aim nodes (目标) need no card and no index: they exist
-# as soon as something points at them, so "common goals" are counted, never
-# maintained by hand.
-#
-#   goal::   [[Aim]]        — the aim this card serves                 (目标)
-#   object:: [[Shape]]      — the structure it acts on                 (对象)
-#   bridge:: [[Elsewhere]]  — an isomorphic idea outside the topic     (跨域同构)
-#
-# A card's own role comes from its tag, no extra tag and no new vocabulary:
-#   attr/technique = 技巧 (trick)   attr/method = 手段 (means)
-#   attr/concept   = 对象 (object)  attr/principle = 原理 (mean at the top)
-# Aim-hood is positional, so one card is a means to a higher aim and an aim
-# for other means at the same time. Targets resolve through note names *and*
-# `aliases:`, so the word you reach for while studying lands on the card.
-# (`goal:: x` is also an Obsidian/Dataview inline field, for free.)
-GRAPH_KINDS = ("goal", "object", "bridge")
-MEANS_ROLES = {"trick", "means", "principle"}
-
-_GRAPH_EDGE_RE = re.compile(
-    r"^\s*(?:[-*+]\s+)?(?:\[[ xX]\]\s+)?(?P<kind>[A-Za-z][A-Za-z_-]{1,15})::\s*"
-    r"\[\[(?P<target>[^\]\n|]+)(?:\|[^\]\n]*)?\]\](?P<tail>.*)$")
-
-_ROLE_BY_TAG = (("attr/technique", "trick"), ("attr/method", "means"),
-                ("attr/principle", "principle"), ("attr/concept", "object"),
-                ("attr/links", "links"), ("attr/map", "map"))
-
-
-def _alias_map(texts: dict) -> dict:
-    """{alias: note stem} — Obsidian resolves wikilinks through `aliases:`."""
-    out = {}
-    for p, text in texts.items():
-        aliases = parse_frontmatter(text).get("aliases")
-        if not aliases:
-            continue
-        if isinstance(aliases, str):
-            aliases = [aliases]
-        for name in aliases:
-            name = str(name).strip()
-            if name:
-                out.setdefault(name, p.stem)
-    return out
-
-
-def iter_typed_edges(text: str):
-    """Yield (line_no, kind, target, why) for every typed-edge line.
-
-    Syntax (bullet/checkbox and trailing why optional, kind case-insensitive):
-        - goal:: [[Bound Estimation]] — 要证不等式先要有界
-    Fenced code blocks and inline code spans are skipped, mirroring
-    extract_wikilinks, so documented syntax is not parsed as an edge.
-    `kind` is yielded raw and lowercased so callers can flag typos.
-    """
-    in_fence = False
-    for line_no, raw in enumerate(text.splitlines(), start=1):
-        if re.match(r"^\s*(?:```|~~~)", raw):
-            in_fence = not in_fence
-            continue
-        if in_fence:
-            continue
-        line = re.sub(r"`[^`]*`", "", raw)
-        match = _GRAPH_EDGE_RE.match(line)
-        if not match:
-            continue
-        target = match.group("target").split("#")[0].split("/")[-1].strip()
-        if not target:
-            continue
-        why = match.group("tail").strip().lstrip("-—–:").strip()
-        yield line_no, match.group("kind").lower(), target, why
-
-
-def _card_role(path: Path, texts: dict) -> str:
-    """Role of a card, from its own tags (trick/means/object/...)."""
-    tags = get_tags(parse_frontmatter(texts[path]))
-    for tag, role in _ROLE_BY_TAG:
-        if tag in tags:
-            return role
-    return "note"
-
-
-def _collect_graph(unwired_scope=None):
-    """The graph struct plus its connective holes.
-
-    `unwired_scope` = vault-relative paths/dirs to scan for unreached capture
-    notes (default: root files + mailbox/).
-
-    Returns edges, kind_errors, aims, objects, bridges, aims_of, out_kinds,
-    debt, dangling, unwired, via_alias and the note maps. Read-only, and a
-    signal rather than a verdict — an aim with one means may simply be young.
-    """
-    texts = _load_notes()
-    by_stem = {}
-    for p in sorted(texts):
-        by_stem.setdefault(p.stem, p)
-    aliases = _alias_map(texts)
-
-    edges = []        # (src Path, line_no, kind, node name, why)
-    kind_errors = []  # (src Path, line_no, kind)
-    dangling = {}     # unresolvable target -> first source that needs it
-    via_alias = 0     # edges that landed on a card by one of its aliases
-    for p, text in texts.items():
-        for line_no, kind, target, why in iter_typed_edges(text):
-            if kind not in GRAPH_KINDS:
-                kind_errors.append((p, line_no, kind))
-                continue
-            node = target if target in by_stem else aliases.get(target)
-            if node is None:
-                dangling.setdefault(target, p)
-                node = target
-            elif node != target:
-                via_alias += 1
-            edges.append((p, line_no, kind, node, why))
-
-    out_kinds = {}   # src Path -> {kind}
-    aims = {}        # aim name -> [(src Path, why)]
-    objects = {}     # object name -> [(src Path, why)]
-    aims_of = {}     # src Path -> {aim}
-    bridges = []     # (src Path, target)
-    for src, _line, kind, node, why in edges:
-        out_kinds.setdefault(src, set()).add(kind)
-        if kind == "goal":
-            aims.setdefault(node, []).append((src, why))
-            aims_of.setdefault(src, set()).add(node)
-        elif kind == "object":
-            objects.setdefault(node, []).append((src, why))
-        else:
-            bridges.append((src, node))
-
-    # debt — the graph's connective holes, not a verdict on any single card:
-    # a means naming no aim is unusable, one naming no shape is unfindable,
-    # and a shape no aim reaches is studied but never aimed at.
-    no_aim, no_object = [], []
-    for src in sorted(out_kinds):
-        if _card_role(src, texts) not in MEANS_ROLES:
-            continue
-        if "goal" not in out_kinds[src]:
-            no_aim.append(src)
-        elif "object" not in out_kinds[src]:
-            no_object.append(src)
-    purposeless = sorted(
-        name for name, users in objects.items()
-        if not any(aims_of.get(src) for src, _why in users))
-
-    # unwired: capture-zone notes (root + mailbox by default) the graph misses.
-    inbound_names = set(aims) | set(objects) | {t for _, t in bridges}
-    unwired = []
-    if unwired_scope:
-        scope = []
-        for item in unwired_scope:
-            path = Path(item)
-            path = path if path.is_absolute() else ROOT / path
-            if path.is_dir():
-                scope += [p for p in sorted(path.rglob("*.md"))
-                          if not any(part in SKIP_DIRS for part in p.parts)]
-            elif path.is_file():
-                scope.append(path)
-    else:
-        scope = [p for p in sorted(ROOT.glob("*.md")) if p.name not in ROOT_ALLOWED]
-        scope += sorted((ROOT / "mailbox").glob("*.md"))
-    for p in scope:
-        if p not in texts or p in out_kinds or p.stem in inbound_names:
-            continue
-        unwired.append(p)
-    unwired.sort(key=lambda p: p.stat().st_mtime, reverse=True)
-
-    return {
-        "edges": edges,
-        "kind_errors": kind_errors,
-        "aims": aims,
-        "objects": objects,
-        "bridges": bridges,
-        "aims_of": aims_of,
-        "out_kinds": out_kinds,
-        "debt": (no_aim, no_object, purposeless),
-        "dangling": dangling,
-        "unwired": unwired,
-        "via_alias": via_alias,
-        "texts": texts,
-        "by_stem": by_stem,
-        "aliases": aliases,
-    }
-
-
-def _plural(count: int, word: str, plural: str = "") -> str:
-    """`1 note` / `2 notes` — report text reads as English either way."""
-    if count == 1:
-        return f"{count} {word}"
-    return f"{count} {plural or word + 's'}"
-
-
-def _graph_counts(g) -> dict:
-    counts = {"goal": 0, "object": 0, "bridge": 0}
-    for _src, _line, kind, _target, _why in g["edges"]:
-        counts[kind] += 1
-    counts["notes"] = len({src for src, *_ in g["edges"]})
-    return counts
-
-
-def _print_report(title: str, findings: list):
-    print(f"## {title}")
-    if findings:
-        for item in findings:
-            print(f"  {item}")
-    else:
-        print("  OK — nothing here")
-    print()
-
-
-def cmd_graph(args) -> int:
-    g = _collect_graph(unwired_scope=args.unwired)
-    texts = g["texts"]
-    if args.around:
-        return _print_around(args.around, g)
-
-    print("# math graph — the struct in your notes (read-only)\n")
-    counts = _graph_counts(g)
-    print(f"edges: goal {counts['goal']}  object {counts['object']}  "
-          f"bridge {counts['bridge']}  ({len(g['edges'])} total over "
-          f"{_plural(counts['notes'], 'note')})")
-    if g["via_alias"]:
-        print(f"of those, {g['via_alias']} landed through a card's `aliases:`\n")
-
-    _print_report("kind errors (valid kinds: goal, object, bridge)",
-                  [f"{p.relative_to(ROOT)}:{line}: '{kind}::' — did you mean "
-                   f"{_nearest_kind(kind)}?" for p, line, kind in g["kind_errors"]])
-
-    aim_lines = []
-    for name, users in sorted(g["aims"].items(), key=lambda kv: (len(kv[1]), kv[0])):
-        aim_lines.append(f"{name} — {_plural(len(users), 'mean', 'means')}")
-        for src, why in sorted(users):
-            aim_lines.append(f"    ← {src.stem} [{_card_role(src, texts)}]"
-                              + (f" — {why}" if why else ""))
-    _print_report("aims ← means (thinnest first: where the graph is young)", aim_lines)
-
-    object_lines = []
-    for name, users in sorted(g["objects"].items(), key=lambda kv: (-len(kv[1]), kv[0])):
-        aims_here = sorted({a for src, _why in users for a in g["aims_of"].get(src, ())})
-        line = f"{name} — {_plural(len(users), 'user')}"
-        if aims_here:
-            line += f", aims: {', '.join(aims_here)}"
-        object_lines.append(line)
-    _print_report("objects ← users (what each shape is used for)", object_lines)
-
-    no_aim, no_object, purposeless = g["debt"]
-    _print_report("connective holes (a note is a fragment until it is wired)",
-                  [f"{p.relative_to(ROOT)}: has object:: but no goal:: — what is it for?"
-                   for p in no_aim]
-                  + [f"{p.relative_to(ROOT)}: has goal:: but no object:: — what shape does it act on?"
-                     for p in no_object]
-                  + [f"{name}: a shape no aim reaches — which aim would use it?"
-                     for name in purposeless])
-
-    _print_report("dangling targets (allowed as hooks — the name you reached for)",
-                  [f"[[{name}]] — first needed by {src.relative_to(ROOT)}; "
-                   f"baseline with: python3 tools/vault.py register-unresolved \"{name}\""
-                   for name, src in sorted(g["dangling"].items())])
-
-    scope_label = ", ".join(args.unwired) if args.unwired else "root + mailbox"
-    _print_report(f"unwired drafts ({scope_label}, no typed edge) — {len(g['unwired'])}",
-                  [str(p.relative_to(ROOT)) for p in g["unwired"]])
-    _clear_notes_cache()
-    return 0
-
-
-def _nearest_kind(word: str) -> str:
-    """Cheapest useful hint for a mistyped edge kind: shared prefix, else parts."""
-    for kind in GRAPH_KINDS:
-        if kind.startswith(word) or word.startswith(kind):
-            return kind
-    return "/".join(GRAPH_KINDS)
-
-
-def _node_names(g) -> list:
-    return sorted(set(g["aims"]) | set(g["objects"]) | {t for _, t in g["bridges"]})
-
-
-def _similar_names(name: str, g) -> list:
-    """Cheap substring match so a near-miss name still finds its node."""
-    low = name.lower()
-    pool = set(_node_names(g)) | set(g["by_stem"]) | set(g["aliases"])
-    return sorted(n for n in pool if low in n.lower() or n.lower() in low)[:10]
-
-
-def _print_around(name: str, g) -> int:
-    """Neighborhood of one node — the struct read from a single name.
-
-    This is the studying query: given an aim, what means exist and what shape
-    does each act on; given a shape, which means use it and toward what aim.
-    """
-    texts = g["texts"]
-    by_stem, aliases = g["by_stem"], g["aliases"]
-    if name in by_stem:
-        node, card = name, by_stem[name]
-        print(f"# {node} — neighborhood (read-only)\n")
-    elif name in aliases:
-        node, card = aliases[name], by_stem.get(aliases[name])
-        print(f"# {name} → {node} (alias) — neighborhood (read-only)\n")
-    else:
-        node, card = name, None
-        print(f"# {name} — nothing is wired to this name yet\n")
-        matches = _similar_names(name, g)
-        if matches:
-            print("closest existing names:")
-            for m in matches:
-                print(f"  {m}")
-        return 0
-
-    means = g["aims"].get(node)
-    if means:
-        print(f"## as an aim ({_plural(len(means), 'mean', 'means')})")
-        for src, why in sorted(means):
-            line = f"- {src.stem} [{_card_role(src, texts)}] — {src.relative_to(ROOT)}"
-            if why:
-                line += f"\n    why: {why}"
-            shapes = sorted({t for s, _l, kind, t, _w in g["edges"]
-                             if s == src and kind == "object"})
-            if shapes:
-                line += "\n    object:: " + ", ".join(shapes)
-            print(line)
-        print()
-
-    users = g["objects"].get(node)
-    if users:
-        print(f"## as an object ({_plural(len(users), 'user')})")
-        for src, why in sorted(users):
-            line = f"- {src.stem} [{_card_role(src, texts)}] — {src.relative_to(ROOT)}"
-            aims_here = sorted(g["aims_of"].get(src, ()))
-            if aims_here:
-                line += f"\n    goal:: " + ", ".join(aims_here)
-            if why:
-                line += f"\n    why: {why}"
-            print(line)
-        print()
-
-    own = [(kind, t, w) for s, _l, kind, t, w in g["edges"]
-           if card is not None and s == card]
-    if own:
-        print("## this card's own edges")
-        for kind, target, why in own:
-            print(f"- {kind}:: [[{target}]]" + (f" — {why}" if why else ""))
-        print()
-
-    touching = sorted({(s.stem, t) for s, t in g["bridges"] if node in (s.stem, t)})
-    if touching:
-        print("## bridges touching it")
-        for src, target in touching:
-            print(f"- {src} ≈ {target}")
-        print()
-
-    if not (means or users or own or touching):
-        print(f"no edges here yet — wire it from a card with `goal:: [[{node}]]`")
     return 0
 
 
@@ -1083,7 +1030,7 @@ def _git_porcelain():
     """git status --porcelain lines, or None when git/repo is unavailable."""
     try:
         proc = subprocess.run(["git", "-C", str(ROOT), "status", "--porcelain"],
-                               capture_output=True, text=True, timeout=30)
+                              capture_output=True, text=True, timeout=30)
     except (OSError, subprocess.SubprocessError):
         return None
     if proc.returncode != 0:
@@ -1091,13 +1038,63 @@ def _git_porcelain():
     return [ln for ln in proc.stdout.splitlines() if ln.strip()]
 
 
-def cmd_status(args) -> int:
-    """Session-entry state report: git + check + triage + graph + next moves.
+def _git_last_commit(paths: list) -> float:
+    """mtime of the last commit touching any of `paths`, else 0."""
+    for p in paths:
+        try:
+            proc = subprocess.run(
+                ["git", "-C", str(ROOT), "log", "-1", "--format=%ct", "--", str(p)],
+                capture_output=True, text=True, timeout=30)
+        except (OSError, subprocess.SubprocessError):
+            continue
+        if proc.returncode == 0 and proc.stdout.strip():
+            return float(proc.stdout.strip())
+    return 0.0
 
-    Read-only, always exits 0. This IS the entry state machine: repo state,
-    not memory, decides what is possible.
+
+def _rhythm_line() -> list:
+    """B3+B7: 上次整理 / 聚簇 / 问箱 / 产出 — days since, git+mtime derived.
+
+    整理 = last commit touching a_sticker/todos/* (todo grooming) or any
+           library move commit; approximated by todos dir mtime + last
+           commit touching todos.
+    聚簇 = last commit touching library/Raw/ (registration = cluster output).
+    问箱 = mtime of library/Links/ newest note (问箱产出直接落为 Links 卡, B4).
+    产出 = last commit/mtime in zzz_output/ (B7 裁决: 手动创建即产出).
     """
+    now = time.time()
+
+    def days_since(paths: list) -> str:
+        t = _git_last_commit(paths)
+        for p in paths:
+            if p.exists():
+                t = max(t, p.stat().st_mtime)
+        if not t:
+            return "从未"
+        d = int((now - t) / 86400)
+        return f"{d} 天前" if d > 0 else "今天"
+
+    todos_dir = ROOT / "a_sticker" / "todos"
+    links_dir = ROOT / "library" / "Links"
+    raw_dir = ROOT / "library" / "Raw"
+    zzz_dir = ROOT / "zzz_output"
+    return [
+        f"上次整理: {days_since([todos_dir])}",
+        f"上次聚簇: {days_since([raw_dir])}",
+        f"上次问箱: {days_since([links_dir])}",
+        f"上次产出: {days_since([zzz_dir])}",
+    ]
+
+
+def cmd_status(args) -> int:
+    """Session-entry state report: rhythm + git + check summary + triage counts + next moves."""
     print("# vault status — session entry report (read-only)\n")
+
+    # (0) rhythm line (B3+B7)
+    print("## 节律 (B3+B7 — 停摆可见 = 停摆可治)")
+    for line in _rhythm_line():
+        print(f"- {line}")
+    print()
 
     # (a) git state
     porcelain = _git_porcelain()
@@ -1109,208 +1106,73 @@ def cmd_status(args) -> int:
     else:
         untracked = sum(1 for ln in porcelain if ln.startswith("??"))
         print(f"{len(porcelain)} entries ({untracked} untracked)")
-        for ln in porcelain:
+        for ln in porcelain[:10]:
             print(f"  {ln.strip()}")
+        if len(porcelain) > 10:
+            print(f"  … ({len(porcelain) - 10} more)")
 
-    # (b) check sections, summary only
-    print("\n## check (summary)")
-    for title, findings, hard in _collect_check():
+    # (b) check two-tier summary
+    print("\n## check (two-tier summary)")
+    for tier, title, findings in _collect_check():
         state = "OK" if not findings else f"{len(findings)} findings"
-        if not hard and findings:
-            state += " (informational)"
-        print(f"- {title}: {state}")
+        print(f"- [{tier}] {title}: {state}")
 
-    # (c) triage key findings, counts only
+    # (c) triage counts
     triage = _collect_triage()
     print("\n## triage (counts)")
     print(f"- root files: {len(triage['root'])}")
-    print(f"- promote candidates (evergreen tag only — verify content first): {len(triage['promote'])}")
-    print(f"- stale in-progress (> 90 days): {len(triage['stale'])}")
-    print(f"- untagged: {len(triage['untagged'])}")
-    print(f"- unhooked in-progress (no todo entry): {len(triage['unhooked'])}")
+    print(f"- todo 老化 (> {TODO_STALE_DAYS} 天): {len(triage['todo_stale'])}")
+    print(f"- 疑似半成品 (≤{HALFDONE_WINDOW_DAYS} 天 + 零出链 + 零挂钩): {len(triage['halfdone'])}")
+    print(f"- unhooked root queue: {len(triage['unhooked'])}")
+    print(f"- 体裁错位: {len(triage['genre'])}")
     print(f"- dead todo references: {len(triage['dead_todo'])}")
 
-    # (d) uncommitted zzz_output changes — git-state only, content never read
+    # (d) trunk summary
+    g = _trunk_graph(_load_notes())
+    print("\n## 主干 (trunk)")
+    print(f"- nodes {len(g['nodes'])} | Raw Index {len(g['raws'])} | "
+          f"Index {len(g['idxs'])} | Links {len(g['linksn'])}")
+    unreg = sum(1 for n in g["nodes"] if not g["reg"][n])
+    print(f"- queue (未登记): {unreg} — `vault.py rawindex` gives L0 归队提议")
+    zero = sum(1 for n in g["nodes"] if not g["out"][n])
+    print(f"- 零出链: {zero}/{len(g['nodes'])} — I3 报告级增量 (B5)")
+
+    # (e) zzz_output git-state (content never read)
     zzz_changes = [ln.strip() for ln in (porcelain or []) if "zzz_output/" in ln]
     print("\n## zzz_output (owner's terminal output — git-state only)")
     if zzz_changes:
         print(f"unpublished-output changes: {len(zzz_changes)} files")
-        for ln in zzz_changes:
-            print(f"  {ln}")
     else:
         print("no uncommitted changes")
 
-    # (e) the graph struct: what the notes already connect
-    graph = _collect_graph()
-    counts = _graph_counts(graph)
-    print("\n## graph (the struct in your notes — `python3 tools/vault.py graph`)")
-    print(f"- edges: {len(graph['edges'])} (goal {counts['goal']}, "
-          f"object {counts['object']}, bridge {counts['bridge']}) over "
-          f"{_plural(counts['notes'], 'note')}")
-    aims = graph["aims"]
-    print(f"- aims: {len(aims)}" + (
-        f" (thinnest: {min(aims, key=lambda k: len(aims[k]))})" if aims else ""))
-    no_aim, no_object, purposeless = graph["debt"]
-    print(f"- connective holes: {len(no_aim)} means without an aim, "
-          f"{len(no_object)} means without an object, "
-          f"{len(purposeless)} objects no aim reaches")
-    print(f"- unwired drafts (root + mailbox): {len(graph['unwired'])}")
-    if graph["kind_errors"]:
-        print(f"- kind errors: {len(graph['kind_errors'])}")
-
-    # next moves — fixed decision table, plain ifs
+    # next moves
     print("\n## next moves")
     moves = []
     if porcelain:
         moves.append("commit or tidy first (run `python3 tools/vault.py status` after)")
     if triage["root"]:
-        moves.append("file me: run triage, decide zone, move")
-    if triage["promote"]:
-        moves.append(f"promote candidates: {len(triage['promote'])} (signal, not verdict — "
-                     "check content) — run `python3 tools/vault.py promote NAME --dry-run`")
-    if triage["stale"]:
-        moves.append(f"{len(triage['stale'])} notes idle > 90 days — review or archive")
-    if triage["untagged"]:
-        moves.append(f"untagged: {len(triage['untagged'])} — tidy: "
-                     "run `python3 tools/vault.py triage`, add `type/*` tags")
+        moves.append(f"file me: {len(triage['root'])} root 笔记 — run triage, decide zone, move")
+    if unreg:
+        moves.append(f"聚簇: {unreg} 条未登记 — `python3 tools/vault.py rawindex --clusters`, "
+                     "AI 归组进粗 Raw Index, 共性/命名你定 (D16)")
+    if triage["todo_stale"]:
+        moves.append(f"todo GC: {len(triage['todo_stale'])} 个 todo >{TODO_STALE_DAYS} 天未动 — "
+                     "review / resolve / archive (B1)")
+    if triage["halfdone"]:
+        moves.append(f"疑似半成品: {len(triage['halfdone'])} — 挂 todo 或补完 (A1)")
     if triage["unhooked"]:
-        moves.append(f"{len(triage['unhooked'])} unhooked in-progress notes — "
-                     "todo-hook per Spec §S5 (dynamic todo creation)")
-    if zzz_changes:
-        moves.append(f"unpublished-output changes: {len(zzz_changes)} files — "
-                     "finish/publish via Spec §S4")
-    if graph["kind_errors"]:
-        moves.append(f"graph: {len(graph['kind_errors'])} mistyped edge kinds — "
-                     "run `python3 tools/vault.py graph`")
-    if no_aim or no_object or purposeless:
-        moves.append(f"graph: {len(no_aim)} means without an aim, {len(no_object)} "
-                     "without an object, "
-                     f"{len(purposeless)} purposeless objects — `vault.py graph` lists them")
-    if graph["dangling"]:
-        moves.append(f"graph: {len(graph['dangling'])} names nothing points at yet — "
-                     "fine as hooks, or write the card")
-    if graph["unwired"]:
-        moves.append(f"graph: {len(graph['unwired'])} unwired drafts in root/mailbox — "
-                     "one `goal:: [[...]]` line wires each (`vault.py graph` lists them)")
+        moves.append(f"unhooked root queue: {len(triage['unhooked'])} — todo-hook (S5)")
+    if triage["genre"]:
+        moves.append(f"体裁错位: {len(triage['genre'])} — name > path, 搬家归位")
+    if triage["dead_todo"]:
+        moves.append(f"dead todo references: {len(triage['dead_todo'])} — clean up")
+    if zero:
+        moves.append(f"零出链 {zero} — 捕获时 AI 给 3 候选链接 (S2); 存量靠 I3 增量,不设硬门 (B5)")
     if not moves:
-        moves.append("vault clean — new capture, idea polish (Spec §S1), "
-                     "or ingestion (Spec §S3) are available")
+        moves.append("vault clean — new capture (S2), 聚簇, or 问箱 available")
     for i, move in enumerate(moves, 1):
         print(f"{i}. {move}")
     _clear_notes_cache()
-    return 0
-
-
-# ---------------------------------------------------------------- register
-
-
-def _cmd_register(target: str, names: list[str], path: Path) -> int:
-    """Shared: append NAMES to PATH (one per line), skip existing entries."""
-    existing = set()
-    if path.exists():
-        for line in path.read_text().splitlines():
-            line = line.strip().split("#")[0].strip()
-            if line:
-                existing.add(line)
-    added = []
-    already = []
-    for name in names:
-        if name in existing:
-            already.append(name)
-        else:
-            added.append(name)
-    if added:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open("a") as f:
-            for name in added:
-                f.write(f"{name}\n")
-    for name in already:
-        print(f"{target}: '{name}' already registered")
-    for name in added:
-        print(f"{target}: registered '{name}'")
-    return 1 if not added else 0
-
-
-def cmd_register_unresolved(args) -> int:
-    return _cmd_register("unresolved", args.names, ROOT / "tools" / "whitelist_unresolved.txt")
-
-
-def cmd_register_lit_nosource(args) -> int:
-    return _cmd_register("lit-nosource", args.paths, ROOT / "tools" / "baseline_lit_nosource.txt")
-
-
-# ---------------------------------------------------------------- promote
-
-
-def _destination_for(name: str, fm: dict) -> Path:
-    if "attr/map" in get_tags(fm) and (name.startswith("Index of") or name.startswith("Raw Index")):
-        return ROOT / "library/Index" / f"{name}.md"
-    if "attr/links" in get_tags(fm):
-        return ROOT / "library/Links" / f"{name}.md"
-    # single-pass: ASCII letter > digit > CJK > misc
-    for ch in name:
-        if "a" <= ch <= "z" or "A" <= ch <= "Z":
-            return ROOT / f"library/{ch.upper()}_fold" / f"{name}.md"
-        if ch.isdigit():
-            return ROOT / "library/0_fold" / f"{name}.md"
-        if ord(ch) > 0x2E80:  # CJK range
-            return ROOT / "library/中_fold" / f"{name}.md"
-    return ROOT / "library/_misc" / f"{name}.md"
-
-
-def cmd_promote(args) -> int:
-    name = args.name
-    name = name.removeprefix("mailbox/")
-    if name.endswith(".md"):
-        name = name[:-3]
-    name_lower = name.lower()
-    matches = [p for p in (ROOT / "mailbox").iterdir()
-               if p.is_file() and p.suffix == ".md" and p.stem.lower() == name_lower]
-    if not matches:
-        print(f"error: mailbox/{name}.md not found", file=sys.stderr)
-        return 1
-    if len(matches) > 1:
-        print(f"error: ambiguous name, matches: {[str(m) for m in matches]}", file=sys.stderr)
-        return 1
-
-    src = matches[0]
-    text = src.read_text(encoding="utf-8", errors="replace")
-    fm = parse_frontmatter(text)
-    tags = get_tags(fm)
-    errors = []
-
-    if "status/evergreen" not in tags and not args.force:
-        errors.append("not stable; finish first or pass --force")
-
-    for tag in tags:
-        if tag.startswith(("type/", "status/", "attr/")) and tag not in VALID_TAGS:
-            errors.append(f"tag typo: '{tag}' not in closed vocabulary")
-
-    if errors:
-        for e in errors:
-            print(f"error: {e}", file=sys.stderr)
-        print("nothing moved", file=sys.stderr)
-        return 1
-
-    dst = _destination_for(name, fm)
-    if dst.exists():
-        print(f"error: destination already exists: {dst.relative_to(ROOT)}", file=sys.stderr)
-        return 1
-
-    print(f"plan: {src.relative_to(ROOT)} -> {dst.relative_to(ROOT)}")
-    if args.dry_run:
-        print("dry-run: nothing moved")
-        return 0
-
-    if "type/lit" in tags:
-        print("refused: type/lit notes belong in archives/, not library/", file=sys.stderr)
-        print(f"suggest: git mv '{src.relative_to(ROOT)}' archives/")
-        return 1
-
-    dst.parent.mkdir(parents=True, exist_ok=True)
-    shutil.move(str(src), str(dst))
-    print(f"moved: {dst.relative_to(ROOT)}")
-    print("reminder: run `python3 tools/vault.py check` before committing")
     return 0
 
 
@@ -1318,39 +1180,20 @@ def cmd_promote(args) -> int:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Vault operating procedures")
+    parser = argparse.ArgumentParser(description="Vault operating procedures (v5)")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    sub.add_parser("check", help="invariant report (read-only)")
-    sub.add_parser("triage", help="placement-debt report (read-only)")
-    sub.add_parser("status", help="session-entry state report: git + check + triage + graph struct + next moves (read-only)")
+    sub.add_parser("check", help="two-tier invariant report: hard gates exit 1, I1–I4 report-level")
+    sub.add_parser("triage", help="placement-debt report: root, todo aging, suspected half-done (read-only)")
+    sub.add_parser("status", help="session entry: rhythm line + git + check + triage + trunk + next moves (read-only)")
 
-    p_graph = sub.add_parser(
-        "graph",
-        help="read the graph struct in your notes: aims ← means, objects ← users, "
-             "connective holes (read-only); --around NAME for one node's neighborhood")
-    p_graph.add_argument("--around", metavar="NAME",
-                         help="one node's neighborhood: as an aim, as an object, its own edges")
-    p_graph.add_argument("--unwired", nargs="*", metavar="PATH",
-                         help="vault dirs/files to scan for unreached notes (default: root + mailbox/)")
-
-    p_promote = sub.add_parser("promote", help="move mailbox -> library with graduation rules")
-    p_promote.add_argument("name", help="note name (mailbox/ prefix and .md optional)")
-    p_promote.add_argument("--dry-run", action="store_true", help="print plan, move nothing")
-    p_promote.add_argument("--force", action="store_true",
-                           help="bypass the status check (never the lit rule)")
-
-    p_reg_unresolved = sub.add_parser(
-        "register-unresolved",
-        help="baseline a dangling wikilink target so check stops flagging it (appends to tools/whitelist_unresolved.txt)")
-    p_reg_unresolved.add_argument("names", nargs="+",
-                                  help="wikilink target name(s) to whitelist")
-
-    p_reg_lit = sub.add_parser(
-        "register-lit-nosource",
-        help="baseline a legacy type/lit note without a real source (appends to tools/baseline_lit_nosource.txt)")
-    p_reg_lit.add_argument("paths", nargs="+",
-                           help="vault-relative note path(s) (e.g. archives/Foo.md)")
+    p_raw = sub.add_parser("rawindex", help="trunk operations: queue + L0 归队提议")
+    p_raw.add_argument("--clusters", action="store_true", help="L1/L2 clusters + binding evidence + grouping advice")
+    p_raw.add_argument("--check", action="store_true", help="I1–I3 + material 未拆 report")
+    p_raw.add_argument("--sync", action="store_true",
+                       help="B6: maintain trunk root member list (structural, D22)")
+    p_raw.add_argument("--around", metavar="NAME", help="one node's neighborhood")
+    p_raw.add_argument("--top", type=int, default=10, help="L0 proposals to show (default 10)")
 
     args = parser.parse_args()
     if args.command == "check":
@@ -1359,13 +1202,7 @@ def main() -> int:
         return cmd_triage(args)
     if args.command == "status":
         return cmd_status(args)
-    if args.command == "graph":
-        return cmd_graph(args)
-    if args.command == "register-unresolved":
-        return cmd_register_unresolved(args)
-    if args.command == "register-lit-nosource":
-        return cmd_register_lit_nosource(args)
-    return cmd_promote(args)
+    return cmd_rawindex(args)
 
 
 if __name__ == "__main__":

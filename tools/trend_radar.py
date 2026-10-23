@@ -432,8 +432,8 @@ def week_month(d: date) -> str:
 # so its numbers come through a third-party daily mirror (MIT). The official page
 # is recorded as source_url in every table header; the mirror is named as such.
 
-LB_NOTE_REL = Path("archives/TR-leaderboards.md")
-LB_STATE_REL = Path("archives/TR-leaderboards.state.json")
+LB_NOTE_REL = Path("archives/work/TR-leaderboards.md")
+LB_STATE_REL = Path("archives/work/TR-leaderboards.state.json")
 LB_TOP = 10
 ARENA_MIRROR = ("https://raw.githubusercontent.com/oolong-tea-2026/"
                 "arena-ai-leaderboards/main/data")
@@ -667,8 +667,7 @@ def write_leaderboard_note(root: Path, day: date, results, sna: Path):
                                     for i, r in enumerate(rows)}
     body.append("\n---\n## Related\n\n")
     body += related_links(root, exclude=("TR-leaderboards",))
-    fm = fm_block(["tags:", "  - type/permanent", "  - status/archive", "  - topic/ai",
-                   f"created: {date_str}", f"data-date: {date_str}", "source:", *source_lines])
+    fm = fm_block([f"source:", *source_lines])
     path = root / LB_NOTE_REL
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(fm + "".join(body), encoding="utf-8")
@@ -746,10 +745,9 @@ def write_raw_note(root: Path, day: date, payload, sna: Path):
     counts = {sid: len(payload[sid][0]) for sid, _l, _f in SOURCES if not payload[sid][3]}
     body.append("- 各节条目数：" +
                 "，".join(f"{sid} {n}" for sid, n in counts.items()) + "\n")
-    fm = fm_block([f"tags:", "  - type/lit", "  - status/archive", "  - topic/ai",
-                   f"created: {date_str}", f"data-date: {date_str}", "source:"] + source_lines)
+    fm = fm_block([f"source:"] + source_lines)
     text = fm + "".join(body)
-    path = root / "archives" / f"TR-raw-D-{date_str}.md"
+    path = root / "archives" / "work" / f"TR-raw-D-{date_str}.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     existed = path.exists()
     path.write_text(text, encoding="utf-8")
@@ -826,7 +824,7 @@ def purge_snapshots(sna: Path) -> None:
 
 def raw_sections(root: Path, date_str: str) -> dict:
     """{url: section id} for a daily raw note — the provenance layer of every pick."""
-    path = root / "archives" / f"TR-raw-D-{date_str}.md"
+    path = root / "archives" / "work" / f"TR-raw-D-{date_str}.md"
     if not path.exists():
         return {}
     found, sid = {}, ""
@@ -843,7 +841,7 @@ def raw_sections(root: Path, date_str: str) -> dict:
 
 def section_counts(root: Path, date_str: str) -> dict:
     """{sid: count} for the sections that returned items (raw note's Provenance line)."""
-    path = root / "archives" / f"TR-raw-D-{date_str}.md"
+    path = root / "archives" / "work" / f"TR-raw-D-{date_str}.md"
     if not path.exists():
         return {}
     m = re.search(r"^- 各节条目数：(.+)$", path.read_text(encoding="utf-8"), re.M)
@@ -950,15 +948,14 @@ def cmd_report(args) -> int:
         return 2
     raw_note = f"TR-raw-D-{date_str}"
     degraded, degraded_sid = [], ""
-    raw_path = root / "archives" / f"{raw_note}.md"
+    raw_path = root / "archives" / "work" / f"{raw_note}.md"
     for line in raw_path.read_text(encoding="utf-8").splitlines():
         head = re.match(r"^## (\S+) — ", line)
         if head:
             degraded_sid = head.group(1)
         elif line.startswith("> [降级]"):
             degraded.append(f"{degraded_sid} {line.removeprefix('> [降级] ').strip()}")
-    fm = fm_block(["tags:", "  - type/permanent", "  - status/archive", "  - topic/ai",
-                   f"created: {date_str}", f"data-date: {date_str}", "source:",
+    fm = fm_block(["source:",
                    f'  - "原始清单（API 快照逐条校验）：[[{raw_note}]]"']
                   + [f'  - "web_search：{q}"' for q in sorted(set(queries))])
     body = [f"\n# Trend Radar {date_str}\n",
@@ -981,7 +978,7 @@ def cmd_report(args) -> int:
     body.append("\n---\n## Related\n\n")
     body.append(f"- [[{raw_note}]]\n")
     body += related_links(root)
-    path = root / "archives" / f"TR-D-{date_str}.md"
+    path = root / "archives" / "work" / f"TR-D-{date_str}.md"
     if path.exists() and not args.force:
         print(f"ERROR: {path.name} 已存在（加 --force 覆盖）")
         return 2
@@ -1006,7 +1003,7 @@ def artifact_sort_key(name: str):
 
 def current_reports(root: Path):
     out = []
-    for path in (root / "archives").glob("TR-[DWMY]-*.md"):
+    for path in (root / "archives" / "work").glob("TR-[DWMY]-*.md"):
         out.append(path)
     return sorted(out, key=lambda p: artifact_sort_key(p.stem), reverse=True)
 
@@ -1015,7 +1012,7 @@ def raw_for(report_stem: str, root: Path):
     m = re.match(r"^TR-([DWMY]-(.+))$", report_stem)
     if not m:
         return None
-    candidate = root / "archives" / f"TR-raw-{m.group(1)}.md"
+    candidate = root / "archives" / "work" / f"TR-raw-{m.group(1)}.md"
     return candidate if candidate.exists() else None
 
 
@@ -1037,7 +1034,7 @@ def related_links(root: Path, extra=(), exclude=()) -> list:
 
 def leaderboard_labels(root: Path) -> list:
     """Board names in the current TR-leaderboards snapshot, in file order."""
-    path = root / "archives" / "TR-leaderboards.md"
+    path = root / "archives" / "work" / "TR-leaderboards.md"
     if not path.exists():
         return []
     out = []
@@ -1050,7 +1047,7 @@ def leaderboard_labels(root: Path) -> list:
 
 def write_index(root: Path, day: date, quiet: bool = False) -> Path:
     reports = current_reports(root)
-    lines = [fm_block(["tags:", "  - todo"]),
+    lines = [
              "\n## Aim\n\n",
              "Trend Radar 每日情报流的索引：原始清单与精选报告一律落 `archives/`"
              "（`TR-raw-*` / `TR-*`），本笔记只挂载当前仍在的件。"
@@ -1187,7 +1184,7 @@ def merge_family(root: Path, family: str, kind: str, label: str, children, day: 
     deduped by URL, then deleted. Returns deleted paths (empty on dry-run).
     """
     prefix = "TR-raw-" if family == "raw" else "TR-"
-    target = root / "archives" / f"{prefix}{kind}-{label}.md"
+    target = root / "archives" / "work" / f"{prefix}{kind}-{label}.md"
     base_entries = parse_items(target) if target.exists() else []
     entries, index = [], {e["url"]: 0 for e in base_entries}
     for e in base_entries:
@@ -1222,11 +1219,8 @@ def merge_family(root: Path, family: str, kind: str, label: str, children, day: 
            + "、".join(sorted(c.stem for c in children)) + '"']
     if target.exists():
         src.append(f'  - "上一版 {target.stem}"')
-    tags = ["  - type/lit", "  - status/archive", "  - topic/ai"] if family == "raw" \
-        else ["  - type/permanent", "  - status/archive", "  - topic/ai"]
-    head = fm_block(["tags:", *tags, f"created: {day.isoformat()}",
-                     f"period: {label}", f"coverage: {span}", "source:", *src])
-    raw_ref = root / "archives" / f"TR-raw-{kind}-{label}.md"
+    head = fm_block([f"period: {label}", f"coverage: {span}", "source:", *src])
+    raw_ref = root / "archives" / "work" / f"TR-raw-{kind}-{label}.md"
     lines = [head, f"\n# Trend Radar {'原始清单 ' if family == 'raw' else ''}"
                    f"{KIND_CN[kind]} {label}\n\n",
              f"> 覆盖区间 {span.replace('..', ' … ')}；"
@@ -1282,7 +1276,7 @@ def _period_groups(archives: Path, kind: str):
 def cmd_merge(args) -> int:
     root = Path(args.vault).resolve()
     day, dry = args.date, args.dry_run
-    archives = root / "archives"
+    archives = root / "archives" / "work"
     merged = []
     for kind, source_kind in (("W", "D"), ("M", "W"), ("Y", "M")):
         for label, group in sorted(_period_groups(archives, source_kind).items()):
@@ -1315,16 +1309,16 @@ def all_note_stems(root: Path):
 def resolve_artifact(root: Path, day: date, family: str):
     """Today's artifact: the daily, or the rolled-up file that now covers it."""
     prefix = "TR-raw-" if family == "raw" else "TR-"
-    daily = root / "archives" / f"{prefix}D-{day.isoformat()}.md"
+    daily = root / "archives" / "work" / f"{prefix}D-{day.isoformat()}.md"
     if daily.exists():
         return daily, "D"
-    week = root / "archives" / f"{prefix}W-{week_label(day)}.md"
+    week = root / "archives" / "work" / f"{prefix}W-{week_label(day)}.md"
     if week.exists() and covers(week, day):
         return week, "W"
-    month = root / "archives" / f"{prefix}M-{week_month(day)}.md"
+    month = root / "archives" / "work" / f"{prefix}M-{week_month(day)}.md"
     if month.exists() and covers(month, day):
         return month, "M"
-    year = root / "archives" / f"{prefix}Y-{day.year:04d}.md"
+    year = root / "archives" / "work" / f"{prefix}Y-{day.year:04d}.md"
     if year.exists() and covers(year, day):
         return year, "Y"
     return daily, "D"
@@ -1486,8 +1480,7 @@ def cmd_verify(args) -> int:
         problems.append(f"缺索引 {INDEX_REL}")
     else:
         text = index_path.read_text(encoding="utf-8")
-        if "  - todo" not in text:
-            problems.append("索引缺裸 todo 标签")
+        # v5: tags retired (incl. bare `todo`) — index needs no frontmatter
         stems = all_note_stems(root)
         for m in re.finditer(r"\[\[([^\]|#]+)", text):
             if m.group(1).split("/")[-1] not in stems:
@@ -1499,7 +1492,7 @@ def cmd_verify(args) -> int:
         notes.append(f"索引链 {len(reports)} 件")
 
     week_counts = {}
-    for path in (root / "archives").glob("TR-D-*.md"):
+    for path in (root / "archives" / "work").glob("TR-D-*.md"):
         m = DAILY_RE.match(path.stem)
         if m:
             label = week_label(date.fromisoformat(m.group(2)))
@@ -1582,7 +1575,7 @@ def prov_candidates(url: str):
 
 def snapshot_recheck(root: Path, day: date, snap: Path) -> list:
     """Re-assert every raw-list URL against the retained API snapshot bytes."""
-    raw_path = root / "archives" / f"TR-raw-D-{day.isoformat()}.md"
+    raw_path = root / "archives" / "work" / f"TR-raw-D-{day.isoformat()}.md"
     text = raw_path.read_text(encoding="utf-8")
     bad = []
     for sid, _label, _fn in SOURCES:
@@ -1601,7 +1594,7 @@ def cmd_run(args) -> int:
     root = Path(args.vault).resolve()
     date_str = args.date.isoformat()
     snap = snapshot_dir(date_str, Path(args.snapshot_dir) if args.snapshot_dir else None)
-    if not (root / "archives" / f"TR-raw-D-{date_str}.md").exists():
+    if not (root / "archives" / "work" / f"TR-raw-D-{date_str}.md").exists():
         print("ERROR: 当天还没有原始清单，先跑 `trend_radar.py fetch`")
         return 2
     if snap.exists():

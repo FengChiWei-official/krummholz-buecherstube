@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - attr/principle
-  - topic/learning
----
-
 ## Definition
 
 The goal of `Simplification Rational Limit` is to turn expressions that are hard to compare, cancel, or substitute

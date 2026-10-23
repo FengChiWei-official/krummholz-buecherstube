@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/links
-  - topic/learning
-  - status/in-progress
----
-
 ## Define
 [[Additive Group of Integers]]
 

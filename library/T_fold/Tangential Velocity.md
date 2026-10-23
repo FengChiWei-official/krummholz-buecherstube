@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - topic/learning
-  - attr/concept
-  - status/evergreen
----
-
 ## Definition
 [[Tangential Velocity]] is the component of [[Acceleration]] that is [[Parallel]] to the [[Instantaneous Velocity]].
 

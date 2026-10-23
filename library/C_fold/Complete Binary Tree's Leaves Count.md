@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/evergreen
----
-
 ## qwq
 For a [[Complete Binary Tree|CBT]] with `n` nodes, we know
 1. `leaves` count `cl` is $cl = \lfloor n / 2 \rfloor$.

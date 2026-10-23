@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - topic/learning
-  - attr/concept
-  - status/evergreen
----
-
 ## 1. Fundamental Definition
 The Arithmetic Mean-Geometric Mean (AM-GM) inequality provides an **upper bound for products** in terms of their sums. For a set of positive real numbers $a_1, a_2, \dots, a_n$:
 

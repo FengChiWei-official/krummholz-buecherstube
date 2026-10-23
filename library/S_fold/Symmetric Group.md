@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - topic/learning
-  - attr/concept
-  - status/evergreen
----
-
 ## Definition
 Let a set $\mathbf{M} = \{f \mid f: \mathbf{T} \to \mathbf{T}, \text{f is bijective} \}$, a set of all bijective maps of $\mathbf{T} \to \mathbf{T}$ from a **finite set** of n elements to itself.
 

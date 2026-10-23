@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/in-progress
-  - topic/learning
-  - attr/concept
----
-
 ## Definition
 
 German articles indicate definiteness, gender, number, and case. Core sets include definite articles (der/die/das), indefinite articles (ein/eine), and negation/article-like forms (kein).

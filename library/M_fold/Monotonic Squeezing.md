@@ -1,10 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/technique
----
 ## **Preliminary Deductions**
 
 1.  **Direction of Monotonicity:**

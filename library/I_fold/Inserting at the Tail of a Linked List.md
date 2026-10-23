@@ -1,10 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/technique
----
 ## Variations & Features
 
 ### 1. [[Rear Pointer for a Linked List]] (Tail Pointer)

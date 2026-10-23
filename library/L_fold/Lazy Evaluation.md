@@ -1,0 +1,6 @@
+## Definition
+
+Lazy evaluation
+
+---
+## **Related**

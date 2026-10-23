@@ -1,8 +1,4 @@
 ---
-tags:
-  - type/lit
-  - topic/learning
-  - status/archive
 aliases:
   - Notwithstanding
 ---

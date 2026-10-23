@@ -1,10 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/map
----
 ## Definition
 
 This index organizes core topics and resources for learning modern German grammar (Deutsch). It maps major concepts, typical grammatical devices, and practical reference notes so you can navigate study and reference material quickly.

@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/learning
-  - status/evergreen
----
-
 ## Let
 - $\phi: \mathbf{G} \to \mathbf{G^{\prime}}$
 - $K$ is the kernel of $\phi$

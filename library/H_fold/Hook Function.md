@@ -1,9 +1,4 @@
 ---
-tags:
-  - type/permanent
-  - topic/learning
-  - status/evergreen
-  - attr/technique
 aliases:
   - Sum to Product
 ---

@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/in-progress
-  - topic/learning
-  - attr/concept
----
-
 ## Definition
 
 When you are facing a Ratio that needs Symmetric, you need [[Chebyshev Polynomials]].

@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/map
-  - topic/learning
-  - status/in-progress
----
-
 ## Define
 [[Range Sum Query|RSQ define]]
 

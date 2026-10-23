@@ -1,8 +1,4 @@
 ---
-tags:
-  - type/lit
-  - topic/learning
-  - status/archive
 source: "AI 调研笔记 (2026-10-04)。依据: Wikipedia《Greek alphabet》《History of the Greek alphabet》《Phoenician alphabet》《History of the Latin script》《Spurius Carvilius Ruga》; Perseus, Harpers Dictionary of Classical Antiquities (1898) 'Alphabet'; HistoryExtra《Greek Alphabet》。`⚠️` = 学界有争议项。"
 ---
 

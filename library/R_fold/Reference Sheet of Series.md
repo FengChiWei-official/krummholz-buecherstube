@@ -1,10 +1,3 @@
----
-tags:
-  - type/lit
-  - topic/learning
-  - status/archive
----
-
 ## Text
 
 $e^\phi = \sum_{k = 0}^{n} \frac{\phi^k}{k!}$

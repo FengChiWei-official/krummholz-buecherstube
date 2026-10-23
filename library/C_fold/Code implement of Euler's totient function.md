@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - attr/principle
-  - topic/algorithm
-  - status/evergreen
----
-
 ## 1 time ($O(n^{\frac{1}{2}})$)
 ### process
 1. while $i<\mathbf{L}$

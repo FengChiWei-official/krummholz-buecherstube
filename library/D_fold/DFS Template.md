@@ -1,9 +1,3 @@
----
-tags:
-  - type/lit
-  - topic/learning
-  - status/archive
----
 ## DFS 模板（整理）
 
 简要说明：DFS 常见有两类用法 —— 1) 对图/网格的连通性搜索（使用全局 visited），2) 回溯/枚举全部解（使用路径局部状态并回滚）。下面给出统一、清晰的模板与要点。

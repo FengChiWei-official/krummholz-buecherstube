@@ -1,11 +1,3 @@
----
-tags:
-  - type/permanent
-  - status/evergreen
-  - topic/learning
-  - attr/map
----
-
 ## Definition
 
 Limit Strategy organizes solving routes by trigger: rational structure, substitution form, squeeze condition, and exponential conversion.
