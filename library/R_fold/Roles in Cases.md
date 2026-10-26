@@ -1,7 +1,3 @@
----
-source: 
----
-
 ## Text
 
 ### Key roles:

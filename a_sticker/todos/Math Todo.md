@@ -52,6 +52,7 @@
 - [ ] [[Universal Limit Theorems]] — 内容已近成卡,评估 promote
 - [ ] [[Standard Limits]] — 补正文:除 Definition-of-E 外的标准极限
 - [ ] [[Monotonicity Multiple Choice]] — 写完选择题分析:单调性理解陷阱
+- [ ] [[通过不等式的函数性态研究]] — 补正文:不等式与函数性态的互推
 - [ ] [[Composition]] — 补定义:函数性质与判定
 - [ ] [[Differentiability]] — 补定义:函数性质与判定
 - [ ] [[Oscillatory Non-differentiable Point]] — 补定义:函数性质与判定
