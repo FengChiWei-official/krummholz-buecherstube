@@ -25,6 +25,11 @@ aliases:
 [[Turn to the definition of differentiability]]
 [[finding the projection of the line onto the plane]]
 
+<!-- L0 2026-10-26: 归队登记 (D22) -->
+[[D23 Reducing into Known Froms]]
+[[Identity to Equation]]
+[[Compound Function to Outside Function]]
+
 
 ---
 ## **Related**

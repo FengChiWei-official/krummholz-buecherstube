@@ -14,4 +14,4 @@ aliases:
 
 ---
 ## **related**：
-[[How do PC system work|现代计算机结构]]
+[[How does PC system work|现代计算机结构]]

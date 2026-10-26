@@ -2,6 +2,10 @@
 
 ## Core Concepts
 
+<!-- L0 2026-10-26: 归队登记 (D22) -->
+[[Maclaurin Series]]
+[[Power Series]]
+
 正项级数敛散性包
 
 正向级数部分和的单调性

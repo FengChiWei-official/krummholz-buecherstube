@@ -24,6 +24,18 @@
 <!-- L0 2026-10-06: ≥90% 归队提议自动登记 (D22) -->
 [[The Square Squeeze]]
 
+<!-- L0 2026-10-26: 归队登记 (D22) -->
+[[Inequality]]
+[[Reversed Trigonometric Inequality]]
+[[Range Inequality]]
+[[Absolute Inequality]]
+
+
+<!-- L0 2026-10-26: 钩子建卡登记 (D22) -->
+[[Log-Linear Symmetry]]
+
+<!-- L0 2026-10-26: 归队登记 (D22) -->
+[[Proof of Reversed Trigonometric Inequality]]
 
 ---
 ## **Related**

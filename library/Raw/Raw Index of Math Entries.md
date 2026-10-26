@@ -1,7 +1,6 @@
 ## Definition
 
 [[Links of Boundedness' Entry]]
-[[]]
 
 ---
 ## **Related**

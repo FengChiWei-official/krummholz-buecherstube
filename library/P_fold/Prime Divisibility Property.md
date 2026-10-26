@@ -28,7 +28,6 @@ so, p is a factor of b.
 
 ## technique
 [[构造法]]
-[[]]
 
 ---
 ## **Related**

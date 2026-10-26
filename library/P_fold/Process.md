@@ -20,4 +20,4 @@ it is for [[System Call]] only
  
 ---
 ## **related**：
-[[Index of Precess]]
+[[Index of Process]]

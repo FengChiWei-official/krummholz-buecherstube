@@ -17,8 +17,11 @@ Let $g(x)$ be a monotonic function. The monotonicity of the composite function $
 *   **Opposite Direction:** If $g(x)$ is decreasing, $f(g(x))$ is **decreasing**.
 
 > [!note]
-> There is a [[Isomorphism]] $$ \text{sgn} (f) = \left \{ \begin{align} & 1 &&f \text{ is increasing }\\ & -1 &&f \text{ is decreasing }\\ \end{align} \right . $$
-> $\text{sgn} (f_1 \circ f_2) = \text{sgn} (f_1) \circ \text{sgn}(f_2)$
+> 设 $G$ 为实数集（或全序集）上的**严格单调自双射群**（例如 $\text{Homeo}(\mathbb{R})$）。
+> 存在一个群**同态 ([[Homomorphism]])** $\text{sgn}: G \to (\{1, -1\}, \cdot)$：
+> $$ \text{sgn} (f) = \begin{cases} 1 & f \text{ 严格递增} \\ -1 & f \text{ 严格递减} \end{cases} $$
+> 满足：
+> $$ \text{sgn} (f_1 \circ f_2) = \text{sgn} (f_1) \cdot \text{sgn}(f_2) $$
 
 ---
 

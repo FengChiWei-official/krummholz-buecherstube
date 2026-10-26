@@ -17,7 +17,6 @@ The property [[Moment of Inertia]] i(*j*) is about both [[Mass]] and [[Position]
 ## Applications
 
 [[Special Case of Inertia]]
-[[]]
 
 ---
 ## **Related**

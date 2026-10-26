@@ -34,3 +34,9 @@
 <!-- L2 2026-10-06: 簇登记 (D22) -->
 [[Rear Pointer for a Linked List]]
 [[Circular Linked List]]
+
+<!-- L0 2026-10-26: 钩子建卡登记 (D22) -->
+[[Binary Tree]]
+
+<!-- L0 2026-10-26: 归队登记 (D22) -->
+[[Sequential List]]

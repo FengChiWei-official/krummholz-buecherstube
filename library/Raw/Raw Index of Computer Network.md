@@ -49,6 +49,51 @@
 <!-- L2 2026-10-06: 簇登记 (D22, owner 裁决) -->
 [[OS Kernel]]
 
+<!-- L0 2026-10-26: 钩子建卡登记 (D22) -->
+[[ARP Cache]]
+[[ARP Reply]]
+[[ARP Request]]
+[[Broadcast]]
+[[Checksum Offload]]
+[[MSS]]
+[[NAT]]
+[[Private IP]]
+[[TCP Retransmission]]
+[[Unicast]]
+
+
+<!-- L0 2026-10-26: 钩子建卡登记 (D22) -->
+[[EUI-64]]
+[[FDM]]
+[[Hub]]
+[[NIC Specific]]
+[[OUI]]
+[[Router]]
+[[Socket]]
+[[TDM]]
+[[WDM]]
+[[reserved-ip]]
+[[the Magic Polynomials]]
+
+<!-- L0 2026-10-26: 归队登记 (D22) -->
+[[Application Layer of Network]]
+[[History of Network Device]]
+[[IPv4 subnetting]]
+[[MAC Address]]
+[[MAC Learning & Filtering]]
+[[Multiplexing]]
+[[NIC]]
+[[Polynomial]]
+[[VLAN]]
+
+<!-- L0 2026-10-26: 归队登记 (D22) -->
+[[CDM]]
+[[Switch]]
+
+<!-- L0 2026-10-26: 归队登记 (D22) -->
+[[Collision Domain]]
+[[Orthogonal Basis]]
+[[STP]]
 
 ---
 ## **Related**

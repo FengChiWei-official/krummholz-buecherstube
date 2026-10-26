@@ -38,6 +38,14 @@ Integration by Parts
 [[双元法拓展]]
 [[Table of Trigonometric Function Integrals]]
 
+<!-- L0 2026-10-26: 归队登记 (D22) -->
+[[Integration]]
+[[Table of Basic Integrals]]
+[[Power Function]]
+[[Exponentiation Function]]
+
+
+[[Anti-derivative]]
 
 ---
 ## **Related**

@@ -16,7 +16,6 @@
 [[CSP Math]]
 [[CSP Simulation]]
 
-[[]]
 ## Distinctions
 
 ## Examples

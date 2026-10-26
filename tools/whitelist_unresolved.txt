@@ -1,0 +1,4 @@
+# Deliberate dangling wikilinks (new-note hooks), one per line.
+# Doctrine: dangling links are allowed as new-note hooks; check flags only NEW
+# unresolved links. Add a name here when the hook is intentional and the note
+# does not exist yet. Remove the line once the note is created. `#` = comment.

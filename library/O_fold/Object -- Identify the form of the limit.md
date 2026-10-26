@@ -15,4 +15,4 @@ $\lim_{x \to 0} \frac{ \int _0 ^ x \frac{\sin t}{t}dt}{x} + \lim_{x \to 0} \frac
 ---
 ## **Related**
 
-[[Raw Index of Limitation Toolkits]]
+[[Limit Solving - First Generation]]

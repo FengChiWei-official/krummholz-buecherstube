@@ -1,5 +1,7 @@
 ## Definition
 
+上一代：正文型主干（原名 `Raw Index of Limitation Toolkits`）。正文已迁入 [[Index of Limit Strategy]]；登记收归 [[Raw Index of Limit Solving Toolkits]]。此篇留作原文存档。
+
 ## Core Concepts
 
 ### [[Object -- Identify the form of the limit]]

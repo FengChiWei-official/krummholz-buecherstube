@@ -1,6 +1,5 @@
 ## Definition
 
-[[]]
 
 ---
 ## **Related**

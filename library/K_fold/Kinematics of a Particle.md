@@ -22,8 +22,8 @@
 [[Instantaneous acceleration]]
 
 [[Natural coordinate system]]
-[[Tangential acceleration]]
-[[Normal acceleration]]
+[[Tangential Acceleration]]
+[[Normal Acceleration]]
 
 ### Circular Motion & Angular Quantities
 
@@ -39,8 +39,8 @@
 [[Relative motion]]
 [[Absolute motion]]
 [[Dragging motion]]
-[[Absolute velocity]]
-[[Relative velocity]]
+[[Absolute Velocity]]
+[[Relative Velocity]]
 [[Drag velocity]]
 
 ## Key Methods

@@ -1,6 +1,6 @@
 - [x] zhihu problem set of Limit
 - [x] 基础30讲习题梳理
-- [x] 常见函数如$f(x) = xe^{-x}$的图像 -> [[]]
+- [x] 常见函数如$f(x) = xe^{-x}$的图像
 - [x] 对数求导法
 - [x] [[Curvature]]
 - [x] **数学分析中的典型问题与方法**
@@ -51,3 +51,21 @@
 - [ ] [[The Scenes and Processes of Probability]] — 内容已近成卡,评估 promote
 - [ ] [[Universal Limit Theorems]] — 内容已近成卡,评估 promote
 - [ ] [[Standard Limits]] — 补正文:除 Definition-of-E 外的标准极限
+- [ ] [[Monotonicity Multiple Choice]] — 写完选择题分析:单调性理解陷阱
+- [ ] [[Composition]] — 补定义:函数性质与判定
+- [ ] [[Differentiability]] — 补定义:函数性质与判定
+- [ ] [[Oscillatory Non-differentiable Point]] — 补定义:函数性质与判定
+- [ ] [[Sigmoid Function]] — 补定义:函数性质与判定
+- [ ] [[Rational Substitution]] — 补定义:代换法适用场景
+- [ ] [[Calculus: The Substitution Rule]] — 补定义:极限求解手段
+- [ ] [[History How do we design Limit]] — 补定义:极限求解手段
+- [ ] [[Odd Function Property]] — 补定义:极限求解手段
+- [ ] [[Reciprocal Transformation]] — 补定义:极限求解手段
+- [ ] [[Strong Convergence]] — 补定义:极限求解手段
+- [ ] [[Weak Convergence]] — 补定义:极限求解手段
+- [ ] [[Weak- Convergence]] — 补定义:极限求解手段
+- [ ] [[Partial Sum Sequence]] — 补定义:数列工具与判据
+- [ ] [[uniqueness of power series expansions]] — 补定义:数列工具与判据
+- [ ] [[Log-Linear Symmetry]] — 补定义:不等式与放缩
+- [ ] [[Chebyshev Polynomials]] — 补定义:结构变换模式
+- [ ] [[Instance of Move Inverse Trigonometric Functions]] — 补定义:函数结构与变形

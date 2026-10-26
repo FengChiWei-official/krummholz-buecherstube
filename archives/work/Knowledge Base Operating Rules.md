@@ -1,12 +1,14 @@
 ## Definition
 
+已退役（pre-v5）：描述的是 `mailbox/` 时代的状态分区与 `promote` 命令，两者都已作废。现行体系见 [[Vault Design]] + [[Vault Workflow]]。原文留档。
+
 This vault works by separating state, not by forcing everything into a folder tree.
 
 ## Core Split
 
-- [[mailbox]] stores work in progress, experiments, temporary workflows, and notes that still need shaping.
-- [[library]] stores your own stable synthesis: reusable ideas, principles, definitions, and methods.
-- [[archives]] stores external material or historical records that are kept for reference but are not part of your current understanding.
+- mailbox/ stores work in progress, experiments, temporary workflows, and notes that still need shaping.
+- library/ stores your own stable synthesis: reusable ideas, principles, definitions, and methods.
+- archives/ stores external material or historical records that are kept for reference but are not part of your current understanding.
 
 ## Index vs Links
 
@@ -17,11 +19,11 @@ This vault works by separating state, not by forcing everything into a folder tr
 
 ## Where to Store Index and Links Notes
 
-- Large cross-topic Index notes should be placed in [[library/Index]].
-- Topic-local Index notes can be placed next to their topic notes in [[library]].
+- Large cross-topic Index notes should be placed in `library/Index/`.
+- Topic-local Index notes can be placed next to their topic notes in library/.
 - Prefer `Index of ...` naming for Index notes.
-- In-progress Index or Links notes can stay in [[mailbox]] until stable.
-- Stable Links notes should be promoted to [[library/Links]].
+- In-progress Index or Links notes can stay in mailbox/ until stable.
+- Stable Links notes should be promoted to `library/Links/`.
 
 ## When to Write a Card
 
@@ -32,7 +34,7 @@ Write a card when one of these is true:
 - you found a recurring pattern;
 - you want to connect one idea to another.
 
-If a note is still exploratory, keep it in [[mailbox]]. If it is already your own stable understanding, move it to [[library]].
+If a note is still exploratory, keep it in mailbox/. If it is already your own stable understanding, move it to library/.
 
 ## How to Structure a Card
 
@@ -43,14 +45,14 @@ If a note is still exploratory, keep it in [[mailbox]]. If it is already your ow
 
 ## How to Promote a Note
 
-Move a note from [[mailbox]] to [[library]] when it has these traits:
+Move a note from mailbox/ to library/ when it has these traits:
 
 - stable meaning;
 - reusable across multiple contexts;
 - clear wording in your own voice;
 - no longer depends on active debugging or temporary context.
 
-Keep it in [[mailbox]] when it still contains TODOs, experiments, debugging, or unfinished reasoning.
+Keep it in mailbox/ when it still contains TODOs, experiments, debugging, or unfinished reasoning.
 
 ## How to Use the System
 

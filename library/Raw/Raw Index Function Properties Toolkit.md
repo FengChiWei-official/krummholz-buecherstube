@@ -47,6 +47,38 @@
 <!-- L0 2026-10-06: ≥90% 归队提议自动登记 (D22) -->
 [[Definition of Function]]
 
+<!-- L0 2026-10-26: 归队登记 (D22) -->
+[[Continuity]]
+[[Intermediate Value Property]]
+[[function and continuous and differential function]]
+[[Graphs of  Functions]]
+[[Logarithmic Functions]]
+[[One-side Limit]]
+[[Darboux 's Theorem]]
+[[Cusp]]
+[[Corner Point]]
+
+
+<!-- L0 2026-10-26: 钩子建卡登记 (D22) -->
+[[Composition]]
+[[Differentiability]]
+[[Oscillatory Non-differentiable Point]]
+[[Sigmoid Function]]
+
+<!-- L0 2026-10-26: 归队登记 (D22) -->
+[[Infinite Discontinuity]]
+[[Jump Discontinuity]]
+[[Oscillatory Discontinuity]]
+[[Removable Discontinuity]]
+
+<!-- L0 2026-10-26: 归队登记 (D22) -->
+[[Derivative]]
+[[Discontinuities of the First Kind]]
+[[Discontinuities of the Second Kind]]
+
+<!-- L0 2026-10-26: 归队登记 (D22) -->
+[[One-side Derivative]]
+[[Points of Discontinuity]]
 
 ---
 ## **Related**
