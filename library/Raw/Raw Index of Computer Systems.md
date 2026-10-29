@@ -50,7 +50,7 @@
 [[soft link]]
 [[time-sharing System]]
 [[POSIX]]
-[[一条指令的一生]]
+[[Links of 一条指令的一生]]
 
 <!-- L0 2026-10-26: 归队登记 (D22) -->
 [[Process Control Block]]

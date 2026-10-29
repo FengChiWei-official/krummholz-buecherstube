@@ -30,4 +30,8 @@
 - [ ] [[soft link]] — 补定义:操作系统与计算机组成
 - [ ] [[time-sharing System]] — 补定义:操作系统与计算机组成
 - [ ] [[POSIX]] — 补定义:操作系统与计算机组成
-- [ ] [[一条指令的一生]] — 补定义:操作系统与计算机组成
+- [ ] [[Links of 一条指令的一生]] — 补定义:操作系统与计算机组成
+- [ ] [[Links of Text to Bin]] — 补定义:文本到二进制的转换链
+- [ ] [[Executable File]] — 补定义:ELF 三型之一,程序入口
+- [ ] [[Relocatable File]] — 补定义:ELF 三型之一,待链接
+- [ ] [[Shared Object File]] — 补定义:ELF 三型之一,动态共享
