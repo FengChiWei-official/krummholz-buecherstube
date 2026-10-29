@@ -1,3 +1,7 @@
+---
+aliases:
+---
+
 ## Aim
 
 ## Items

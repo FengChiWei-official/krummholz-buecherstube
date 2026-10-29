@@ -1,3 +1,7 @@
+---
+aliases:
+---
+
 ## Definition
 
 ## Core Concepts
