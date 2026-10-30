@@ -475,15 +475,17 @@ def collect_links_candidates(cfg: Config, g: model.Graph, topic: str, n: int = 1
         data["warnings"].append(f"另有 {structural} 篇结构笔记（Raw Index / Index / Links / doctrine）"
                                 "是关系的中介，不是成员——已排除")
     if len(members) > n:
-        data["warnings"].append(f"候选 {len(members)} 篇，只列前 {n} 篇（--n 可调）")
+        data["warnings"].append(f"候选 {len(members)} 篇，成员表只列前 {n} 篇/组（--n 可调）")
 
-    areas: dict = collections.defaultdict(list)
-    for member in data["members"]:
+    # Coverage is computed from EVERY member, never from the capped display list:
+    # capping the table must not turn a 3-area topic into "only 1 area".
+    grouped: dict = collections.defaultdict(list)
+    for member in members:
         for area in member["areas"] or ["(无区域)"]:
-            areas[area].append(member)
-    data["groups"] = [{"area": area, "members": sorted(ms, key=lambda m: m["note"])}
-                      for area, ms in sorted(areas.items())]
-    data["areas"] = sorted(a for a in areas if a != "(无区域)")
+            grouped[area].append(member)
+    data["groups"] = [{"area": area, "members": ms[:n], "member_count": len(ms)}
+                      for area, ms in sorted(grouped.items())]
+    data["areas"] = sorted(a for a in grouped if a != "(无区域)")
     data["area_count"] = len(data["areas"])
     data["crosses_areas"] = data["area_count"] >= 2
     if not data["crosses_areas"]:
@@ -510,12 +512,14 @@ def _render_links_candidates(cfg: Config, data: dict) -> None:
     print(f"  种子（名字/别名命中）: {', '.join(data['seeds'][:8])}")
     print(f"  覆盖区域 {data['area_count']}: "
           f"{', '.join(data['areas']) if data['areas'] else '(无)'}")
-    print(f"  成员 {len(data['members'])} 篇（按区域分组；跨区域的成员会在多个区域下重复出现）:")
+    print(f"  成员 {data['member_total']} 篇（按区域分组；跨区域的成员会在多个区域下重复出现）:")
     for group in data["groups"]:
-        print(f"    [{group['area']}] {len(group['members'])} 篇")
+        print(f"    [{group['area']}] {group['member_count']} 篇")
         for member in group["members"]:
             mark = "  ★种子" if member["seed"] else ""
             print(f"      [[{member['note']}]] — {member['why']}{mark}")
+        if group["member_count"] > len(group["members"]):
+            print(f"      … (+{group['member_count'] - len(group['members'])} more)")
     if data["card_name_candidates"]:
         print(f"  卡片名候选（D16，最终你定）: {data['card_name_candidates'][0]}")
     for warning in data["warnings"]:

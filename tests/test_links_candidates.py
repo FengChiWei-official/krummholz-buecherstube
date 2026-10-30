@@ -63,6 +63,18 @@ def test_members_can_be_capped(vault):
     assert "只列前 2 篇" in proc.stdout
 
 
+def test_coverage_is_computed_before_the_cap(vault):
+    """A small --n must not shrink the area verdict (found by running the example)."""
+    full = json.loads(run_vault(vault, "links-candidates", "Node", "--json").stdout)
+    capped = json.loads(run_vault(vault, "links-candidates", "Node", "--n", "2",
+                                  "--json").stdout)
+    assert capped["area_count"] == full["area_count"] == 3
+    assert capped["crosses_areas"] is True
+    assert capped["member_total"] == full["member_total"]
+    assert len(capped["members"]) == 2
+    assert sum(g["member_count"] for g in capped["groups"]) > len(capped["members"])
+
+
 def test_read_only(vault):
     before = {p: p.read_text(encoding="utf-8") for p in vault.rglob("*.md")}
     run_vault(vault, "links-candidates", "Node")
