@@ -1,6 +1,6 @@
 ---
 name: trend-radar
-description: "Daily trend radar for a geek/AI-scholar: fetch GitHub/HuggingFace/arXiv/Hacker News/Lobsters/Semantic Scholar/OpenAlex trending via API, archive the raw lists, write a signal-sized two-layer report (精选 + 学术) with links and why-lines, roll reports up by ISO week → month → year, and index them under the todo tree. Use when the owner says 跑 trend radar / 今天的趋势 / 每日情报 / trend-radar."
+description: "Daily trend radar for a geek/AI-scholar: fetch GitHub/HuggingFace/arXiv/Hacker News/Lobsters/Semantic Scholar/OpenAlex trending via API, keep the candidate pool in a /tmp snapshot (never in the vault), write a signal-sized two-layer report (精选 + 学术) with links and why-lines, roll reports up by ISO week → month → year, and index them under the todo tree. Use when the owner says 跑 trend radar / 今天的趋势 / 每日情报 / trend-radar."
 ---
 
 # trend-radar
@@ -13,11 +13,11 @@ One call = one day. Nothing runs in the background; there is no daemon, no watch
 
 | Layer | Path | Nature |
 |---|---|---|
-| 原始清单 | `archives/work/TR-raw-D-<YYYY-MM-DD>.md` | 机器生成，零 AI 改写，每条 = 源侧字段原样映射，逐条可回溯到 API 快照 |
+| 候选池（当日快照） | `<snapshot-dir>/<date>/raw.md` + 每源 `<sid>.raw`（默认 `/tmp/trend-radar/<date>/`） | 机器生成，零 AI 改写，每条 = 源侧字段原样映射，当日可回溯到 API 快照字节流；**不落库、不滚动、不保留** |
 | 报告 | `archives/work/TR-D-<YYYY-MM-DD>.md` | 两节：`## 精选`（工业/社区热点）+ `## 学术`（论文）。条数随当日信号浮动（sanity 界 4–24，无固定配额），每条 = 链接 + 来源 + 一句"为什么值得看" |
-| 榜单快照 | `archives/work/TR-leaderboards.md` | **每次抓取整体覆盖**，只留当前榜单 + Δ 列；`TR-leaderboards.state.json` 存上一份用于算 Δ。两者都不参与滚动合并 |
+| 榜单快照 | `archives/work/TR-leaderboards.md` | **每次抓取整体覆盖**，只留当前榜单 + Δ 列；`TR-leaderboards.state.json` 存上一份用于算 Δ（已 gitignore：Δ 只在本机当日有效）。两者都不参与滚动合并 |
 | 索引 | `a_sticker/todos/Trend Radar.md` | v5：无 frontmatter（tags 已退役）；只链当前仍在的件 |
-| 滚动件 | `archives/work/TR-{W,M,Y}-*.md` 与 `TR-raw-{W,M,Y}-*.md` | 7 日报→周报、月内 ≥4 周报→月报、年内 ≥12 月报→年报；**被合并件删除，不保留** |
+| 滚动件 | `archives/work/TR-{W,M,Y}-*.md` | 7 日报→周报、月内 ≥4 周报→月报、年内 ≥12 月报→年报；**被合并件删除，不保留** |
 
 Tool: `tools/trend_radar.py`（stdlib only）。
 
@@ -51,13 +51,13 @@ Tool: `tools/trend_radar.py`（stdlib only）。
 
 - 每榜列前 10（`LB_TOP`），表头带来源、抓取时间、条目数、快照 sha256；`Δ` 列对比上一份快照（`▲n`/`▼n`/`NEW`），`ΔElo`/`Δ分数` 同源。
 - 同一天重复跑 `fetch` 不会污染 Δ：状态文件只在日期变化时推进。
-- 榜单**不写进原始清单的 URL 列表**（快照不是链接流，且会被合并去重规则吃掉），日报里只放一行指针。
+- 榜单**不写进候选池的 URL 列表**（快照不是链接流，且会被合并去重规则吃掉），日报里只放一行指针。
 - owner 想看新榜：改 `LEADERBOARDS` 加一个 `@leaderboard(...)` 函数即可；Terminal-Bench 这类只有 Next.js 页面的站点需要额外解析，别默认加。
 
 ## Daily run
 
 ```bash
-# 1. 抓取 + 写原始清单 + 打印候选池（这是给你挑选用的事实来源）
+# 1. 抓取 + 写当日 /tmp 快照 + 打印候选池（这是给你挑选用的事实来源）
 python3 tools/trend_radar.py fetch
 
 # 2. 读候选池，必要时用 web_search 补 API 抓不到的漏
@@ -87,7 +87,7 @@ Hard rules enforced by the tool (non-zero exit, nothing written):
 
 - 条数落在 sanity 界 4–24（`REPORT_MIN`/`REPORT_MAX`）；无重复 URL；每条要有 `title`/`source`/`why`。
 - `section` ∈ {`精选`, `学术`}，**两节都不能空**。
-- `from: raw` → URL 必须逐字出现在当天原始清单里，且所属节决定它能不能进这一节：学术源 → 只能进 `学术`，非学术源 → 只能进 `精选`。
+- `from: raw` → URL 必须逐字出现在当天快照（`<snapshot-dir>/<date>/raw.md`）里，且所属节决定它能不能进这一节：学术源 → 只能进 `学术`，非学术源 → 只能进 `精选`。
 - `from: websearch` → 必须给 `query`，报告里标 `⟦ws: …⟧`，让来源缺口可见而不是被暗示。
 - 学术节至少要覆盖 2 个不同的学术源（当天可用 ≥2 个时），且满足 `BUCKET_QUOTA`：`arxiv-ml` ≥2、`arxiv-plse` ≤2、`arxiv-ds` ≤2。
 
@@ -98,10 +98,10 @@ Pick for signal, not coverage — **强日多写、弱日少写，弱日宁可 6
 Runs inside `run` — nothing separate to call.
 
 - ISO week of a daily's date decides its weekly label (`TR-W-2026-W38`); a weekly belongs to the month of its ISO week's Thursday.
-- Weekly: 7 dailies in one ISO week → merge (dedupe by URL, cross-file repeats tagged `⟦YYYY-MM-DD⟧`), delete the 7 dailies + their raw files.
+- Weekly: 7 dailies in one ISO week → merge (dedupe by URL, cross-file repeats tagged `⟦YYYY-MM-DD⟧`), delete the 7 dailies.
 - 报告滚动件保留分层：被折叠的学术条目在 tail 带 `⟦学术⟧` 标记（与 `⟦YYYY-MM-DD⟧` 同族），合并后仍看得出哪条来自学术节。
 - Monthly: ≥4 weeklies in one calendar month → merge, delete them. Yearly: ≥12 monthlies → merge, delete them.
-- Raw merges on the same clock but keeps only the first `MERGE_RAW_CAP` (50) entries, so `archives/` cannot grow without bound; full snapshots are never kept.
+- 候选池只在 `/tmp`，不参与滚动合并 —— `archives/` 里没有任何原始清单可以增长。
 - Re-merging preserves the previous merged file as the base (no loss), and the index is regenerated from the filesystem, so it never points at a deleted file.
 
 ## Failure handling
@@ -111,24 +111,24 @@ Runs inside `run` — nothing separate to call.
 - **`OPENALEX_API_KEY` unset** → only OpenAlex degrades; report it to the owner and deliver the rest. The key is read from the environment only — never written to a note, never printed (the tool redacts `api_key=` in every path it writes).
 - **`ARTIFICIAL_ANALYSIS_API_KEY` unset** → the AA row reads 未启用 (not an error). Set but rejected → that board alone degrades (`HTTP 401`), other boards keep their tables. Same rule: key from env, `x-api-key` header only, never written down.
 - **No network** → all sections degrade; still write the files, tell the owner it was a network failure, and do not treat the day as covered.
-- **`fetch` interrupted after writing the raw list** → rerun `run`; `fetch` is safe to rerun (it overwrites and warns).
+- **`fetch` interrupted after writing the snapshot** → rerun `run`; `fetch` is safe to rerun (it overwrites and warns).
 
 ## Verify before reporting
 
 ```bash
-python3 tools/trend_radar.py verify                     # 当天三层产出 + 滚动不变量
+python3 tools/trend_radar.py verify                     # 当日快照 + 报告 + 索引 + 榜单
 python3 tools/vault.py check                            # 结构不变量（本流程不得引入新 problem）
 ```
 
-`verify` asserts: every non-降级/未启用 section meets its floor (`MIN_ITEMS` 20，openalex 10), provenance hit rate N/N, 报告两节都存在且条数落在 sanity 界内，`候选池 N / 入选 M` 一行且 N 等于原始清单正常节合计、M ≤ N, 每条 URL 都能回溯到 raw（或带 `⟦ws⟧`），学术节的 raw 条目全部来自学术源、精选节的 raw 条目全不来自学术源，学术节覆盖 ≥2 个可用学术源**且满足 ML 算法优先的配额（`arxiv-ml` ≥2 / `arxiv-plse` ≤2 / `arxiv-ds` ≤2）**, index links resolve and cover every current artifact (+ the leaderboard note), leaderboard tables each have ≥10 rows with a source line and snapshot hash, the Δ state file parses, and no ISO week holds ≥7 unmerged dailies.
+`verify` asserts: 当日快照存在且 `raw.md` 有候选池, 报告两节都存在且条数落在 sanity 界内，`候选池 N / 入选 M` 一行且 N 等于快照正常节合计、M ≤ N, 每条 URL 都能回溯到当日快照（或带 `⟦ws⟧`），学术节的 raw 条目全部来自学术源、精选节的 raw 条目全不来自学术源，学术节覆盖 ≥2 个可用学术源**且满足 ML 算法优先的配额（`arxiv-ml` ≥2 / `arxiv-plse` ≤2 / `arxiv-ds` ≤2）**, index links resolve and cover every current artifact (+ the leaderboard note), leaderboard tables each have ≥10 rows with a source line and snapshot hash, the Δ state file parses, and no ISO week holds ≥7 unmerged dailies. 各源条目下限与 provenance 命中率由 `fetch` 当场把关（不足即降级该节），不再留到 `verify` 复查。
 
 `vault.py check` under the new two-tier doctrine: hard gates (root drain / material source / new dangling wikilinks) must stay clean; report-level I1–I4 give weekly increments and never block. The requirement here: no hard-gate finding, and no new finding mentioning `TR-`/`Trend Radar`.
 
-旧契约日报（`date < LAYER_CUTOVER` = 2026-09-21）不套两节/条数/候选池/配额规则，也不要求原始清单里存在新增的 arXiv 桶或 `s2`——那时它们还不存在。**不回填历史日报**：HF trending / HN 前排这类源只能取"此刻"，补跑过去的日子只会用今天的数据污染旧日期。
+旧契约日报（`date < LAYER_CUTOVER` = 2026-09-21）不套两节/条数/候选池/配额规则。**不回填历史日报**：HF trending / HN 前排这类源只能取"此刻"，补跑过去的日子只会用今天的数据污染旧日期。
 
 ## Boundaries
 
-Write: `archives/work/TR-*.md` 与 `archives/work/TR-leaderboards.state.json`、`a_sticker/todos/Trend Radar.md`、`a_sticker/todos/Index of Todos.md`（一行登记）、`tools/trend_radar.py`、本 SKILL。
+Write: `archives/work/TR-*.md`（含 `TR-leaderboards.state.json`，已 gitignore）、`a_sticker/todos/Trend Radar.md`、`tools/trend_radar.py`、本 SKILL、以及 `/tmp` 快照目录。索引登记不再自动写入 `a_sticker/todos/Index of Todos.md`：`index` 只打印 `请登记: - [ ] [[Trend Radar]]`，由 owner/AI 决定是否登记。
 
 Never: `zzz_output/` contents, `.obsidian/`, `library/`, `README.md`, `AGENTS.md`, any note this flow did not create; artifacts stay flat in `archives/work/`; no commit, no push. Deletion is limited to TR- files this flow merged away.
 

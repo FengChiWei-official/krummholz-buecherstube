@@ -3,17 +3,20 @@
 
 Daily flow (see .agent/skills/trend-radar/SKILL.md):
 
-    python3 tools/trend_radar.py fetch                  # 抓取 + 写原始清单 + 打印候选池
+    python3 tools/trend_radar.py fetch                  # 抓取 + 写 /tmp 快照 + 打印候选池
     python3 tools/trend_radar.py run --items items.json # 写精选报告 + 滚动合并 + 更新索引 + 校验
-    python3 tools/trend_radar.py verify                 # 离线复核当天三层产出
+    python3 tools/trend_radar.py verify                 # 离线复核当日快照 + 报告 + 索引 + 榜单
     python3 tools/trend_radar.py fetch --purge          # 删掉 /tmp 快照
 
-Artifacts (all under archives/, flat, no new zone layers):
+Artifacts (reports under archives/work/, flat, no new zone layers):
 
-    TR-raw-D-YYYY-MM-DD.md  原始清单（零 AI 改写，逐条可回溯到 API 快照）
     TR-D-YYYY-MM-DD.md      当日报告：精选 + 学术两节，条数随当日信号浮动
     TR-W-<ISOyear>-W<week>.md / TR-M-YYYY-MM.md / TR-Y-YYYY.md   滚动合并件
     a_sticker/todos/Trend Radar.md   索引（只链当前仍在的件）
+
+Candidate pool (raw list) lives only in the day's /tmp snapshot (`<snapshot-dir>/<date>/raw.md`
+plus one `<sid>.raw` per source) — it is never written into the vault, so nothing to merge
+or bound. Reports trace every pick back to that snapshot's API bytes for the day.
 
 Academic layer: hf-papers / arxiv (cs.AI·LG·CL) / arxiv-ml (stat.ML·math.OC·cs.NA) /
 arxiv-plse (cs.SE·PL·AR·OS) / arxiv-ds (cs.DS·CG·CC) / s2 / openalex.
@@ -21,7 +24,6 @@ The two report layers are disjoint: a pick from an academic source belongs to �
 Academic picks are ML-algorithms-first: BUCKET_QUOTA caps the engineering and algorithms buckets.
 
 Rolling: 7 日报 → 周报；自然月内 ≥4 周报 → 月报；年 ≥12 月报 → 年报。被合并件删除。
-Raw merges on the same clock, capped per section (MERGE_RAW_CAP) so the archive stays bounded.
 
 Stdlib only. Vault root = parent of tools/ (override with --vault for sandbox runs).
 """
@@ -46,7 +48,6 @@ SECTION_FLOOR = {"openalex": 10}   # sections whose source is narrower than MIN_
 OPENALEX_WINDOW = 7     # days back for the OpenAlex citation-velocity window
 S2_WINDOW = 7           # days back for the Semantic Scholar publication window
 GITHUB_WINDOW = 7       # days back for "new repositories" window
-MERGE_RAW_CAP = 50      # per-section cap inside merged raw files
 
 # Report size is adaptive — the day decides. These are sanity bounds, not targets.
 REPORT_MIN, REPORT_MAX = 4, 24
@@ -68,8 +69,6 @@ S2_FIELDS = ("title,venue,publicationDate,citationCount,influentialCitationCount
              "externalIds,fieldsOfStudy")
 INDEX_NAME = "Trend Radar"
 INDEX_REL = Path("a_sticker/todos") / f"{INDEX_NAME}.md"
-TODOS_INDEX_REL = Path("a_sticker/todos/Index of Todos.md")
-TEMPLATES = ("template/", "a_sticker/todos/")
 UA = {"User-Agent": "trend-radar/1.0 (obsidian vault archive; +krummholz)"}
 
 # section id → (label, fetch function)
@@ -710,8 +709,11 @@ def redact(url: str) -> str:
     return re.sub(r"(api_key=)[^&\s]+", r"\1***", url)
 
 
-def write_raw_note(root: Path, day: date, payload, sna: Path):
-    """payload: {sid: (items, raw_bytes, api, error, skipped)}"""
+def write_snapshot_list(day: date, payload, sna: Path):
+    """Render the candidate pool into the /tmp snapshot dir (never into the vault).
+
+    payload: {sid: (items, raw_bytes, api, error, skipped)}
+    """
     date_str = day.isoformat()
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     source_lines = [f'  - "原始清单 {date_str}：机器生成，零 AI 改写"']
@@ -747,7 +749,7 @@ def write_raw_note(root: Path, day: date, payload, sna: Path):
                 "，".join(f"{sid} {n}" for sid, n in counts.items()) + "\n")
     fm = fm_block([f"source:"] + source_lines)
     text = fm + "".join(body)
-    path = root / "archives" / "work" / f"TR-raw-D-{date_str}.md"
+    path = sna / "raw.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     existed = path.exists()
     path.write_text(text, encoding="utf-8")
@@ -787,8 +789,8 @@ def cmd_fetch(args) -> int:
         items, raw_bytes, _api, err, _skip = payload[sid]
         if not err and raw_bytes:
             (sna / f"{sid}.raw").write_bytes(raw_bytes)
-    path, existed, size = write_raw_note(root, day, payload, sna)
-    print(f"{'重写' if existed else '写入'} {path.relative_to(root)}（{size} B）")
+    path, existed, size = write_snapshot_list(day, payload, sna)
+    print(f"{'重写' if existed else '写入'} {path}（{size} B，/tmp 快照，不落库）")
     fetch_leaderboards(root, day, sna)
     print(f"快照目录 {sna}")
     ok = sum(1 for sid, _l, _f in SOURCES if not payload[sid][3])
@@ -822,9 +824,14 @@ def purge_snapshots(sna: Path) -> None:
 # ---------------------------------------------------------------- report
 
 
-def raw_sections(root: Path, date_str: str) -> dict:
-    """{url: section id} for a daily raw note — the provenance layer of every pick."""
-    path = root / "archives" / "work" / f"TR-raw-D-{date_str}.md"
+def snapshot_list_path(snap: Path) -> Path:
+    """The rendered candidate pool inside the day's /tmp snapshot dir."""
+    return snap / "raw.md"
+
+
+def raw_sections(snap: Path) -> dict:
+    """{url: section id} for the day's snapshot — the provenance layer of every pick."""
+    path = snapshot_list_path(snap)
     if not path.exists():
         return {}
     found, sid = {}, ""
@@ -839,9 +846,9 @@ def raw_sections(root: Path, date_str: str) -> dict:
     return found
 
 
-def section_counts(root: Path, date_str: str) -> dict:
-    """{sid: count} for the sections that returned items (raw note's Provenance line)."""
-    path = root / "archives" / "work" / f"TR-raw-D-{date_str}.md"
+def section_counts(snap: Path) -> dict:
+    """{sid: count} for the sections that returned items (snapshot's Provenance line)."""
+    path = snapshot_list_path(snap)
     if not path.exists():
         return {}
     m = re.search(r"^- 各节条目数：(.+)$", path.read_text(encoding="utf-8"), re.M)
@@ -855,14 +862,14 @@ def section_counts(root: Path, date_str: str) -> dict:
     return counts
 
 
-def pool_size(root: Path, date_str: str) -> int:
+def pool_size(snap: Path) -> int:
     """Candidate pool = every item of every non-degraded raw section that day."""
-    return sum(section_counts(root, date_str).values())
+    return sum(section_counts(snap).values())
 
 
-def academic_available(root: Path, date_str: str) -> set:
+def academic_available(snap: Path) -> set:
     """Academic sections that actually returned items today."""
-    return {sid for sid in section_counts(root, date_str) if sid in ACADEMIC_SIDS}
+    return {sid for sid in section_counts(snap) if sid in ACADEMIC_SIDS}
 
 
 def quota_problems(counts: dict) -> list:
@@ -880,16 +887,17 @@ def quota_problems(counts: dict) -> list:
 def cmd_report(args) -> int:
     root = Path(args.vault).resolve()
     date_str = args.date.isoformat()
+    snap = snapshot_dir(date_str, Path(args.snapshot_dir) if args.snapshot_dir else None)
     items = json.loads(Path(args.items).read_text(encoding="utf-8"))
     if not isinstance(items, list):
         print("ERROR: items 文件必须是 JSON 数组")
         return 2
     write_index(root, args.date, quiet=True)      # ensure Related targets resolve
-    sections = raw_sections(root, date_str)
+    sections = raw_sections(snap)
     if not sections:
-        print(f"ERROR: 缺少 {date_str} 的原始清单，先跑 fetch")
+        print(f"ERROR: 缺少当日快照 {snap}/raw.md，先跑 fetch")
         return 2
-    pool = pool_size(root, date_str)
+    pool = pool_size(snap)
     errors = []
     if not (REPORT_MIN <= len(items) <= REPORT_MAX):
         errors.append(f"条数 {len(items)} 超出 sanity 界 [{REPORT_MIN},{REPORT_MAX}]")
@@ -917,7 +925,7 @@ def cmd_report(args) -> int:
         origin_sid = sections.get(url)
         if origin == "raw":
             if origin_sid is None:
-                errors.append(f"#{idx} 声称来自原始清单，但 URL 不在 TR-raw-D-{date_str}：{url}")
+                errors.append(f"#{idx} 声称来自原始清单，但 URL 不在当日快照：{url}")
             elif section == "学术" and origin_sid not in ACADEMIC_SIDS:
                 errors.append(f"#{idx} 学术节条目却来自非学术源 {origin_sid}：{url}")
             elif section == "精选" and origin_sid in ACADEMIC_SIDS:
@@ -937,7 +945,7 @@ def cmd_report(args) -> int:
         sid = sections.get(url)
         if sid:
             cited[sid] = cited.get(sid, 0) + 1
-    available = academic_available(root, date_str)
+    available = academic_available(snap)
     if len(available) >= 2 and len(cited) < 2:
         errors.append(f"学术节只用到 {len(cited)} 个学术源（今日可用 {sorted(available)}），需 ≥2")
     errors += quota_problems(cited)
@@ -946,20 +954,19 @@ def cmd_report(args) -> int:
         for e in errors:
             print(f"  - {e}")
         return 2
-    raw_note = f"TR-raw-D-{date_str}"
     degraded, degraded_sid = [], ""
-    raw_path = root / "archives" / "work" / f"{raw_note}.md"
-    for line in raw_path.read_text(encoding="utf-8").splitlines():
+    snap_list = snapshot_list_path(snap)
+    for line in snap_list.read_text(encoding="utf-8").splitlines():
         head = re.match(r"^## (\S+) — ", line)
         if head:
             degraded_sid = head.group(1)
         elif line.startswith("> [降级]"):
             degraded.append(f"{degraded_sid} {line.removeprefix('> [降级] ').strip()}")
     fm = fm_block(["source:",
-                   f'  - "原始清单（API 快照逐条校验）：[[{raw_note}]]"']
+                   '  - "当日快照（/tmp，API 逐条校验，不落库）"']
                   + [f'  - "web_search：{q}"' for q in sorted(set(queries))])
     body = [f"\n# Trend Radar {date_str}\n",
-            f"\n> 候选池 {pool} 条（原始清单正常节合计）/ 入选 {len(items)} 条"
+            f"\n> 候选池 {pool} 条（当日快照正常节合计）/ 入选 {len(items)} 条"
             f"（精选 {len(picked['精选'])} + 学术 {len(picked['学术'])}）；"
             f"条数随当日信号浮动，不设固定配额；每条含来源与一句为什么值得看。\n"]
     if note_exists(root, "TR-leaderboards"):
@@ -976,7 +983,6 @@ def cmd_report(args) -> int:
                 tail += f" ⟦ws: {it['query']}⟧"
             body.append(f"- [ ] {md_link(it['title'], it['url'])} — {tail}\n")
     body.append("\n---\n## Related\n\n")
-    body.append(f"- [[{raw_note}]]\n")
     body += related_links(root)
     path = root / "archives" / "work" / f"TR-D-{date_str}.md"
     if path.exists() and not args.force:
@@ -1006,14 +1012,6 @@ def current_reports(root: Path):
     for path in (root / "archives" / "work").glob("TR-[DWMY]-*.md"):
         out.append(path)
     return sorted(out, key=lambda p: artifact_sort_key(p.stem), reverse=True)
-
-
-def raw_for(report_stem: str, root: Path):
-    m = re.match(r"^TR-([DWMY]-(.+))$", report_stem)
-    if not m:
-        return None
-    candidate = root / "archives" / "work" / f"TR-raw-{m.group(1)}.md"
-    return candidate if candidate.exists() else None
 
 
 def item_count(path: Path) -> int:
@@ -1049,17 +1047,14 @@ def write_index(root: Path, day: date, quiet: bool = False) -> Path:
     reports = current_reports(root)
     lines = [
              "\n## Aim\n\n",
-             "Trend Radar 每日情报流的索引：原始清单与精选报告一律落 `archives/`"
-             "（`TR-raw-*` / `TR-*`），本笔记只挂载当前仍在的件。"
+             "Trend Radar 每日情报流的索引：精选报告落 `archives/work/`（`TR-*`），"
+             "原始候选池只活在当日 `/tmp` 快照（不落库、不长期保留）。本笔记只挂载当前仍在的件。"
              "报告按 ISO 周 → 自然月 → 自然年滚动合并（7/4/12），被合并件删除。\n",
              "\n## Items\n\n"]
     if reports:
         for rep in reports:
-            raw = raw_for(rep.stem, root)
             kind = {"D": "日报", "W": "周报", "M": "月报", "Y": "年报"}[rep.stem[3]]
             tail = f"（{kind}，{item_count(rep)} 条）"
-            if raw:
-                tail += f" — 原始 [[{raw.stem}]]"
             lines.append(f"- [ ] [[{rep.stem}]]{tail}\n")
     else:
         lines.append("- [ ] （尚无报告：跑一次 `python3 tools/trend_radar.py fetch`）\n")
@@ -1072,7 +1067,7 @@ def write_index(root: Path, day: date, quiet: bool = False) -> Path:
               "- 抓取层：HuggingFace（模型/数据集/Space/日报论文）/ arXiv（AI 桶 cs.AI·LG·CL + "
               "ML 算法桶 stat.ML·math.OC·cs.NA + 工程桶 cs.SE·PL·AR·OS + 算法桶 cs.DS·CG·CC）/ "
               "Semantic Scholar / OpenAlex（期刊会议）/ Hacker News / "
-              "Lobsters / GitHub，原始清单零 AI 改写、逐条可回溯到 API 快照\n",
+              "Lobsters / GitHub，候选池零 AI 改写、当日可回溯到 /tmp 快照\n",
               "- 精选层：分「精选 + 学术」两节，条数随当日信号浮动（不设固定配额）；"
               "学术节以 ML 算法/优化为主（≥2 条），工程桶与算法桶各 ≤2；"
               "每条一句为什么值得看，空白处用 web_search 补漏\n",
@@ -1081,47 +1076,27 @@ def write_index(root: Path, day: date, quiet: bool = False) -> Path:
     path = root / INDEX_REL
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("".join(lines), encoding="utf-8")
-    register_in_todos_index(root)
     if not quiet:
         print(f"写入 {path.relative_to(root)}")
     return path
 
 
-def register_in_todos_index(root: Path) -> None:
-    path = root / TODOS_INDEX_REL
-    if not path.exists():
-        return
-    text = path.read_text(encoding="utf-8")
-    if f"[[{INDEX_NAME}]]" in text:
-        return
-    anchor = "- [ ] [[AI 报告挂载 Todo]]"
-    if anchor in text:
-        text = text.replace(anchor, f"{anchor}\n- [ ] [[{INDEX_NAME}]]", 1)
-    else:
-        text = text.replace("## Key Methods", f"- [ ] [[{INDEX_NAME}]]\n\n## Key Methods", 1)
-    path.write_text(text, encoding="utf-8")
-    print(f"已登记 [[{INDEX_NAME}]] 到 {TODOS_INDEX_REL}")
-
-
 def cmd_index(args) -> int:
     root = Path(args.vault).resolve()
     write_index(root, args.date)
+    print(f"请登记: - [ ] [[{INDEX_NAME}]]")
     return 0
 
 
 # ---------------------------------------------------------------- merge
 
 
-DAILY_RE = re.compile(r"^TR-(raw-)?D-(\d{4}-\d{2}-\d{2})$")
-WEEKLY_RE = re.compile(r"^TR-(raw-)?W-(\d{4})-W(\d{2})$")
-MONTHLY_RE = re.compile(r"^TR-(raw-)?M-(\d{4}-\d{2})$")
+DAILY_RE = re.compile(r"^TR-D-(\d{4}-\d{2}-\d{2})$")
+WEEKLY_RE = re.compile(r"^TR-W-(\d{4})-W(\d{2})$")
+MONTHLY_RE = re.compile(r"^TR-M-(\d{4}-\d{2})$")
 
 KIND_CN = {"D": "日报", "W": "周报", "M": "月报", "Y": "年报"}
 THRESHOLD = {"W": 7, "M": 4, "Y": 12}
-
-
-def raw_sibling(path: Path) -> Path:
-    return path.with_name(path.stem.replace("TR-", "TR-raw-", 1) + ".md")
 
 
 ITEM_LINE_RE = re.compile(r"^- (?:\[ \] )?\[(.+)\]\((?:<)?([^)>\s]+)(?:>)?\) — (.+)$")
@@ -1165,26 +1140,24 @@ def coverage_of(path: Path):
     m = re.search(r"^coverage: (\d{4}-\d{2}-\d{2})\.\.(\d{4}-\d{2}-\d{2})$", text, re.M)
     if m:
         return m.group(1), m.group(2)
-    dm = re.search(r"^TR-(?:raw-)?D-(\d{4}-\d{2}-\d{2})$", path.stem, re.M)
+    dm = re.search(r"^TR-D-(\d{4}-\d{2}-\d{2})$", path.stem, re.M)
     if dm:
         return dm.group(1), dm.group(1)
     return "", ""
 
 
-def render_items(family: str, entries) -> list:
-    box = "- [ ] " if family == "report" else "- "
-    return [f"{box}{md_link(e['title'], e['url'])} — {e['tail']}" for e in entries]
+def render_items(entries) -> list:
+    return [f"- [ ] {md_link(e['title'], e['url'])} — {e['tail']}" for e in entries]
 
 
-def merge_family(root: Path, family: str, kind: str, label: str, children, day: date,
+def merge_family(root: Path, kind: str, label: str, children, day: date,
                  dry_run: bool) -> list:
-    """Merge one family+period into archives/TR-<raw-><kind>-<label>.md.
+    """Merge one period of reports into archives/work/TR-<kind>-<label>.md.
 
     An existing target is the base (idempotent re-merge); children are folded in,
     deduped by URL, then deleted. Returns deleted paths (empty on dry-run).
     """
-    prefix = "TR-raw-" if family == "raw" else "TR-"
-    target = root / "archives" / "work" / f"{prefix}{kind}-{label}.md"
+    target = root / "archives" / "work" / f"TR-{kind}-{label}.md"
     base_entries = parse_items(target) if target.exists() else []
     entries, index = [], {e["url"]: 0 for e in base_entries}
     for e in base_entries:
@@ -1205,11 +1178,9 @@ def merge_family(root: Path, family: str, kind: str, label: str, children, day: 
                 continue
             index[e["url"]] = len(entries)
             fold = dict(e)
-            if family == "report" and "学术" in layers.get(e["url"], ""):
+            if "学术" in layers.get(e["url"], ""):
                 fold["tail"] += " ⟦学术⟧"
             entries.append(fold)
-    if family == "raw":
-        entries = entries[:MERGE_RAW_CAP]
     span = f"{min(dates)}..{max(dates)}" if dates else f"{day.isoformat()}..{day.isoformat()}"
     if target.exists():                       # keep the wider coverage on re-merge
         old = coverage_of(target)
@@ -1220,21 +1191,14 @@ def merge_family(root: Path, family: str, kind: str, label: str, children, day: 
     if target.exists():
         src.append(f'  - "上一版 {target.stem}"')
     head = fm_block([f"period: {label}", f"coverage: {span}", "source:", *src])
-    raw_ref = root / "archives" / "work" / f"TR-raw-{kind}-{label}.md"
-    lines = [head, f"\n# Trend Radar {'原始清单 ' if family == 'raw' else ''}"
-                   f"{KIND_CN[kind]} {label}\n\n",
+    lines = [head, f"\n# Trend Radar {KIND_CN[kind]} {label}\n\n",
              f"> 覆盖区间 {span.replace('..', ' … ')}；"
              f"被合并的 {len(children)} 份{KIND_CN[kind]}已按滚动规则删除（不保留被合并件）。\n",
-             "> 条目按 URL 去重；跨件重复的条目标注其出现日期 ⟦YYYY-MM-DD⟧。\n"]
-    if family == "raw":
-        lines.append(f"> 原始层按合并顺序保留前 {MERGE_RAW_CAP} 条（完整快照不保留）。\n")
-    if family == "report":
-        lines.append(f"> 证据层：[[{raw_ref.stem}]]\n")
-    lines.append(f"\n## 条目（{len(entries)}）\n\n")
-    lines += [ln + "\n" for ln in render_items(family, entries)]
-    if family == "report":
-        lines += ["\n---\n## Related\n\n", f"- [[{raw_ref.stem}]]\n"]
-        lines += related_links(root)
+             "> 条目按 URL 去重；跨件重复的条目标注其出现日期 ⟦YYYY-MM-DD⟧。\n",
+             f"\n## 条目（{len(entries)}）\n\n"]
+    lines += [ln + "\n" for ln in render_items(entries)]
+    lines += ["\n---\n## Related\n\n"]
+    lines += related_links(root)
     if dry_run:
         print(f"[dry-run] 将写 {target.relative_to(root)}"
               f"（{len(entries)} 条）← 折叠 {len(children)} 份")
@@ -1258,18 +1222,18 @@ def _period_groups(archives: Path, kind: str):
             m = DAILY_RE.match(path.stem)
             if not m:
                 continue
-            groups.setdefault(week_label(date.fromisoformat(m.group(2))), []).append(path)
+            groups.setdefault(week_label(date.fromisoformat(m.group(1))), []).append(path)
         elif kind == "W":
             m = WEEKLY_RE.match(path.stem)
             if not m:
                 continue
-            d = date.fromisocalendar(int(m.group(2)), int(m.group(3)), 4)
+            d = date.fromisocalendar(int(m.group(1)), int(m.group(2)), 4)
             groups.setdefault(f"{d.year:04d}-{d.month:02d}", []).append(path)
         else:
             m = MONTHLY_RE.match(path.stem)
             if not m:
                 continue
-            groups.setdefault(m.group(2)[:4], []).append(path)
+            groups.setdefault(m.group(1)[:4], []).append(path)
     return groups
 
 
@@ -1285,9 +1249,7 @@ def cmd_merge(args) -> int:
             group_sorted = sorted(group)
             anchor = max((coverage_of(p) for p in group_sorted), key=lambda c: c[1])
             anchor_date = date.fromisoformat(anchor[1]) if anchor[1] else day
-            raw_children = [p for p in (raw_sibling(c) for c in group_sorted) if p.exists()]
-            merged += merge_family(root, "raw", kind, label, raw_children, anchor_date, dry)
-            merged += merge_family(root, "report", kind, label, group_sorted, anchor_date, dry)
+            merged += merge_family(root, kind, label, group_sorted, anchor_date, dry)
     if not merged:
         print("[dry-run] 无周期达到阈值，无需合并" if dry else "无需合并（无周期达到阈值）")
     return 0
@@ -1306,19 +1268,18 @@ def all_note_stems(root: Path):
     return stems
 
 
-def resolve_artifact(root: Path, day: date, family: str):
-    """Today's artifact: the daily, or the rolled-up file that now covers it."""
-    prefix = "TR-raw-" if family == "raw" else "TR-"
-    daily = root / "archives" / "work" / f"{prefix}D-{day.isoformat()}.md"
+def resolve_artifact(root: Path, day: date):
+    """Today's report: the daily, or the rolled-up file that now covers it."""
+    daily = root / "archives" / "work" / f"TR-D-{day.isoformat()}.md"
     if daily.exists():
         return daily, "D"
-    week = root / "archives" / "work" / f"{prefix}W-{week_label(day)}.md"
+    week = root / "archives" / "work" / f"TR-W-{week_label(day)}.md"
     if week.exists() and covers(week, day):
         return week, "W"
-    month = root / "archives" / "work" / f"{prefix}M-{week_month(day)}.md"
+    month = root / "archives" / "work" / f"TR-M-{week_month(day)}.md"
     if month.exists() and covers(month, day):
         return month, "M"
-    year = root / "archives" / "work" / f"{prefix}Y-{day.year:04d}.md"
+    year = root / "archives" / "work" / f"TR-Y-{day.year:04d}.md"
     if year.exists() and covers(year, day):
         return year, "Y"
     return daily, "D"
@@ -1335,63 +1296,18 @@ def cmd_verify(args) -> int:
     date_str = day.isoformat()
     problems, notes = [], []
 
-    raw_path, raw_kind = resolve_artifact(root, day, "raw")
-    if not raw_path.exists():
-        problems.append(f"缺原始清单 archives/TR-raw-*-{date_str}（当天件与滚动件均不存在）")
+    # provenance layer: the day's /tmp snapshot (candidate lists never enter the vault)
+    snap = snapshot_dir(date_str, Path(args.snapshot_dir) if args.snapshot_dir else None)
+    if not snap.exists():
+        problems.append(f"缺当日快照 {snap}（先跑 fetch）")
     else:
-        text = raw_path.read_text(encoding="utf-8")
-        if raw_kind == "D":
-            legacy_raw = day < LAYER_CUTOVER
-            sections = re.findall(r"^## (\S+) — (.+)$", text, re.M)
-            present = {sid for sid, _label in sections}
-            if len(sections) != len(SOURCES) and not legacy_raw:
-                problems.append(f"原始清单节数 {len(sections)} ≠ 源数 {len(SOURCES)}")
-            if legacy_raw:
-                notes.append(f"旧契约原始清单（< {LAYER_CUTOVER}）：{len(sections)} 节，"
-                             f"新增的 arXiv 桶/s2 不要求存在")
-            for sid, _label, _fn in SOURCES:
-                if legacy_raw and sid not in present:
-                    continue
-                block = re.search(rf"^## {re.escape(sid)} — [^\n]*\n(.*?)(?=^## |\Z)",
-                                  text, re.M | re.S)
-                if not block:
-                    problems.append(f"原始清单缺 {sid} 节")
-                    continue
-                body = block.group(1)
-                if "[未启用]" in body:
-                    reason = re.search(r"\[未启用\] (.+)", body)
-                    notes.append(f"{sid} 未启用：{reason.group(1) if reason else '未写明原因'}")
-                    continue
-                if "[降级]" in body:
-                    reason = re.search(r"\[降级\] 抓取失败：(.+)", body)
-                    if reason:
-                        notes.append(f"{sid} 降级：{reason.group(1)}")
-                    else:
-                        problems.append(f"{sid} 标了降级但未写原因")
-                    continue
-                n = len(parse_items_in(body))
-                floor = SECTION_FLOOR.get(sid, MIN_ITEMS)
-                if n < floor:
-                    problems.append(f"{sid} 条目 {n} < {floor}")
-                else:
-                    notes.append(f"{sid} {n} 条")
-            prov = re.search(r"URL 命中：(\d+)/(\d+)", text)
-            if not prov:
-                problems.append("原始清单缺 Provenance 命中率")
-            elif prov.group(1) != prov.group(2):
-                problems.append(f"Provenance 命中率不足：{prov.group(1)}/{prov.group(2)}")
-            else:
-                notes.append(f"provenance {prov.group(1)}/{prov.group(2)}")
+        n_urls = len(raw_sections(snap))
+        if not n_urls:
+            problems.append(f"快照缺候选池 {snapshot_list_path(snap)}")
         else:
-            n = len(parse_items(raw_path))
-            if n == 0:
-                problems.append(f"滚动原始件 {raw_path.name} 无条目")
-            elif n > MERGE_RAW_CAP:
-                problems.append(f"滚动原始件 {raw_path.name} 超过 {MERGE_RAW_CAP} 条上限（{n}）")
-            else:
-                notes.append(f"滚动原始件 {raw_path.name}（{n} 条，含 {date_str}）")
+            notes.append(f"快照 {snap.name}（{n_urls} 条 URL 可回溯到 API 字节流）")
 
-    rep_path, rep_kind = resolve_artifact(root, day, "report")
+    rep_path, rep_kind = resolve_artifact(root, day)
     if not rep_path.exists():
         problems.append(f"缺当日报告 archives/TR-*-{date_str}")
     else:
@@ -1422,7 +1338,7 @@ def cmd_verify(args) -> int:
             for layer in ("精选", "学术"):
                 if not legacy and not picked.get(layer):
                     problems.append(f"报告缺「{layer}」节或该节无条目")
-            sections = raw_sections(root, date_str) if raw_kind == "D" else {}
+            sections = raw_sections(snap)
             cited = {}
             for layer, rows in picked.items():
                 if layer == "Related":
@@ -1445,20 +1361,20 @@ def cmd_verify(args) -> int:
                         problems.append(f"报告精选节含学术源条目（{sid}）：{url}")
                     if layer == "学术":
                         cited[sid] = cited.get(sid, 0) + 1
-            if raw_kind == "D" and not legacy:
-                pool = pool_size(root, date_str)
+            if not legacy:
+                pool = pool_size(snap)
                 m = re.search(r"候选池 (\d+) 条.*?入选 (\d+) 条", rep_text)
                 if not m:
                     problems.append("报告缺「候选池 N / 入选 M」一行")
                 else:
                     n_pool, n_pick = int(m.group(1)), int(m.group(2))
                     if n_pool != pool:
-                        problems.append(f"报告候选池 {n_pool} ≠ 原始清单合计 {pool}")
+                        problems.append(f"报告候选池 {n_pool} ≠ 当日快照合计 {pool}")
                     if n_pick != len(lines):
                         problems.append(f"报告入选 {n_pick} ≠ 实际条目 {len(lines)}")
                     if n_pick > n_pool:
                         problems.append(f"报告入选 {n_pick} > 候选池 {n_pool}")
-                available = academic_available(root, date_str)
+                available = academic_available(snap)
                 if len(available) >= 2 and len(cited) < 2:
                     problems.append(f"报告学术节只用到 {len(cited)} 个学术源"
                                     f"（今日可用 {sorted(available)}），需 ≥2")
@@ -1472,8 +1388,7 @@ def cmd_verify(args) -> int:
             if not lines:
                 problems.append(f"滚动报告件 {rep_path.name} 无条目")
             notes.append(f"滚动报告件 {rep_path.name}（{len(lines)} 条，含 {date_str}）")
-        notes.append(f"报告 {len(lines)} 条（候选池 "
-                     f"{pool_size(root, date_str) if raw_kind == 'D' else '—'}）")
+        notes.append(f"报告 {len(lines)} 条（候选池 {pool_size(snap)}）")
 
     index_path = root / INDEX_REL
     if not index_path.exists():
@@ -1495,7 +1410,7 @@ def cmd_verify(args) -> int:
     for path in (root / "archives" / "work").glob("TR-D-*.md"):
         m = DAILY_RE.match(path.stem)
         if m:
-            label = week_label(date.fromisoformat(m.group(2)))
+            label = week_label(date.fromisoformat(m.group(1)))
             week_counts[label] = week_counts.get(label, 0) + 1
     for label, n in sorted(week_counts.items()):
         if n >= THRESHOLD["W"]:
@@ -1573,10 +1488,9 @@ def prov_candidates(url: str):
     return {c for c in cands if c}
 
 
-def snapshot_recheck(root: Path, day: date, snap: Path) -> list:
-    """Re-assert every raw-list URL against the retained API snapshot bytes."""
-    raw_path = root / "archives" / "work" / f"TR-raw-D-{day.isoformat()}.md"
-    text = raw_path.read_text(encoding="utf-8")
+def snapshot_recheck(day: date, snap: Path) -> list:
+    """Re-assert every candidate-pool URL against the retained API snapshot bytes."""
+    text = snapshot_list_path(snap).read_text(encoding="utf-8")
     bad = []
     for sid, _label, _fn in SOURCES:
         block = re.search(rf"^## {re.escape(sid)} — [^\n]*\n(.*?)(?=^## |\Z)", text, re.M | re.S)
@@ -1594,26 +1508,24 @@ def cmd_run(args) -> int:
     root = Path(args.vault).resolve()
     date_str = args.date.isoformat()
     snap = snapshot_dir(date_str, Path(args.snapshot_dir) if args.snapshot_dir else None)
-    if not (root / "archives" / "work" / f"TR-raw-D-{date_str}.md").exists():
-        print("ERROR: 当天还没有原始清单，先跑 `trend_radar.py fetch`")
+    if not snap.exists():
+        print("ERROR: 当天还没有快照，先跑 `trend_radar.py fetch`")
         return 2
-    if snap.exists():
-        bad = snapshot_recheck(root, args.date, snap)
-        if bad:
-            print("ERROR: 快照复核失败（原始清单条目未在快照中命中）：")
-            for b in bad[:10]:
-                print(f"  - {b}")
-            return 1
-        print(f"快照复核通过（每条 URL 命中对应源快照字节流）")
-    else:
-        print(f"提示：快照目录不存在（{snap}），跳过在线复核")
+    bad = snapshot_recheck(args.date, snap)
+    if bad:
+        print("ERROR: 快照复核失败（候选池条目未在快照中命中）：")
+        for b in bad[:10]:
+            print(f"  - {b}")
+        return 1
+    print("快照复核通过（每条 URL 命中对应源快照字节流）")
     rc = cmd_report(argparse.Namespace(vault=str(root), date=args.date, items=args.items,
-                                       force=True))
+                                       force=True, snapshot_dir=args.snapshot_dir))
     if rc:
         return rc
     cmd_merge(argparse.Namespace(vault=str(root), date=args.date, dry_run=False))
     write_index(root, args.date, quiet=True)      # merge may have folded today's daily away
-    rc = cmd_verify(argparse.Namespace(vault=str(root), date=args.date))
+    rc = cmd_verify(argparse.Namespace(vault=str(root), date=args.date,
+                                       snapshot_dir=args.snapshot_dir))
     if args.purge:
         purge_snapshots(snap)
     return rc
