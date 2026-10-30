@@ -1,5 +1,7 @@
 # Agent Contract
 
+> 版本：v6（2026-10-30）。
+
 Self-contained handover contract for an AI (or a new human) with **zero history**.
 If you read only this file plus run `python3 tools/vault.py status --json`, you can
 take over correctly. Deeper why: [[Vault Design]]; operational procedures:

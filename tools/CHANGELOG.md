@@ -1,9 +1,22 @@
 # Changelog
 
-## v6.0.0 (unreleased)
+## v6.0.0 (2026-10-30)
 
 In-place overhaul of the vault tooling and doctrine, phased P0–P9 (plan slug
 `vault-overhaul-plan`, proposal `a_sticker/or/vault-overhaul-plan.md`).
+Measured before → after (details: `tools/migrations/baseline-v6.md`):
+
+| metric | v5 | v6.0.0 |
+|---|---|---|
+| `vault.py status` wall time | 17.0 s | ~0.5 s |
+| tests | 0 | 55 (pytest + fixture vault) |
+| CI | none | `.github/workflows/ci.yml` |
+| zones/genres/thresholds defined in code | 3 copies | 1 (`tools/vault.toml`) |
+| material notes without `source:` | 49 | 0 (49 carry an honest `未记录` marker, counted by I9) |
+| retired-tag files | 20 | 0 |
+| registration queue | 500 | 392 |
+| trunk model | tree | DAG (registration is an edge) |
+| raw candidate lists in the repo | one file per day | none (`/tmp` snapshot only) |
 
 - **P0** — baseline frozen at tag `v6-start` (`tools/migrations/baseline-v6.md`).
 - **P1** — trend radar stops persisting raw candidate lists: the pool lives only
@@ -14,16 +27,30 @@ In-place overhaul of the vault tooling and doctrine, phased P0–P9 (plan slug
   with `tools/vault.toml` as the single home for zones, genres, thresholds and
   baselines; `tools/vault.py` is a thin entry point; one parser, one graph per
   process; pytest suite + fixtures + GitHub Actions CI.
-- **P3** — performance and honest failure: one batched git pass, graph built
-  once, explicit missing-config errors, `rawindex --sync` dry-run by default,
-  `TR_SNAPSHOT_DIR`.
+- **P3** — performance and honest failure: one batched git pass (was ~948
+  subprocesses), graph built once, explicit missing-config errors, `rawindex
+  --sync` dry-run by default, `TR_SNAPSHOT_DIR`.
 - **P4** — rule registry shared by `check` and `rawindex --check`; I1 split into
-  I1a/I1b/I1c; I4 zone exclusion enforced; G3 scan scope stated.
-- **P5** — trunk semantics tree → DAG: registration is an edge (multi-parent
-  legal), cycles are the invariant.
-- **P6** — learning mechanisms I5–I8 + the 计组 scaffold (owner fills prose).
-- **P7** — servicization: `doctrine/Agent Contract.md`, `--json`, `help <topic>`,
-  `random`, `suggest`, template ruling, skill dedup, 心法, decision ledger.
+  I1a 未登记 / I1b 重复登记边 / I1c Raw Index 环; I4's doctrine/Raw exclusion is
+  real in the binding-neighbour graph; G3 states its scan scope; exit-code matrix
+  in `--help`.
+- **P5** — trunk semantics tree → DAG: a Node needs ≥1 registration edge, the
+  same `(Raw Index, Node)` pair may not repeat, multi-parent is legal, and the
+  `Raw Index → Raw Index` subgraph must stay acyclic.
+- **P6** — learning mechanisms I5 (`## Mapping`) / I6 (`## 实例化`) /
+  I7 (学科 `## 时间轴`) / I8 (挂点覆盖率) + the 计组 scaffold (empty tables and
+  six invariant Node skeletons; owner fills the prose).
+- **P7** — servicization: `doctrine/Agent Contract.md`, `--json` on every
+  subcommand, `help <topic>`, `random`, `suggest`, the template ruling
+  (「工具不依赖模板；模板是可选脚手架」), SKILL dedup with `--help` as the single
+  source of constants, 心法, decision ledger D30–D37.
 - **P8** — content cleanup: source backfill + I9, `Raw Index of Root`, obsolete
-  proposal banners, retired-tag removal, history folder, registration campaign.
-- **P9** — finalize.
+  proposal banners, retired-tag removal, `archives/work/history/`, the
+  `Index of  Traditional CS` rename, and one owner-confirmed registration round
+  (108 Nodes into 5 existing + 2 new Raw Indexes).
+- **P9** — finalize: full pass, version markers, tag `v6.0.0`.
+
+Known limitations (documented in `doctrine/Agent Contract.md`): the rhythm line
+and todo aging are mtime proxies (a fresh clone reads 今天); a moved file has no
+first-commit entry, so it is never mistaken for a fresh note; `zzz_output/Root.md`
+still needs the owner's `[[Raw Index of Root]]` line.
