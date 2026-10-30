@@ -78,3 +78,53 @@ def test_iter_notes_skips_directories(tmp_path):
     (tmp_path / "keep" / "a.md").write_text("a", encoding="utf-8")
     (tmp_path / "skip" / "b.md").write_text("b", encoding="utf-8")
     assert [p.name for p in parse.iter_notes(tmp_path, {"skip"})] == ["a.md"]
+
+
+SECTIONS = """# Note
+
+## 时间轴
+
+| 世代 | 年份 |
+|---|---|
+| 一 | 1950 |
+
+## 地图
+
+| 挂点 | 合同 |
+|---|---|
+| [[Node A]] | ISA |
+
+## Mapping
+
+| 实例 | 章节 |
+|---|---|
+| [[Node B]] | ch4 |
+| [[Node C]] | ch5 |
+
+```cpp
+## 地图
+[[Not A Link]]
+```
+"""
+
+
+def test_section_lines_distinguishes_missing_from_empty():
+    assert parse.section_lines(SECTIONS, "时间轴") is not None
+    assert parse.section_lines(SECTIONS, "地图") is not None
+    assert parse.section_lines(SECTIONS, "不存在") is None
+
+
+def test_table_rows_counts_body_only():
+    assert parse.table_rows(SECTIONS, "时间轴") == 1
+    assert parse.table_rows(SECTIONS, "地图") == 1
+    assert parse.table_rows(SECTIONS, "Mapping") == 2
+    assert parse.table_rows(SECTIONS, "不存在") is None
+    assert parse.table_rows("## 实例化\n\n| a | b |\n|---|---|\n", "实例化") == 0
+
+
+def test_section_links_stays_inside_the_section_and_skips_fences():
+    links = parse.section_links(SECTIONS, "地图")
+    assert [link.target for link in links] == ["Node A"]
+    assert [link.target for link in parse.section_links(SECTIONS, "Mapping")] == ["Node B",
+                                                                                  "Node C"]
+    assert parse.section_links(SECTIONS, "不存在") == []

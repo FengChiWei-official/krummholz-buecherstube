@@ -166,7 +166,41 @@ def test_sync_apply_writes_member_list(vault):
         encoding="utf-8") == text
 
 
-def test_strict_exits_2_on_missing_list_file(vault):
+def test_learning_mechanism_rules(vault):
+    """I5–I8 count from 0 and follow the sections the owner adds."""
+    idx = vault / "library" / "Index" / "Index of Alpha Area.md"
+    idx.write_text(idx.read_text(encoding="utf-8")
+                   + "\n## 时间轴\n\n| 世代 | 年份 | 代表 |\n|---|---|---|\n| 一 | 1950 | — |\n"
+                   + "\n## 地图\n\n| 挂点 | 合同 |\n|---|---|\n| [[Node A]] | ISA |\n",
+                   encoding="utf-8")
+    node_b = vault / "library" / "B_fold" / "Node B.md"
+    node_b.write_text(node_b.read_text(encoding="utf-8")
+                      + "\n## Mapping\n\n| 实例 | 章节 |\n|---|---|\n| [[Node A]] | ch4 |\n",
+                      encoding="utf-8")
+    node_zero = vault / "library" / "A_fold" / "Node Zero.md"
+    node_zero.write_text(node_zero.read_text(encoding="utf-8")
+                         + "\n## 实例化\n\n| 实例 | 章节 |\n|---|---|\n",
+                         encoding="utf-8")
+
+    proc = run_vault(vault, "check")
+    assert "Mapping 不足 2 行的笔记: 1" in proc.stdout
+    assert "library/B_fold/Node B.md: ## Mapping 只有 1 行 (<2)" in proc.stdout
+    assert "实例化 不足 2 行的笔记: 1" in proc.stdout
+    assert "library/A_fold/Node Zero.md: ## 实例化 只有 0 行 (<2)" in proc.stdout
+    assert "时间轴 未达标的学科 Index: 1" in proc.stdout
+    assert "Index of Alpha Area: ## 时间轴 只有 1 行 (<2)" in proc.stdout
+    # I8: Node A is a 地图 anchor, Node Shared reaches it, so coverage is full.
+    assert "挂点覆盖率: 2/2 (100%) — 学科 Index 1 个" in proc.stdout
+    assert "Index of Alpha Area: 2/2 (100%)" in proc.stdout
+
+
+def test_learning_rules_are_quiet_without_the_sections(vault):
+    proc = run_vault(vault, "check")
+    assert "Mapping 不足 2 行的笔记: 0" in proc.stdout
+    assert "实例化 不足 2 行的笔记: 0" in proc.stdout
+    assert "时间轴 未达标的学科 Index: 0" in proc.stdout
+    assert "挂点覆盖率: 0/0 (0%) — 学科 Index 0 个" in proc.stdout
+
     lenient = run_vault(vault, "check")
     assert lenient.returncode == 1                      # only the seeded G2 violation
     assert "WARNING: missing config" in lenient.stderr

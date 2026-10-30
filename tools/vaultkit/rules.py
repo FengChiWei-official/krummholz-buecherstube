@@ -188,6 +188,92 @@ def rule_material(ctx: Context) -> list:
     return lines
 
 
+# ------------------------------------------------- learning mechanisms (I5–I8)
+
+
+def _section_rows(ctx: Context, path, heading):
+    """(rows, present) for one section of one note."""
+    rows = parse.table_rows(ctx.graph.notes[path], heading)
+    return rows, rows is not None
+
+
+def rule_i5(ctx: Context) -> list:
+    """I5: a note that carries `## Mapping` needs ≥2 table rows in it."""
+    out = []
+    for p in sorted(ctx.graph.notes, key=lambda q: q.stem):
+        rows, present = _section_rows(ctx, p, "Mapping")
+        if present and rows < 2:
+            out.append(f"{ctx.rel(p)}: ## Mapping 只有 {rows} 行 (<2)")
+    return [f"Mapping 不足 2 行的笔记: {len(out)}"] + out
+
+
+def rule_i6(ctx: Context) -> list:
+    """I6: a note that carries `## 实例化` needs ≥2 table rows in it."""
+    out = []
+    for p in sorted(ctx.graph.notes, key=lambda q: q.stem):
+        rows, present = _section_rows(ctx, p, "实例化")
+        if present and rows < 2:
+            out.append(f"{ctx.rel(p)}: ## 实例化 只有 {rows} 行 (<2)")
+    return [f"实例化 不足 2 行的笔记: {len(out)}"] + out
+
+
+def subject_indexes(ctx: Context) -> list:
+    """学科 Index = an Index note that has adopted the learning-mechanism shape.
+
+    Opt-in by section: a note is treated as a 学科 index once it carries
+    `## 地图` or `## 时间轴`, so the rule counts from 0 instead of flagging
+    every one of the ~39 Index notes.
+    """
+    g = ctx.graph
+    out = []
+    for idx in sorted(g.idxs, key=lambda p: p.stem):
+        text = g.notes[idx]
+        if parse.section_lines(text, "地图") is None \
+                and parse.section_lines(text, "时间轴") is None:
+            continue
+        out.append(idx)
+    return out
+
+
+def rule_i7(ctx: Context) -> list:
+    """I7: a 学科 Index needs `## 时间轴` with ≥2 generational rows."""
+    out = []
+    for idx in subject_indexes(ctx):
+        rows = parse.table_rows(ctx.graph.notes[idx], "时间轴")
+        if rows is None:
+            out.append(f"{idx.stem}: 缺 ## 时间轴")
+        elif rows < 2:
+            out.append(f"{idx.stem}: ## 时间轴 只有 {rows} 行 (<2)")
+    return [f"时间轴 未达标的学科 Index: {len(out)}"] + out
+
+
+def rule_i8(ctx: Context) -> list:
+    """I8: 挂点覆盖率 — how many of a 学科 Index's Nodes hang off a `## 地图` node.
+
+    Members = the Nodes the Index links to (its semantic membership); a member
+    counts as attached when it *is* one of the `## 地图` 挂点 or links to one.
+    Report-level coverage only (increment, never a gate): it measures whether
+    the 整体层 map is being grown, not whether today's number is good.
+    """
+    g = ctx.graph
+    node_set = set(g.nodes)
+    lines = []
+    total_attached = total_members = 0
+    for idx in subject_indexes(ctx):
+        anchors = {g.resolve(link.target)
+                   for link in parse.section_links(g.notes[idx], "地图")}
+        anchors = {a for a in anchors if a in node_set}
+        members = {n for n in g.out[idx] if n in node_set}
+        attached = {n for n in members if n in anchors or (g.out[n] & anchors)}
+        total_attached += len(attached)
+        total_members += len(members)
+        pct = len(attached) * 100 // len(members) if members else 0
+        lines.append(f"{idx.stem}: {len(attached)}/{len(members)} ({pct}%)")
+    pct = total_attached * 100 // total_members if total_members else 0
+    return [f"挂点覆盖率: {total_attached}/{total_members} ({pct}%) — "
+            f"学科 Index {len(lines)} 个"] + lines
+
+
 RULES = [
     Rule("G1", "hard", "G1 root drained (hard gate)", rule_g1),
     Rule("G2", "hard", "G2 archives/material/ has real source (hard gate)", rule_g2),
@@ -206,5 +292,13 @@ RULES = [
     Rule("I3", "report", "I3 Node ≥1 出链 (report: weekly increment)", rule_i3,
          short="I3 Node 必须 >=1 条出链（捕获规则）"),
     Rule("I4", "report", "I4 doctrine/Raw 不做绑定邻居 (report)", rule_i4),
+    Rule("I5", "report", "I5 ## Mapping ≥2 行 (report: 学习机制)", rule_i5,
+         short="I5 ## Mapping 表格 ≥2 行"),
+    Rule("I6", "report", "I6 ## 实例化 ≥2 行 (report: 学习机制)", rule_i6,
+         short="I6 ## 实例化 表格 ≥2 行"),
+    Rule("I7", "report", "I7 学科 Index ## 时间轴 ≥2 行 (report: 学习机制)", rule_i7,
+         short="I7 学科 Index 的 ## 时间轴 ≥2 行"),
+    Rule("I8", "report", "I8 挂点覆盖率 (report: 学习机制, 只报增量)", rule_i8,
+         short="I8 挂点覆盖率"),
     Rule("D21", "report", None, rule_material, short="材料 出链=已拆 (D21)"),
 ]

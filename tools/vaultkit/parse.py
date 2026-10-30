@@ -94,6 +94,78 @@ def is_image_embed(target: str) -> bool:
     return target.lower().endswith(_IMAGE_SUFFIXES)
 
 
+_HEADING_RE = re.compile(r"^#{1,6}\s+(\S.*?)\s*$")
+_TABLE_SEPARATOR_RE = re.compile(r"^\|[\s:|-]+\|$")
+
+
+def section_lines(text: str, heading: str):
+    """Raw lines under the first `#… heading`, up to the next heading.
+
+    Headings inside fenced code blocks do not open or close a section, so a
+    fenced example never leaks into the real section's body. Returns None when
+    the heading is absent — callers use that to tell "section missing" from
+    "section present but empty".
+    """
+    out = None
+    capture = False
+    fence = None
+    for line in text.splitlines():
+        stripped = line.lstrip()
+        marker = stripped[:3]
+        if marker in ("```", "~~~"):
+            fence = None if fence == marker else (fence or marker)
+            if capture:
+                out.append(line)
+            continue
+        if fence is None:
+            match = _HEADING_RE.match(line)
+            if match:
+                capture = match.group(1).strip() == heading
+                if capture and out is None:
+                    out = []
+                continue
+        if capture:
+            out.append(line)
+    return out
+
+
+def section_links(text: str, heading: str) -> list:
+    """[[...]] links inside one section, with section-relative line numbers."""
+    lines = section_lines(text, heading)
+    if lines is None:
+        return []
+    body = _strip_fences("\n".join(lines))
+    out = []
+    for line_no, line in enumerate(body.splitlines(), start=1):
+        line = _INLINE_CODE_RE.sub("", line)
+        for match in _WIKILINK_RE.finditer(line):
+            alias = (match.group(3) or "")[1:].strip() or None
+            out.append(Link(match.group(2), alias, line_no))
+    return out
+
+
+def table_rows(text: str, heading: str):
+    """Body rows of the markdown table under `heading`; None when absent.
+
+    Header row and separator are not counted, so an empty table is 0.
+    """
+    lines = section_lines(text, heading)
+    if lines is None:
+        return None
+    rows = 0
+    seen_separator = False
+    for line in lines:
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            continue
+        if _TABLE_SEPARATOR_RE.match(stripped):
+            seen_separator = True
+            continue
+        if seen_separator:
+            rows += 1
+    return rows
+
+
 def alias_map(texts: dict) -> dict:
     """{alias: note Path} — Obsidian resolves wikilinks through `aliases:`."""
     out: dict = {}
