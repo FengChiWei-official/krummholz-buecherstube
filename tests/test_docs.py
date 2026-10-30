@@ -122,6 +122,7 @@ BARE = {
     "check": (),
     "docs-check": (),
     "help": ("rawindex",),
+    "links-candidates": ("Node",),
     "new": ("Fresh Note",),
     "place": ("Node A",),
     "random": (),

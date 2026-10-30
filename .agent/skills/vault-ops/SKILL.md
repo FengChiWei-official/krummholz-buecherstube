@@ -18,7 +18,7 @@ Read in this order before acting:
 5. `doctrine/Vault Workflow.md` — the 3 verbs + 1 loop, S1–S10, 心法
 6. `doctrine/Vault Extension.md` — 改系统 / 改文档前读 §同步面（`doctrine/New Machine.md` 面向 owner 装配，不在 AI 载入序）
 
-Inline help: `python3 tools/vault.py help <topic>` for `check` / `status` / `triage` / `rawindex` / `dag` / `links` / `random` / `suggest` / `docs-check` / `rename` / `new` / `place`.
+Inline help: `python3 tools/vault.py help <topic>` for `check` / `status` / `triage` / `rawindex` / `dag` / `links` / `random` / `suggest` / `docs-check` / `rename` / `new` / `place` / `links-candidates`.
 
 ## Session entry
 
@@ -55,6 +55,15 @@ At capture time (S2): give 3 candidate links with a why-line each (`python3 tool
 ### Material extraction state (D21)
 
 `rawindex --check` reports zero-outlink material = 未拆. A material note with outbound links to Nodes has been 拆过 — the links are the state, there is no status field.
+
+### Building a Links card
+
+A Links card is one concept seen from several angles and **must cross ≥2 Index areas** (`Links of*` → `library/Links/`, genre by name).
+
+1. `python3 tools/vault.py links-candidates "<topic>"` — seeds are notes whose name or alias contains the topic; members come grouped by Index area, each with its evidence (名字含 / 链到种子 / 同登记 / 同区域 / 共同邻居, the counterparts named). Structural notes (Raw Index / Index / Links / doctrine) are mediators, not members, and are excluded with a count.
+2. If it reports fewer than 2 areas, the card is not a Links card yet — add members from the missing side first.
+3. Owner writes the card name and the commonality sentence (D16); the sentence must rest on the evidence printed in step 1.
+4. Create it: `python3 tools/vault.py new "Links of X and Y" --zone library`, then fill it from the member list. `Node↔Node` links inside the card change meaning → owner approval (Agent Contract §4).
 
 ### Note feels lost / can't find related
 

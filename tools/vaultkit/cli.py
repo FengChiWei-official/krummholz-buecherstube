@@ -364,6 +364,173 @@ def cmd_place(cfg: Config, g: model.Graph, args) -> int:
     return 0 if data["found"] else 1
 
 
+# ---------------------------------------------------------------- links-candidates
+
+
+def _area_names(g, path) -> set:
+    return {i.stem for i in g.area.get(path, ())}
+
+
+def _raw_names(g, path) -> set:
+    return {r.stem for r in g.reg.get(path, ())}
+
+
+def _links_evidence(g, nbr, path, seed, topic) -> tuple:
+    """(score, why) — how strongly `path` belongs on a Links card seeded by `seed`.
+
+    Evidence is graded, because a bare shared Index area is nearly meaningless in
+    a large area: name/alias hit 3, a link to or from the seed 2, a shared Raw
+    Index registration 2, a shared binding neighbour 1, a bare shared area 0
+    (reported but never a membership reason).
+    """
+    low = topic.strip().lower()
+    if low and (low in path.stem.lower()
+                or any(low in a.lower() for a in _aliases_of(g, path))):
+        return 3, f"名字含 `{topic}`"
+    if seed is not None:
+        if seed in g.out.get(path, ()):
+            return 2, f"链到种子 [[{seed.stem}]]"
+        if path in g.out.get(seed, ()):
+            return 2, f"被种子 [[{seed.stem}]] 链"
+        shared_raw = _raw_names(g, path) & _raw_names(g, seed)
+        if shared_raw:
+            return 2, f"同登记: {sorted(shared_raw)[0]}"
+        shared = nbr.get(path, set()) & nbr.get(seed, set())
+        if shared:
+            names = " / ".join(p.stem for p in sorted(shared, key=lambda p: p.stem)[:3])
+            return 1, f"共同邻居 {len(shared)}: {names}"
+        shared_area = _area_names(g, path) & _area_names(g, seed)
+        if shared_area:
+            return 0, f"仅同区域: {sorted(shared_area)[0]}"
+    return -1, ""
+
+
+def _aliases_of(g, path) -> list:
+    return sorted(a for a, p in g.aliases.items() if p == path)
+
+
+def collect_links_candidates(cfg: Config, g: model.Graph, topic: str, n: int = 12) -> dict:
+    """Candidate members of a Links card about `topic`, grouped by Index area.
+
+    Doctrine: a Links card is one concept seen from several angles and must cross
+    ≥2 Index areas. The tool proposes the member list and the shared evidence per
+    member; the name and the commonality sentence stay the owner's (D16).
+    """
+    data = {"command": "links-candidates", "topic": topic, "found": False,
+            "did_you_mean": [], "seeds": [], "areas": [], "groups": [],
+            "members": [], "area_count": 0, "crosses_areas": False,
+            "card_name_candidates": [], "warnings": []}
+    low = topic.strip().lower()
+    if not low:
+        data["warnings"].append("主题为空")
+        return data
+
+    seeds = sorted((p for p in g.notes
+                    if low in p.stem.lower() or any(low in a.lower() for a in _aliases_of(g, p))),
+                   key=lambda p: p.stem)
+    if not seeds:
+        data["did_you_mean"] = sorted(
+            {s for s in g.stems if low[:3] in s.lower()}
+            | {a for a in g.aliases if low[:3] in a.lower()})[:10]
+        data["warnings"].append(f"没有名字或别名含 `{topic}` 的笔记——用 `vault.py retrieve \"{topic}\"` "
+                               "做整库检索，或换一个主题词")
+        return data
+    data["found"] = True
+    data["seeds"] = [p.stem for p in seeds]
+
+    nbr = g.binding_neighbors()
+    seed_paths = set(seeds)
+    scored: dict = {}
+    for seed in seeds:
+        scored[seed] = _links_evidence(g, nbr, seed, None, topic)
+        for q in (g.out.get(seed, set()) | {p for p, qs in g.out.items() if seed in qs}):
+            scored[q] = max(scored.get(q, (-1, "")), _links_evidence(g, nbr, q, seed, topic))
+        for q in g.notes:
+            if q in scored:
+                continue
+            hit = _links_evidence(g, nbr, q, seed, topic)
+            if hit[0] > 0:
+                scored[q] = hit
+
+    members, weak, structural = [], 0, 0
+    for path, (score, why) in scored.items():
+        if score < 2:
+            weak += 1          # a bare shared neighbour, or a bare shared area
+            continue
+        role = _role_of(g, cfg, path)
+        if role in ("raw", "index", "links", "doctrine"):
+            structural += 1
+            continue  # a Links card links concepts, not the trees themselves
+        members.append({"note": path.stem, "path": g.rel(path), "why": why, "score": score,
+                        "role": role, "areas": sorted(_area_names(g, path)),
+                        "seed": path in seed_paths})
+    members.sort(key=lambda m: (not m["seed"], -m["score"], m["note"]))
+    data["members"] = members[:n]
+    data["member_total"] = len(members)
+    if weak:
+        data["warnings"].append(f"另有 {weak} 篇证据太弱（只共享邻居或区域，不算成员）——"
+                                "它们可能是下一层")
+    if structural:
+        data["warnings"].append(f"另有 {structural} 篇结构笔记（Raw Index / Index / Links / doctrine）"
+                                "是关系的中介，不是成员——已排除")
+    if len(members) > n:
+        data["warnings"].append(f"候选 {len(members)} 篇，只列前 {n} 篇（--n 可调）")
+
+    areas: dict = collections.defaultdict(list)
+    for member in data["members"]:
+        for area in member["areas"] or ["(无区域)"]:
+            areas[area].append(member)
+    data["groups"] = [{"area": area, "members": sorted(ms, key=lambda m: m["note"])}
+                      for area, ms in sorted(areas.items())]
+    data["areas"] = sorted(a for a in areas if a != "(无区域)")
+    data["area_count"] = len(data["areas"])
+    data["crosses_areas"] = data["area_count"] >= 2
+    if not data["crosses_areas"]:
+        data["warnings"].append(f"只覆盖 {data['area_count']} 个 Index 区域——"
+                                "Links 卡必须横跨 ≥2 个区域（先补另一侧的成员）")
+    top = [m["note"] for m in data["members"] if m["seed"]][:2] or data["seeds"][:2]
+    if len(top) == 2:
+        data["card_name_candidates"] = [f"Links of {top[0]} and {top[1]}",
+                                        f"Links of {topic}"]
+    if not data["areas"]:
+        data["warnings"].append("没有任何成员落在 Index 区域里——Links 卡要先有 ≥2 个区域")
+    data["warnings"].append("卡片名与共性句由你写（D16）；共性句必须基于上面的共同证据")
+    return data
+
+
+def _render_links_candidates(cfg: Config, data: dict) -> None:
+    print(f"# vault links-candidates — \"{data['topic']}\"")
+    if not data["found"]:
+        for warning in data["warnings"]:
+            print(f"  ⚠ {warning}")
+        if data["did_you_mean"]:
+            print("  相近的名字: " + " / ".join(data["did_you_mean"]))
+        return
+    print(f"  种子（名字/别名命中）: {', '.join(data['seeds'][:8])}")
+    print(f"  覆盖区域 {data['area_count']}: "
+          f"{', '.join(data['areas']) if data['areas'] else '(无)'}")
+    print(f"  成员 {len(data['members'])} 篇（按区域分组；跨区域的成员会在多个区域下重复出现）:")
+    for group in data["groups"]:
+        print(f"    [{group['area']}] {len(group['members'])} 篇")
+        for member in group["members"]:
+            mark = "  ★种子" if member["seed"] else ""
+            print(f"      [[{member['note']}]] — {member['why']}{mark}")
+    if data["card_name_candidates"]:
+        print(f"  卡片名候选（D16，最终你定）: {data['card_name_candidates'][0]}")
+    for warning in data["warnings"]:
+        print(f"  ⚠ {warning}")
+
+
+def cmd_links_candidates(cfg: Config, g: model.Graph, args) -> int:
+    """Member candidates for a Links card about one topic (read-only)."""
+    data = collect_links_candidates(cfg, g, args.topic, n=args.n)
+    if wants_json(args):
+        emit_json(data)
+        return 0 if data["found"] else 1
+    _render_links_candidates(cfg, data)
+    return 0 if data["found"] else 1
+
+
 # ---------------------------------------------------------------- random / suggest
 
 
@@ -1599,6 +1766,26 @@ moves (each with a copy-pasteable command).
 
 On a fresh clone the rhythm line reads 今天 — it takes the max of git commit
 time and mtime, and a checkout refreshes mtime. Known limitation, not a signal.""",
+    "links-candidates": """links-candidates — members for a Links card about one topic
+
+    python3 tools/vault.py links-candidates TOPIC [--n 12] [--json]
+
+A Links card is one concept seen from several angles, and doctrine requires it
+to cross ≥2 Index areas. This proposes the member list, grouped by area, with
+the evidence for each member named:
+
+  种子               notes whose name or alias contains TOPIC (the seed set)
+  覆盖区域 / 成员     members grouped by Index area, each with a why-line:
+                     name hit · 链到/被种子链 · 同登记 (shared Raw Index) ·
+                     同区域 (shared Index area) · 共同邻居 (shared neighbours,
+                     named) · ★种子
+  卡片名候选          `Links of X and Y` (D16: the name and the commonality
+                     sentence are yours — the sentence must rest on the evidence
+                     printed above)
+  ⚠                  fewer than 2 areas covered → not a Links card yet
+
+Read-only. No seed found → exit 1, with the pointer to `retrieve` for a
+whole-vault search instead of a name match.""",
     "place": """place — where a note sits in the relation graph (read-only)
 
     python3 tools/vault.py place NAME [--json]
@@ -1803,7 +1990,7 @@ def build_parser() -> argparse.ArgumentParser:
                 "a refused rename or new, or a docs-sync violation under docs-check --gate; "
                 "2 = missing/unreadable config (or a missing list file under --strict). "
                 "Topics: `vault.py help check|status|triage|rawindex|dag|links|random|suggest"
-                "|docs-check|rename|new|place`."),
+                "|docs-check|rename|new|place|links-candidates`."),
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--strict", action="store_true", default=argparse.SUPPRESS,
                         help="missing config / list files are fatal (exit 2), not warnings")
@@ -1841,6 +2028,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_place = sub.add_parser("place", parents=[common],
                              help="where a note sits in the relation graph (read-only)")
     p_place.add_argument("name", help="note name or alias")
+
+    p_lc = sub.add_parser("links-candidates", parents=[common],
+                          help="member candidates for a Links card about one topic")
+    p_lc.add_argument("topic", help="topic word, or a note name/alias to seed from")
+    p_lc.add_argument("--n", type=int, default=12, help="members to list (default 12)")
 
     p_new = sub.add_parser("new", parents=[common],
                            help="create a note from a scaffold, placed by zone (dry-run)")
@@ -1913,6 +2105,8 @@ def main(argv=None) -> int:
         return cmd_new(cfg, g, args)
     if args.command == "place":
         return cmd_place(cfg, g, args)
+    if args.command == "links-candidates":
+        return cmd_links_candidates(cfg, g, args)
     return cmd_rawindex(cfg, g, args)
 
 
