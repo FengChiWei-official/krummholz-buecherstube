@@ -21,6 +21,7 @@ take over correctly. Deeper why: [[Vault Design]]; operational procedures:
 | `python3 tools/vault.py rawindex [...]` | trunk operations: queue + L0 归队 / `--clusters` / `--check` / `--sync` |
 | `python3 tools/vault.py place NAME` | one note's position in the relation graph: registration edges, 归队提议 with the voting evidence, areas, links, link candidates (read-only) |
 | `python3 tools/vault.py links-candidates TOPIC` | member candidates for a Links card: seeds by name/alias, members grouped by Index area with the evidence each, and whether it crosses ≥2 areas (read-only) |
+| `python3 tools/vault.py index-candidates RAW_INDEX` | candidate card table for an Index: the Raw Index's members clustered by shared neighbours, with the evidence, a draft commonality sentence and draft Index names (read-only) |
 | `python3 tools/vault.py random [--scope …] [--seed N]` | 问箱 material (S9): one note + its backlinks |
 | `python3 tools/vault.py suggest NAME [--n 3]` | candidate links for a note, one why-line each (S2) |
 | `python3 tools/vault.py rename OLD NEW [--apply]` | rename a note + cascade every inbound wikilink (dry-run; refuses a name collision, a path separator, a root contract file, and a file inside `zzz_output/`) |

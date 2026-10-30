@@ -531,6 +531,168 @@ def cmd_links_candidates(cfg: Config, g: model.Graph, args) -> int:
     return 0 if data["found"] else 1
 
 
+# ---------------------------------------------------------------- index-candidates
+
+
+_STOP_TOKENS = {"the", "of", "and", "in", "to", "a", "an", "with", "for", "on",
+                "index", "links", "raw", "moc"}
+
+
+def _name_tokens(stem: str) -> list:
+    """Distinctive tokens of a note name (`BFS & DFS with Cycles` → BFS, DFS, Cycles).
+
+    Genre words are dropped: a token that only says "index" or "raw" says nothing
+    about what the cluster is about.
+    """
+    raw = re.split(r"[^0-9A-Za-z\u4e00-\u9fff]+", stem)
+    return [t for t in raw if len(t) > 2 and t.lower() not in _STOP_TOKENS and not t.isdigit()]
+
+
+def _index_name_candidates(g, members: list, evidence: list) -> list:
+    """Suggested Index names — a draft; the owner picks (D16).
+
+    Spellings come from the notes themselves (`DFS`, not `Dfs`), and an evidence
+    note too long to be a name is skipped rather than pasted in.
+    """
+    counts: dict = collections.Counter()
+    spellings: dict = {}
+    for stem in members:
+        for token in _name_tokens(stem):
+            counts[token.lower()] += 1
+            spellings.setdefault(token.lower(), token)
+    shared = [t for t, n in counts.most_common() if n >= 2]
+    out = [f"Index of {spellings[shared[0]]}"] if shared else []
+    structural = {p.stem for p in (*g.raws, *g.idxs, *g.linksn)}
+    for item in evidence:
+        if item["note"] not in structural and len(item["note"]) <= 30:
+            out.append(f"Index of {item['note']}")
+            break
+    return out[:2]
+
+
+def collect_index_candidates(cfg: Config, g: model.Graph, name: str, n: int = 8) -> dict:
+    """A candidate card table for building an Index out of one Raw Index.
+
+    Doctrine (D10-P3): the coarse Raw Index stays coarse — the *clusters* and
+    their commonality go into the Index. So this clusters the Raw Index's
+    registered members by shared binding neighbours (the same θ the trunk uses),
+    and for each cluster prints the members, the evidence, a draft commonality
+    sentence and draft Index names. The name and the sentence stay the owner's
+    (D16).
+    """
+    data = {"command": "index-candidates", "target": name, "found": False,
+            "did_you_mean": [], "raw": None, "path": None, "members": [],
+            "covering_links": [], "theta": None, "clusters": [], "cluster_count": 0,
+            "isolated": 0, "warnings": []}
+    target = g.resolve(name)
+    if target is None:
+        low = name.lower()
+        data["did_you_mean"] = sorted([s for s in g.stems if low in s.lower()])[:10]
+        data["warnings"].append(f"没有叫 `{name}` 的笔记")
+        return data
+    raw_set = set(g.raws)
+    if target not in raw_set:
+        data["warnings"].append(f"`{target.stem}` 不是 Raw Index（体裁 {cfg.genre(target.stem)}）"
+                                "——Index 由主干成员长出来，先选一个 Raw Index")
+        return data
+
+    members = sorted((m for m in g.nodes if target in g.reg.get(m, ())), key=lambda p: p.stem)
+    data["found"] = True
+    data["raw"] = target.stem
+    data["path"] = g.rel(target)
+    data["members"] = [m.stem for m in members]
+    if len(members) < 2:
+        data["warnings"].append(f"`{target.stem}` 只登记了 {len(members)} 篇——先补成员再谈 Index")
+        return data
+
+    nbr = g.binding_neighbors()
+    clusters = _cluster_data(cfg, g, nbr, members)
+    data["theta"] = round(clusters["theta"], 4)
+    l2 = clusters["l2"]["clusters"]
+    data["isolated"] = clusters["l3_isolated"]
+    path_by_stem = {m.stem: m for m in members}
+
+    def covering_links(stems: list) -> list:
+        """Links cards that already span ≥2 of these members — natural Index seeds."""
+        inside = {path_by_stem[s] for s in stems if s in path_by_stem}
+        out = []
+        for link in sorted(g.linksn, key=lambda p: p.stem):
+            hit = sorted(q.stem for q in g.out.get(link, ()) if q in inside)
+            if len(hit) >= 2:
+                out.append({"links": link.stem, "members": hit})
+        return out
+
+    rows = []
+    for i, cluster in enumerate(l2[:n], 1):
+        evidence = cluster["binding_evidence"]
+        draft = ("共享 " + str(len(evidence)) + " 个邻居：" +
+                 " / ".join(e["note"] for e in evidence[:3])) if evidence else "（无共同邻居）"
+        rows.append({"cluster": i, "size": len(cluster["members"]),
+                     "members": cluster["members"], "evidence": evidence,
+                     "covering_links": covering_links(cluster["members"]),
+                     "commonality_draft": draft,
+                     "index_names": _index_name_candidates(g, cluster["members"], evidence)})
+    data["clusters"] = rows
+    data["cluster_count"] = len(l2)
+    data["covering_links"] = covering_links(data["members"])
+    if len(l2) > n:
+        data["warnings"].append(f"{len(l2)} 个簇，只列前 {n} 个（--n 可调）")
+    if len(l2) == 1:
+        data["warnings"].append("只有一个簇——一个簇还撑不起一个 Index，先让它长大")
+    if data["covering_links"]:
+        data["warnings"].append("有 Links 卡已覆盖 ≥2 个成员（已标注）——"
+                                "Links 卡是 Index 的天然种子")
+    data["warnings"].append("共性句与 Index 名由你写（D16），且绝不每簇一个 Index（D10-P3）——"
+                            "粗主干保持粗，细结构才进 Index")
+    return data
+
+
+def _render_index_candidates(cfg: Config, data: dict) -> None:
+    print(f"# vault index-candidates — {data['target']}")
+    if not data["found"]:
+        for warning in data["warnings"]:
+            print(f"  ⚠ {warning}")
+        if data["did_you_mean"]:
+            print("  相近的名字: " + " / ".join(data["did_you_mean"]))
+        return
+    links = {c["links"] for c in data["covering_links"]}
+    print(f"  主干: {data['raw']}  ({data['path']})")
+    print(f"  登记成员 {len(data['members'])} 篇"
+          + (f"，已有 Links 卡覆盖 ≥2 个成员: {', '.join(sorted(links))}" if links else ""))
+    print(f"  簇 {data['cluster_count']} 个（θ={data['theta']}，绑定证据 = 共同邻居）| "
+          f"孤点 {data['isolated']}")
+    if not data["clusters"]:
+        print("  （没有可成簇的成员）" if not data["cluster_count"]
+              else f"  （{data['cluster_count']} 个簇未列出——--n 太小）")
+    else:
+        print()
+        print("  | 簇 | 成员 | 共同证据 | 共性句候选（草稿） | 建议 Index 名 |")
+        print("  |---|---|---|---|---|")
+        for row in data["clusters"]:
+            members = " / ".join(row["members"][:6])
+            if len(row["members"]) > 6:
+                members += f" …(+{len(row['members']) - 6})"
+            evidence = ", ".join(f"{e['note']}({e['shared']})" for e in row["evidence"]) or "—"
+            for cover in row["covering_links"]:
+                evidence += f" · Links 卡 {cover['links']}（{len(cover['members'])} 成员）"
+            names = " 或 ".join(row["index_names"]) or "—"
+            print(f"  | {row['cluster']} ({row['size']}) | {members} | {evidence} | "
+                  f"{row['commonality_draft']} | {names} |")
+    print()
+    for warning in data["warnings"]:
+        print(f"  ⚠ {warning}")
+
+
+def cmd_index_candidates(cfg: Config, g: model.Graph, args) -> int:
+    """Candidate card table for building an Index out of one Raw Index (read-only)."""
+    data = collect_index_candidates(cfg, g, args.name, n=args.n)
+    if wants_json(args):
+        emit_json(data)
+        return 0 if data["found"] else 1
+    _render_index_candidates(cfg, data)
+    return 0 if data["found"] else 1
+
+
 # ---------------------------------------------------------------- random / suggest
 
 
@@ -1766,6 +1928,26 @@ moves (each with a copy-pasteable command).
 
 On a fresh clone the rhythm line reads 今天 — it takes the max of git commit
 time and mtime, and a checkout refreshes mtime. Known limitation, not a signal.""",
+    "index-candidates": """index-candidates — a candidate card table for an Index
+
+    python3 tools/vault.py index-candidates RAW_INDEX_NAME [--n 8] [--json]
+
+An Index grows out of the trunk's *clusters*, not out of the Raw Index itself
+(D10-P3: the coarse Raw Index stays coarse). This clusters the Raw Index's
+registered members by shared binding neighbours — the same θ the trunk uses —
+and prints a candidate card table:
+
+  | 簇 | 成员 | 共同证据 | 共性句候选（草稿） | 建议 Index 名 |
+
+  共同证据       the shared neighbours (name and how many members share it)
+  共性句候选      a draft sentence built from that evidence — you rewrite it
+  建议 Index 名   from the cluster's shared name tokens and its top evidence
+  （Links）       members that are themselves Links cards — natural Index seeds
+  孤点            members that share no binding evidence (L3)
+
+Refuses a name that is not a Raw Index, and says so when there is only one
+cluster (one cluster is not yet an Index). The name and the commonality sentence
+are the owner's (D16); never one Index per cluster.""",
     "links-candidates": """links-candidates — members for a Links card about one topic
 
     python3 tools/vault.py links-candidates TOPIC [--n 12] [--json]
@@ -2034,6 +2216,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_lc.add_argument("topic", help="topic word, or a note name/alias to seed from")
     p_lc.add_argument("--n", type=int, default=12, help="members to list (default 12)")
 
+    p_ic = sub.add_parser("index-candidates", parents=[common],
+                          help="candidate card table for an Index from one Raw Index")
+    p_ic.add_argument("name", help="Raw Index name")
+    p_ic.add_argument("--n", type=int, default=8, help="clusters to list (default 8)")
+
     p_new = sub.add_parser("new", parents=[common],
                            help="create a note from a scaffold, placed by zone (dry-run)")
     p_new.add_argument("name", help="note name (stem)")
@@ -2107,6 +2294,8 @@ def main(argv=None) -> int:
         return cmd_place(cfg, g, args)
     if args.command == "links-candidates":
         return cmd_links_candidates(cfg, g, args)
+    if args.command == "index-candidates":
+        return cmd_index_candidates(cfg, g, args)
     return cmd_rawindex(cfg, g, args)
 
 

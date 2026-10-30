@@ -18,7 +18,7 @@ Read in this order before acting:
 5. `doctrine/Vault Workflow.md` — the 3 verbs + 1 loop, S1–S10, 心法
 6. `doctrine/Vault Extension.md` — 改系统 / 改文档前读 §同步面（`doctrine/New Machine.md` 面向 owner 装配，不在 AI 载入序）
 
-Inline help: `python3 tools/vault.py help <topic>` for `check` / `status` / `triage` / `rawindex` / `dag` / `links` / `random` / `suggest` / `docs-check` / `rename` / `new` / `place` / `links-candidates`.
+Inline help: `python3 tools/vault.py help <topic>` for `check` / `status` / `triage` / `rawindex` / `dag` / `links` / `random` / `suggest` / `docs-check` / `rename` / `new` / `place` / `links-candidates` / `index-candidates`.
 
 ## Session entry
 
@@ -64,6 +64,14 @@ A Links card is one concept seen from several angles and **must cross ≥2 Index
 2. If it reports fewer than 2 areas, the card is not a Links card yet — add members from the missing side first.
 3. Owner writes the card name and the commonality sentence (D16); the sentence must rest on the evidence printed in step 1.
 4. Create it: `python3 tools/vault.py new "Links of X and Y" --zone library`, then fill it from the member list. `Node↔Node` links inside the card change meaning → owner approval (Agent Contract §4).
+
+### Building an Index (from a Raw Index and its Links)
+
+An Index grows out of the trunk's *clusters*; the coarse Raw Index stays coarse (D10-P3).
+
+1. `python3 tools/vault.py index-candidates "<Raw Index name>"` — the Raw Index's registered members clustered by shared neighbours (θ from `tools/vault.toml`), printed as `| 簇 | 成员 | 共同证据 | 共性句候选（草稿） | 建议 Index 名 |`. Members that are themselves Links cards are flagged: they are the natural seeds.
+2. Fewer than 2 clusters → not an Index yet; let the Raw Index grow first. Never one Index per cluster.
+3. Owner writes the name and the commonality sentence (D16) on the printed evidence, then creates it with `python3 tools/vault.py new "Index of …" --zone library` and links the cluster's members from it (`Index→Node` links change meaning → owner approval, Agent Contract §4).
 
 ### Note feels lost / can't find related
 
