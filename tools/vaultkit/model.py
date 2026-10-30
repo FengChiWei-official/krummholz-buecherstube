@@ -68,6 +68,58 @@ class Graph:
         return {n.stem: [r.stem for r in sorted(self.reg[n], key=lambda p: p.stem)]
                 for n in self.nodes if len(self.reg[n]) > 1}
 
+    def duplicate_registration_edges(self) -> list:
+        """[(Raw Index, Node, count)] for pairs listed more than once in one Raw Index."""
+        zone = self.config.zone
+        suffix = self.config.zones["node_suffix"]
+        out = []
+        for raw in self.raws:
+            counts: dict = collections.Counter()
+            for link in parse.extract_links(self.notes[raw]):
+                target = self.resolve(link.target)
+                if target is None or target == raw:
+                    continue
+                z = zone(target)
+                if z and z.endswith(suffix):
+                    counts[target] += 1
+            for node, count in sorted(counts.items(), key=lambda kv: kv[0].stem):
+                if count > 1:
+                    out.append((raw, node, count))
+        return out
+
+    def registration_violations(self) -> dict:
+        """Registration-edge problems, per the configured trunk model.
+
+        Duplicate (Raw Index, Node) pairs are always a violation. Multi-parent
+        Nodes are a violation only under the tree model — under the DAG the
+        uniqueness lives in the edge, not the parent (P5).
+        """
+        return {
+            "duplicate_edges": self.duplicate_registration_edges(),
+            "multi_parent": self.multi_registered() if self.config.trunk_model == "tree" else {},
+        }
+
+    def raw_index_cycle_core(self) -> list:
+        """Raw Indexes lying on a cycle in the Raw Index → Raw Index subgraph.
+
+        Peels nodes without an in-edge or without an out-edge until only the
+        cycle core remains, which is exactly the union of all cycles.
+        """
+        adj = {r: {q for q in self.out[r] if q in set(self.raws)} for r in self.raws}
+        remaining = {n: set(targets) for n, targets in adj.items()}
+        changed = True
+        while changed:
+            changed = False
+            live = set(remaining)
+            incoming = {t for targets in remaining.values() for t in targets if t in live}
+            for n in list(remaining):
+                if not remaining[n] or n not in incoming:
+                    del remaining[n]
+                    changed = True
+            for n in remaining:
+                remaining[n] &= set(remaining)
+        return sorted(remaining, key=lambda p: p.stem)
+
     def unregistered(self) -> list:
         return [n for n in self.nodes if not self.reg[n]]
 
@@ -95,6 +147,24 @@ class Graph:
         nbr: dict = collections.defaultdict(set)
         for p, qs in self.out.items():
             for q in qs:
+                nbr[p].add(q)
+                nbr[q].add(p)
+        return nbr
+
+    def binding_neighbors(self) -> dict:
+        """Undirected adjacency with doctrine and Raw Index notes removed (I4).
+
+        Binding evidence is Node↔Node: a Raw Index or a doctrine note may not
+        vote on, or count towards, another note's neighborhood.
+        """
+        excluded = set(self.doctrine) | set(self.raws)
+        nbr: dict = collections.defaultdict(set)
+        for p, qs in self.out.items():
+            if p in excluded:
+                continue
+            for q in qs:
+                if q in excluded:
+                    continue
                 nbr[p].add(q)
                 nbr[q].add(p)
         return nbr

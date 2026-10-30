@@ -83,11 +83,63 @@ def test_rawindex_around_unknown_exits_1(vault):
     assert "not found." in proc.stdout
 
 
-def test_rawindex_check_reports_registration_state(vault):
+def test_rawindex_check_renders_the_rule_registry(vault):
     proc = run_vault(vault, "rawindex", "--check")
     assert proc.returncode == 0
-    assert "未登记: 2   多重登记: 1" in proc.stdout
-    assert "零出链: 2/5  (40%)" in proc.stdout
+    assert "## I1a 每个 Node 至少登记在一个 Raw Index" in proc.stdout
+    assert "未登记: 2  (queue — see rawindex L0)" in proc.stdout
+    assert "## I1b 重复登记边（同一 (Raw Index, Node) 出现两次）" in proc.stdout
+    assert "重复登记边: 0   多重登记: 1" in proc.stdout
+    assert "## I1c Raw Index 子图无环" in proc.stdout
+    assert "Raw Index 环: 0  (登记边构成的子图无环)" in proc.stdout
+    assert "零出链: 2/5 (40%) — 捕获规则增量,不阻断 (B5)" in proc.stdout
+    assert "## 材料 出链=已拆 (D21)" in proc.stdout
+    assert "未拆材料: 1/1  (零出链 = 未拆)" in proc.stdout
+
+
+def test_check_reports_i1c_cycle_and_i1b_duplicate(vault):
+    alpha = vault / "library" / "Raw" / "Raw Index of Alpha.md"
+    beta = vault / "library" / "Raw" / "Raw Index of Beta.md"
+    alpha.write_text(alpha.read_text(encoding="utf-8") + "- [[Node A]]\n", encoding="utf-8")
+    beta.write_text(beta.read_text(encoding="utf-8") + "- [[Raw Index of Alpha]]\n",
+                    encoding="utf-8")
+    proc = run_vault(vault, "check")
+    assert proc.returncode == 1                      # only the seeded G2 gate
+    assert "PROBLEMS: 1 (hard gates failed)" in proc.stdout
+    assert "重复登记边: 1   多重登记: 1" in proc.stdout
+    assert "重复边: Raw Index of Alpha -> Node A ×2" in proc.stdout
+    assert "Raw Index 环: 2 个 Raw Index 落在环上" in proc.stdout
+    assert "环上: Raw Index of Alpha" in proc.stdout
+    assert "环上: Raw Index of Beta" in proc.stdout
+
+
+def test_g3_scope_line_is_stated(vault):
+    proc = run_vault(vault, "check")
+    assert "扫描范围: 除 .agent、.git、.obsidian 之外的全部 *.md" in proc.stdout
+    assert "笔记载入另跳过 template、zzz_output" in proc.stdout
+
+
+def test_new_rule_renders_in_check_and_rawindex_check(vault, monkeypatch, capsys):
+    """Adding a rule = appending one Rule; both renderers pick it up."""
+    from vaultkit import cli, rules
+
+    def fake_rule(ctx):
+        return ["假规则: 1"]
+
+    fake = rules.Rule("Z9", "report", "Z9 假规则 (report)", fake_rule,
+                      short="Z9 假规则（rawindex 视图）")
+    monkeypatch.setattr(rules, "RULES", [*rules.RULES, fake])
+    monkeypatch.setenv("VAULT_ROOT", str(vault))
+
+    assert cli.main(["check"]) == 1                  # the fixture's seeded G2 gate
+    out = capsys.readouterr().out
+    assert "## Z9 假规则 (report)" in out
+    assert "假规则: 1" in out
+
+    assert cli.main(["rawindex", "--check"]) == 0
+    out = capsys.readouterr().out
+    assert "## Z9 假规则（rawindex 视图）" in out
+    assert "假规则: 1" in out
 
 
 def test_sync_is_dry_run_without_apply(vault):

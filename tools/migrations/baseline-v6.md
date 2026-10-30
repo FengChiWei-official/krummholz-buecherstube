@@ -96,3 +96,24 @@ Also fixed while porting (recorded as a deliberate change, not equivalence):
 equal counts resolved in set-iteration order — i.e. differently on every process
 run. Both now sort by `(-count, stem)`.
 
+## P4 — first measurements of the split invariants (2026-10-30)
+
+The plan predicted `I1b 0`, `I1c 0`. The implementation reports the truth
+instead; both findings were verified by hand:
+
+| rule | value | evidence |
+|---|---|---|
+| I1a 未登记 | 500 | queue |
+| I1b 重复登记边 | 8 | e.g. `Raw Index of Computer Systems` lists `[[How does PC system work]]` on lines 19 and 71 |
+| I1b 多重登记 (tree model) | 9 | the known multi-parent Nodes |
+| I1c Raw Index 环 | 4 | `Raw Index of Tricks in Math` ↔ `Raw Index Structural Transformation Toolkit`, and it also closes a 2-cycle with `Raw Index of Inequality Toolkits` and with `Raw Index of Math Entries` |
+
+I1b's registration surface is every `[[Node]]` link inside a Raw Index note
+(including prose mentions), matching how registration edges have always been
+counted. All three are report-level; hard gates stay green.
+
+`check` output changed shape in P4 (I1 → I1a/I1b/I1c, a G3 scope line, I4
+wording, `[gate]` → `[hard]` in `status`), and `rawindex --check` now renders
+the same rule registry instead of its own duplicate implementation.
+
+

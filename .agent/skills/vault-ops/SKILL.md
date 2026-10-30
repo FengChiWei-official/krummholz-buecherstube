@@ -54,7 +54,7 @@ The weekly core loop — 聚簇 (cluster) → 归组 (group) → 登记 (registe
 2. `python3 tools/vault.py rawindex --clusters` — L1 coarse components (direct interlinks), L2 fine clusters (shared-neighbor θ=P97, with binding evidence = common neighbors), L3 isolated points.
 3. **Group clusters into coarse Raw Indexes** (D10-P3): one coarse Raw Index holds several clusters — AI proposes the grouping, owner confirms names. Never create one Raw Index per cluster (68 clusters ≠ 68 files).
 4. Registration is append-only bookkeeping: you add `[[Node]]` lines to the Raw Index (structural, direct). Cluster共性 (commonality) goes into the Index note as a draft for owner sign-off — one sentence per cluster, owner's words, or the cluster does not enter the Index (D16).
-5. `python3 tools/vault.py rawindex --check` — I1–I3 report-level increments (未登记 / 多重登记 / Links 区域 / 零出链).
+5. `python3 tools/vault.py rawindex --check` — report-level increments (I1a 未登记 / I1b 重复登记边 / I1c Raw Index 环 / I2 Links 区域 / I3 零出链 / D21 未拆材料)。规则注册表在 `tools/vaultkit/rules.py`：加一条规则 = 追加一个 `Rule`。
 6. `python3 tools/vault.py rawindex --sync` — dry-run: prints the intended `library/Raw/Raw Index of Everything.md` member list without touching the file (L13 write safety). Add `--apply` to land it (structural, direct).
 
 Convergence is bounded (measured: 674 queue → 6 rounds → 108; first round eats 25%).

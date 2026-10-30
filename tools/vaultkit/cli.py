@@ -16,7 +16,7 @@ import time
 from itertools import combinations
 from pathlib import Path
 
-from . import model, parse
+from . import model, parse, rules
 from .config import Config, ConfigError, load as load_config
 
 
@@ -86,17 +86,6 @@ def _git_porcelain(cfg: Config):
 
 
 # ---------------------------------------------------------------- render helpers
-
-
-def report(title: str, findings: list) -> bool:
-    print(f"## {title}")
-    if findings:
-        for item in findings:
-            print(f"  {item}")
-    else:
-        print("  OK — no violations")
-    print()
-    return bool(findings)
 
 
 def _rel(cfg: Config, path: Path) -> str:
@@ -194,56 +183,48 @@ def collect_check(cfg: Config, g: model.Graph):
 
 
 def cmd_check(cfg: Config, g: model.Graph, args) -> int:
+    """Render every `check` rule from the registry (rules.py)."""
+    ctx = rules.Context(cfg=cfg, graph=g)
     problems = 0
     print("# vault check — two-tier (D20): hard gates exit 1; I1–I4 report-level\n")
-    for tier, title, findings in collect_check(cfg, g):
-        if tier == "gate":
-            if report(title, findings):
-                problems += 1
-        elif tier == "report":
-            print(f"## {title}")
+    for rule in rules.RULES:
+        if not rule.title:
+            continue
+        findings = rule.fn(ctx)
+        print(f"## {rule.title}")
+        if rule.note:
+            print(f"  {rule.note(ctx)}")
+        if findings:
             for item in findings:
                 print(f"  {item}")
-            print()
-        else:
-            report(title, findings)
+            if rule.tier == "hard":
+                problems += 1
+        elif rule.tier in ("hard", "info"):
+            print("  OK — no violations")
+        print()
     print("CLEAN — hard gates hold; report-level numbers above are weekly increments"
           if problems == 0 else f"PROBLEMS: {problems} (hard gates failed)")
     return 1 if problems else 0
+
+
+def collect_check(cfg: Config, g: model.Graph):
+    """(tier, title, findings) for every `check` rule — used by `status`."""
+    ctx = rules.Context(cfg=cfg, graph=g)
+    return [(rule.tier, rule.title, rule.fn(ctx)) for rule in rules.RULES if rule.title]
 
 
 # ---------------------------------------------------------------- rawindex
 
 
 def _rawindex_check(cfg: Config, g: model.Graph) -> None:
-    queue = g.unregistered()
-    multi = g.multi_registered()
-    print("\n## I1 每个 Node 恰好登记在一个 Raw Index")
-    print(f"  未登记: {len(queue)}   多重登记: {len(multi)}")
-    for stem, rs in sorted(multi.items())[:5]:
-        print(f"    {stem}: {rs}")
-    print("\n## I2 Links 必须横跨 >=2 个 Index 区域")
-    area = g.area
-    intra, cross, noarea = [], [], []
-    for L in g.linksn:
-        mem = [q for q in g.out[L] if q in area]
-        ar = set().union(*[area[q] for q in mem]) if mem else set()
-        (cross if len(ar) >= 2 else (intra if ar else noarea)).append((L, len(mem), len(ar)))
-    print(f"  跨界 {len(cross)} | 同区域 {len(intra)}(违规) | 无区域 {len(noarea)}(提示)")
-    for L, m, x in intra[:6]:
-        print(f"    同区域: {L.stem} ({m} 成员, {x} 区域)")
-    print("\n## I3 Node 必须 >=1 条出链（捕获规则）")
-    zero = g.zero_outlink()
-    print(f"  零出链: {len(zero)}/{len(g.nodes)}  "
-          f"({len(zero)*100//max(1,len(g.nodes))}%)")
-    print("\n## 材料 出链=已拆 (D21)")
-    material_prefix = cfg.paths["archives_material"] + "/"
-    materials = [p for p in g.notes
-                 if _rel(cfg, p).startswith(material_prefix) and p.suffix == ".md"]
-    unsplit = [p for p in materials if not g.out[p]]
-    print(f"  未拆材料: {len(unsplit)}/{len(materials)}  (零出链 = 未拆)")
-    for p in unsplit[:8]:
-        print(f"    {_rel(cfg, p)}")
+    """Render the registry rules that carry a `rawindex --check` heading."""
+    ctx = rules.Context(cfg=cfg, graph=g)
+    for rule in rules.RULES:
+        if not rule.short:
+            continue
+        print(f"\n## {rule.short}")
+        for line in rule.fn(ctx):
+            print(f"  {line}")
 
 
 def _rawindex_sync(cfg: Config, g: model.Graph, apply: bool) -> int:
@@ -326,7 +307,7 @@ def cmd_rawindex(cfg: Config, g: model.Graph, args) -> int:
     """Trunk operations: queue + L0 proposals; --clusters / --check / --sync / --around."""
     out, reg = g.out, g.reg
     nodes, raws = g.nodes, g.raws
-    nbr = g.neighbors()
+    nbr = g.binding_neighbors()          # I4: doctrine/Raw are not binding neighbors
 
     registered = [n for n in nodes if reg[n]]
     queue = [n for n in nodes if not reg[n]]
@@ -687,7 +668,12 @@ def build_parser() -> argparse.ArgumentParser:
     common.add_argument("--strict", action="store_true", default=argparse.SUPPRESS,
                         help="missing config / list files are fatal (exit 2), not warnings")
 
-    parser = argparse.ArgumentParser(description="Vault operating procedures (v6)")
+    parser = argparse.ArgumentParser(
+        description="Vault operating procedures (v6)",
+        epilog=("exit codes: 0 = ok (all reports, and any check with green hard gates); "
+                "1 = hard gate failed (check) or unknown target (rawindex --around); "
+                "2 = missing/unreadable config (or a missing list file under --strict)"),
+        formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--strict", action="store_true", default=argparse.SUPPRESS,
                         help="missing config / list files are fatal (exit 2), not warnings")
     sub = parser.add_subparsers(dest="command", required=True)

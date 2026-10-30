@@ -54,6 +54,45 @@ def test_registration_edges_are_unique_pairs(graph):
     assert len(graph.registration_edges) == len(edges)
 
 
+def test_no_duplicate_edges_and_no_cycle_in_the_fixture(graph):
+    assert graph.duplicate_registration_edges() == []
+    assert graph.raw_index_cycle_core() == []
+    assert graph.registration_violations()["duplicate_edges"] == []
+
+
+def test_binding_neighbors_exclude_doctrine_and_raw(cfg):
+    model.clear_cache()
+    g = model.load(cfg)
+    full = g.neighbors()
+    binding = g.binding_neighbors()
+    assert g.stems["Raw Index of Alpha"] in full
+    assert g.stems["Vault Design"] in full
+    assert g.stems["Raw Index of Alpha"] not in binding
+    assert g.stems["Vault Design"] not in binding
+    # Node↔Node evidence survives
+    assert g.stems["Node A"] in binding[g.stems["Node B"]]
+
+
+def test_cycle_core_finds_a_seeded_cycle(vault):
+    alpha = vault / "library" / "Raw" / "Raw Index of Alpha.md"
+    beta = vault / "library" / "Raw" / "Raw Index of Beta.md"
+    beta.write_text(beta.read_text(encoding="utf-8") + "- [[Raw Index of Alpha]]\n",
+                    encoding="utf-8")
+    model.clear_cache()
+    g = model.load(config.load(root=vault))
+    assert [p.stem for p in g.raw_index_cycle_core()] == ["Raw Index of Alpha",
+                                                         "Raw Index of Beta"]
+
+
+def test_duplicate_edge_is_detected(vault):
+    alpha = vault / "library" / "Raw" / "Raw Index of Alpha.md"
+    alpha.write_text(alpha.read_text(encoding="utf-8") + "- [[Node A]]\n", encoding="utf-8")
+    model.clear_cache()
+    g = model.load(config.load(root=vault))
+    dupes = [(r.stem, n.stem, c) for r, n, c in g.duplicate_registration_edges()]
+    assert dupes == [("Raw Index of Alpha", "Node A", 2)]
+
+
 def test_multi_parent_registration_is_visible(graph):
     assert graph.multi_registered() == {"Node Shared": ["Raw Index of Alpha",
                                                        "Raw Index of Beta"]}
