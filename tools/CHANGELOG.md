@@ -4,6 +4,25 @@
 
 No version bump — `tools/vaultkit/__init__.py` still reports 6.0.0.
 
+**Retrieval: four read-only graph-query subcommands** (they answer questions in
+the vault's own vocabulary — evidence, never a bare list):
+
+- **`place NAME`** — one note's position: registration edges, the neighborhood's
+  voting evidence for further registration (`via` names the voters), Index areas,
+  links, the notes worth linking first, and the I1a/I3/I1c/D21 signals. Replaces
+  the thinner `rawindex --around`.
+- **`links-candidates TOPIC`** — members for a Links card, grouped by Index area,
+  with graded evidence (name 3 · link/shared registration 2 · shared neighbour 1 ·
+  bare shared area 0). Says plainly when it crosses fewer than 2 areas.
+- **`index-candidates RAW_INDEX`** — the candidate card table for an Index:
+  clusters by shared neighbours, per-cluster evidence, a draft commonality
+  sentence and draft names; covering Links cards are named as natural seeds
+  (D10-P3, D16).
+- **`retrieve TERM`** — whole-vault retrieval ranked by evidence (name / alias /
+  registration / area / text with the matching line / shared neighbour), each hit
+  with its reason, registrations, areas and role. Same scope as G3; exit 1 when
+  nothing matches.
+
 - **`docs-check [--against REV] [--gate]`** — the doc sync map
   (`doctrine/Vault Extension.md` §同步面, machine copy `tools/vault.toml
   [docs_sync]`) diffed against the working tree: names every triggered row's

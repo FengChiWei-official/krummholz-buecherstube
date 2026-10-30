@@ -22,6 +22,7 @@ take over correctly. Deeper why: [[Vault Design]]; operational procedures:
 | `python3 tools/vault.py place NAME` | one note's position in the relation graph: registration edges, 归队提议 with the voting evidence, areas, links, link candidates (read-only) |
 | `python3 tools/vault.py links-candidates TOPIC` | member candidates for a Links card: seeds by name/alias, members grouped by Index area with the evidence each, and whether it crosses ≥2 areas (read-only) |
 | `python3 tools/vault.py index-candidates RAW_INDEX` | candidate card table for an Index: the Raw Index's members clustered by shared neighbours, with the evidence, a draft commonality sentence and draft Index names (read-only) |
+| `python3 tools/vault.py retrieve TERM` | whole-vault retrieval ranked by evidence (name / alias / registration / area / text / shared neighbour), each hit with its reason, registrations, areas and role; exit 1 when nothing matches (read-only) |
 | `python3 tools/vault.py random [--scope …] [--seed N]` | 问箱 material (S9): one note + its backlinks |
 | `python3 tools/vault.py suggest NAME [--n 3]` | candidate links for a note, one why-line each (S2) |
 | `python3 tools/vault.py rename OLD NEW [--apply]` | rename a note + cascade every inbound wikilink (dry-run; refuses a name collision, a path separator, a root contract file, and a file inside `zzz_output/`) |
@@ -37,7 +38,7 @@ Every subcommand accepts `--json` (one JSON document on stdout, nothing else) an
 | code | meaning |
 |---|---|
 | 0 | ok — every report, and any `check` whose hard gates are green |
-| 1 | a hard gate failed (`check`), an unknown target (`place`, `suggest`), a refused rename or `new`, or a docs-sync violation under `docs-check --gate` |
+| 1 | a hard gate failed (`check`), an unknown target (`place`, `suggest`), a search with no hits (`retrieve`), a refused rename or `new`, or a docs-sync violation under `docs-check --gate` |
 | 2 | missing/unreadable config; a missing list file under `--strict`; unknown `help` topic |
 
 ## 2. Where state lives

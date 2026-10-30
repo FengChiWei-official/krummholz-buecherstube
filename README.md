@@ -43,6 +43,7 @@ Root = 入口队列（Obsidian 默认落点）：新捕获落在那里，triage 
 - `python3 tools/vault.py place NAME` — **一篇笔记在图里的位置**（只读）：登记边、归队提议（邻居投票 + 谁投的）、语义区域、出入链、先链哪几篇（含 why）、I1a/I3/I1c/D21 信号。别名可查；查不到 exit 1 + did-you-mean。
 - `python3 tools/vault.py links-candidates TOPIC [--n 12]` — **建 Links 卡的成员候选**（只读）：名字/别名命中作种子，按 Index 区域分组成员，每人带证据（名字含 / 链到种子 / 同登记 / 同区域 / 共同邻居）。跨 <2 区域会明确说「还不算 Links 卡」；结构笔记（Raw/Index/Links/doctrine）作为中介被排除。
 - `python3 tools/vault.py index-candidates RAW_INDEX [--n 8]` — **建 Index 的候选卡表**（只读）：把该 Raw Index 的成员按共同邻居（θ 同主干）成簇，输出 `| 簇 | 成员 | 共同证据 | 共性句候选（草稿） | 建议 Index 名 |`。成员里的 Links 卡会标注为天然种子；只有一个簇会明说「撑不起 Index」（D10-P3）。
+- `python3 tools/vault.py retrieve TERM [--n 15]` — **整库检索**（只读）：按证据强度排序（名字 4 / 别名 3 / 登记于或区域名命中或正文命中 2 / 共同邻居 1），每条命中带理由、登记者、区域、角色，正文命中还带行号与原文。范围 = 载入的笔记（`zzz_output/`、`template/` 不参与，同 G3）。有命中 exit 0，无命中 exit 1。
 - `python3 tools/vault.py rename OLD NEW [--apply]` — 改名 + 级联：把全库指向 `OLD` 的 wikilink 一次改完（`|alias` 与 `#标题` 原样保留，只改名字那一段）。同名冲突 / 路径分隔符 / root 契约文件 / `zzz_output/` 里的文件都会**拒绝**（exit 1）。默认 dry-run。
 - `python3 tools/vault.py new NAME [--zone Z] [--source S] [--todo NOTE --into TODO_NOTE] [--apply]` — 按模板新建：分区由**状态**定（root 入口队列 / library / material / work / todos），体裁由**名字**定，脚手架从 `tools/vault.toml [templates]` 按体裁取（可选，D30）。`material` 缺 `source:` 会拒绝（G2 硬门）；落地后给 3 个候选链接（S2）。默认 dry-run。
 - `python3 tools/vault.py random [--scope …] [--seed N]` / `suggest NAME [--n 3]` — 问箱材料（S9）与候选链接（S2），只给信号不写笔记。

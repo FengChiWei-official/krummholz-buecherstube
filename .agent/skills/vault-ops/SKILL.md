@@ -18,7 +18,7 @@ Read in this order before acting:
 5. `doctrine/Vault Workflow.md` — the 3 verbs + 1 loop, S1–S10, 心法
 6. `doctrine/Vault Extension.md` — 改系统 / 改文档前读 §同步面（`doctrine/New Machine.md` 面向 owner 装配，不在 AI 载入序）
 
-Inline help: `python3 tools/vault.py help <topic>` for `check` / `status` / `triage` / `rawindex` / `dag` / `links` / `random` / `suggest` / `docs-check` / `rename` / `new` / `place` / `links-candidates` / `index-candidates`.
+Inline help: `python3 tools/vault.py help <topic>` for `check` / `status` / `triage` / `rawindex` / `dag` / `links` / `random` / `suggest` / `docs-check` / `rename` / `new` / `place` / `links-candidates` / `index-candidates` / `retrieve`.
 
 ## Session entry
 
@@ -73,12 +73,19 @@ An Index grows out of the trunk's *clusters*; the coarse Raw Index stays coarse 
 2. Fewer than 2 clusters → not an Index yet; let the Raw Index grow first. Never one Index per cluster.
 3. Owner writes the name and the commonality sentence (D16) on the printed evidence, then creates it with `python3 tools/vault.py new "Index of …" --zone library` and links the cluster's members from it (`Index→Node` links change meaning → owner approval, Agent Contract §4).
 
+### Finding things (whole-vault retrieval)
+
+1. `python3 tools/vault.py retrieve "<term>"` — ranked by the vault's own evidence: name hit, alias hit, registered by / inside a matching Raw Index or Index, text hit (with the line), shared neighbour. Each hit prints why, its registrations, its areas and its role. Scope = loaded notes; exit 1 when nothing matches.
+2. For a term that only lives in `zzz_output/` or `template/` (not loaded, so not searched), fall back to `grep -rn -- '<term>' .`.
+3. Found a note and want its position? `place NAME`. Want raw material instead of a verdict? `random --scope library` (问箱, S9).
+
 ### Note feels lost / can't find related
 
 1. Backlinks (Obsidian).
 2. `grep -rn -- '\[\[NAME' .`
 3. `python3 tools/vault.py place NAME` — one note's position: registration edges, 归队提议 with the voters named, areas, links, and the notes worth linking first.
-4. `python3 tools/vault.py random --scope library` (问箱 material, S9)
+4. `python3 tools/vault.py retrieve "NAME"` — who else mentions it, and why.
+5. `python3 tools/vault.py random --scope library` (问箱 material, S9)
 
 ### Renaming
 

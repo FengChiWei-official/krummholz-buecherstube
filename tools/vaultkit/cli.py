@@ -105,8 +105,9 @@ def emit_json(payload: dict) -> None:
 
 EXIT_CODES = {
     "0": "ok — every report, and any check whose hard gates are green",
-    "1": "hard gate failed (check), unknown target (place / suggest), "
-         "a refused rename or a refused new, or a docs-sync violation under docs-check --gate",
+    "1": "hard gate failed (check), unknown target (place / suggest), a search with no hits "
+         "(retrieve), a refused rename or a refused new, or a docs-sync violation "
+         "under docs-check --gate",
     "2": "missing or unreadable config (also a missing list file under --strict)",
 }
 
@@ -690,6 +691,135 @@ def cmd_index_candidates(cfg: Config, g: model.Graph, args) -> int:
         emit_json(data)
         return 0 if data["found"] else 1
     _render_index_candidates(cfg, data)
+    return 0 if data["found"] else 1
+
+
+# ---------------------------------------------------------------- retrieve
+
+
+def _snippet(text: str, low: str, limit: int = 120):
+    """The first line containing `low`, trimmed — so a text hit can be judged."""
+    for i, line in enumerate(text.splitlines(), 1):
+        if low in line.lower():
+            return {"line": i, "text": line.strip()[:limit]}
+    return None
+
+
+def collect_retrieve(cfg: Config, g: model.Graph, term: str, n: int = 15) -> dict:
+    """Whole-vault retrieval by evidence strength, with the reason for each hit.
+
+    Evidence, strongest first: name contains the term · alias contains it · the
+    note is registered by a Raw Index (or sits in an Index area) whose name
+    contains it · the note's text contains it (occurrence count as tiebreak) ·
+    the note is a binding neighbour of a name hit. Every hit carries its reason
+    plus who registers it and which areas it is in.
+    """
+    data = {"command": "retrieve", "term": term, "found": False, "hits": [],
+            "hit_count": 0, "scanned": len(g.notes), "scope": "loaded notes",
+            "warnings": []}
+    low = term.strip().lower()
+    if not low:
+        data["warnings"].append("检索词为空")
+        return data
+    if len(low) < 2:
+        data["warnings"].append("检索词太短（1 个字符）——正文命中会淹没信号，只按名字匹配")
+
+    hits: dict = {}
+
+    def bump(path, score, why, snippet=None):
+        current = hits.get(path)
+        if current is None or score > current["score"]:
+            hits[path] = {"score": score, "why": why, "snippet": snippet,
+                          "text_hits": current["text_hits"] if current else 0}
+        elif snippet and not current["snippet"]:
+            current["snippet"] = snippet
+
+    for path in g.notes:
+        if low in path.stem.lower():
+            bump(path, 4, f"名字含 `{term}`")
+        elif any(low in a.lower() for a in _aliases_of(g, path)):
+            bump(path, 3, f"别名含 `{term}`")
+
+    for raw in g.raws:
+        if low in raw.stem.lower():
+            for member in g.nodes:
+                if raw in g.reg.get(member, ()):
+                    bump(member, 2, f"登记于 [[{raw.stem}]]")
+    for idx in g.idxs:
+        if low in idx.stem.lower():
+            for path, areas in g.area.items():
+                if idx in areas:
+                    bump(path, 2, f"在区域 [[{idx.stem}]]")
+
+    if len(low) >= 2:
+        for path, text in g.notes.items():
+            count = text.lower().count(low)
+            if not count:
+                continue
+            snippet = _snippet(text, low)
+            before = hits.get(path)
+            bump(path, 2, f"正文命中 {count} 处", snippet)
+            hits[path]["text_hits"] = count
+            if before is not None and before["score"] > 2:
+                hits[path]["score"] = before["score"]
+                hits[path]["why"] = before["why"]
+
+    named = [p for p, h in hits.items() if h["score"] >= 3]
+    nbr = g.binding_neighbors()
+    for seed in named:
+        for q in nbr.get(seed, set()):
+            bump(q, 1, f"共同邻居 [[{seed.stem}]]")
+
+    ranked = sorted(hits.items(), key=lambda kv: (-kv[1]["score"], -kv[1]["text_hits"],
+                                                  kv[0].stem))
+    data["hit_count"] = len(ranked)
+    data["found"] = bool(ranked)
+    for path, hit in ranked[:n]:
+        data["hits"].append({
+            "note": path.stem, "path": g.rel(path), "role": _role_of(g, cfg, path),
+            "score": hit["score"], "why": hit["why"],
+            "snippet": hit["snippet"] if hit["score"] < 3 else None,
+            "text_hits": hit["text_hits"],
+            "registered_by": sorted(r.stem for r in g.reg.get(path, ())),
+            "areas": sorted(i.stem for i in g.area.get(path, ()))})
+    if len(ranked) > n:
+        data["warnings"].append(f"命中 {len(ranked)} 篇，只列前 {n} 篇（--n 可调）")
+    if not ranked:
+        data["warnings"].append(f"`{term}` 在载入的笔记里没有命中——"
+                                "换一个词，或确认它是不是在 zzz_output/ 里")
+    data["warnings"].append("范围 = 载入的笔记；zzz_output/ 与 template/ 不参与（G3 同范围）")
+    return data
+
+
+def _render_retrieve(cfg: Config, data: dict) -> None:
+    print(f"# vault retrieve — \"{data['term']}\"")
+    print(f"  范围: {data['scanned']} 篇载入的笔记（zzz_output/ 与 template/ 不在内）")
+    if not data["found"]:
+        for warning in data["warnings"]:
+            print(f"  ⚠ {warning}")
+        return
+    print(f"  命中 {data['hit_count']} 篇（按证据强度排序）:")
+    for i, hit in enumerate(data["hits"], 1):
+        print(f"   {i:2}. [[{hit['note']}]] — {hit['why']}   ({hit['role']})")
+        context = []
+        if hit["registered_by"]:
+            context.append("登记: " + ", ".join(hit["registered_by"]))
+        if hit["areas"]:
+            context.append("区域: " + ", ".join(hit["areas"]))
+        print(f"       {hit['path']}" + ("  |  " + " | ".join(context) if context else ""))
+        if hit["snippet"]:
+            print(f"       L{hit['snippet']['line']}: {hit['snippet']['text']}")
+    for warning in data["warnings"]:
+        print(f"  ⚠ {warning}")
+
+
+def cmd_retrieve(cfg: Config, g: model.Graph, args) -> int:
+    """Whole-vault retrieval by evidence strength (read-only)."""
+    data = collect_retrieve(cfg, g, args.term, n=args.n)
+    if wants_json(args):
+        emit_json(data)
+        return 0 if data["found"] else 1
+    _render_retrieve(cfg, data)
     return 0 if data["found"] else 1
 
 
@@ -1928,6 +2058,26 @@ moves (each with a copy-pasteable command).
 
 On a fresh clone the rhythm line reads 今天 — it takes the max of git commit
 time and mtime, and a checkout refreshes mtime. Known limitation, not a signal.""",
+    "retrieve": """retrieve — whole-vault retrieval by evidence strength (read-only)
+
+    python3 tools/vault.py retrieve TERM [--n 15] [--json]
+
+Not grep: every hit carries *why* it is a hit, and the ranking is the vault's own
+evidence order.
+
+  4  名字含 TERM
+  3  别名含 TERM
+  2  登记于 <名字含 TERM 的 Raw Index> · 在区域 <名字含 TERM 的 Index> ·
+     正文命中 N 处 (the first matching line is shown, with its number)
+  1  共同邻居 <一个名字命中项>
+
+Each hit also prints who registers it and which Index areas it is in, plus its
+role (node / raw / index / links / material / work / todo / doctrine). Ties are
+broken by occurrence count, then by name.
+
+Scope: the loaded notes — `zzz_output/` and `template/` are not searched, the
+same scope G3 uses. Exit 0 when something is found, 1 when nothing is (a search
+with no hits is an answer, not a failure).""",
     "index-candidates": """index-candidates — a candidate card table for an Index
 
     python3 tools/vault.py index-candidates RAW_INDEX_NAME [--n 8] [--json]
@@ -2172,7 +2322,7 @@ def build_parser() -> argparse.ArgumentParser:
                 "a refused rename or new, or a docs-sync violation under docs-check --gate; "
                 "2 = missing/unreadable config (or a missing list file under --strict). "
                 "Topics: `vault.py help check|status|triage|rawindex|dag|links|random|suggest"
-                "|docs-check|rename|new|place|links-candidates`."),
+                "|docs-check|rename|new|place|links-candidates|index-candidates|retrieve`."),
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--strict", action="store_true", default=argparse.SUPPRESS,
                         help="missing config / list files are fatal (exit 2), not warnings")
@@ -2220,6 +2370,11 @@ def build_parser() -> argparse.ArgumentParser:
                           help="candidate card table for an Index from one Raw Index")
     p_ic.add_argument("name", help="Raw Index name")
     p_ic.add_argument("--n", type=int, default=8, help="clusters to list (default 8)")
+
+    p_rt = sub.add_parser("retrieve", parents=[common],
+                          help="whole-vault retrieval by evidence strength (read-only)")
+    p_rt.add_argument("term", help="word or phrase to look for")
+    p_rt.add_argument("--n", type=int, default=15, help="hits to list (default 15)")
 
     p_new = sub.add_parser("new", parents=[common],
                            help="create a note from a scaffold, placed by zone (dry-run)")
@@ -2296,6 +2451,8 @@ def main(argv=None) -> int:
         return cmd_links_candidates(cfg, g, args)
     if args.command == "index-candidates":
         return cmd_index_candidates(cfg, g, args)
+    if args.command == "retrieve":
+        return cmd_retrieve(cfg, g, args)
     return cmd_rawindex(cfg, g, args)
 
 

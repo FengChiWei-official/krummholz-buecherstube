@@ -129,6 +129,7 @@ BARE = {
     "random": (),
     "rawindex": (),
     "rename": ("Node Zero", "Zero Two"),
+    "retrieve": ("Node",),
     "status": (),
     "suggest": ("Node A",),
     "triage": (),
