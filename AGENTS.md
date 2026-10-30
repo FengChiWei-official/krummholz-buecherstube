@@ -5,23 +5,26 @@ Read this first, then the source-of-truth files it points to. Do not improvise d
 ## Source of truth
 
 - `README.md` — zones, two trees, minimal memory set.
+- `doctrine/Agent Contract.md` — AI handover contract: entry commands, direct vs owner-approval actions, never-do list, self-verification, bootstrap checklist.
 - `doctrine/Vault Design.md` — why the system works, the two trees, two-tier invariants.
-- `doctrine/Vault Workflow.md` — 3 verbs + 1 loop, scenarios S1–S10, AI boundary.
+- `doctrine/Vault Workflow.md` — 3 verbs + 1 loop, scenarios S1–S10, 心法, AI boundary.
 - `.agent/skills/vault-ops/SKILL.md` — operational procedures (load order, common problems → exact steps).
+- `tools/vault.toml` — the single definition of zones, genres, thresholds and paths; `python3 tools/vault.py help <topic>` for inline help.
 
 ## Hard rules
 
 1. **Wikilinks resolve by note name, not path.** Moving a file never breaks a link; renaming one requires updating every `[[Old Name]]` inbound link. Grep before renaming.
 2. **Zones by state:** external material → `archives/material/`, own archives → `archives/work/`, stable own-voice knowledge → `library/`, drafts → root (entry queue, drained by `triage`). Root is the entry queue: new captures land there (Obsidian default) and are drained by `triage`; only `README.md` and `AGENTS.md` stay permanently.
-3. **Two trees (doctrine):** Raw Index = trunk (complete, unique registration, coarse: one coarse Raw Index holds several clusters, AI-grouped); Index = emergent semantic tree; Links = edges across ≥2 Index areas; Node = default genre in `<A–Z>_fold/`. Registration edge (Raw Index → Node) is a structural action, AI may append directly; `Node↔Node` and `Index→Node` links change meaning — owner approval required.
-4. **No templates, no status frontmatter.** Notes are plain markdown. Fields kept: `aliases` (wikilink resolution), `source` (mandatory for `archives/material/` — hard gate). Genre by name: `Raw Index*` → `library/Raw/`, `Index of*` → `library/Index/`, `Links of*` → `library/Links/`, else fold.
+3. **Two trees (doctrine):** Raw Index = trunk (complete, ≥1 registration edge, coarse: one coarse Raw Index holds several clusters, AI-grouped); Index = emergent semantic tree; Links = edges across ≥2 Index areas; Node = default genre in `<A–Z>_fold/`. Registration is an edge, not a parent: the same `(Raw Index, Node)` pair may not repeat, a Node may carry several registration edges, and `Raw Index → Raw Index` must stay acyclic (I1a/I1b/I1c). Registration edge (Raw Index → Node) is a structural action, AI may append directly; `Node↔Node` and `Index→Node` links change meaning — owner approval required.
+4. **No required templates, no status frontmatter.** Notes are plain markdown — the tools never depend on a template, and `template/` holds optional scaffolds only (notes are not required to fill any template section). Fields kept: `aliases` (wikilink resolution), `source` (mandatory for `archives/material/` — hard gate). Genre by name: `Raw Index*` → `library/Raw/`, `Index of*` → `library/Index/`, `Links of*` → `library/Links/`, else fold.
 5. **State lives only in the todo tree** (`a_sticker/todos/`). Unfinished work must have a `- [ ] [[NAME]]` hook + 5–10 word continuation note. `status/*`, `topic/*`, `attr/*` tags are retired — do not reintroduce them.
 6. **Don't touch** `zzz_output/` contents (owner's terminal output — human-only; links and git-state may be checked/diagnosed) or `.obsidian/`. `zzz_output/Root.md` is the main-tree entry (主树): `Root.md` → `Raw Index of Root` → topic indexes.
 7. One note, one idea. Prefer short definitions; link instead of inlining. AI never writes own-voice body prose; AI-generated prose belongs in `a_sticker/or/`.
 8. No commits or pushes unless the owner asks. Deletions and renames need the owner's sign-off.
-9. Run `python3 tools/vault.py check` before committing structural changes; before any rename/move, `grep -rn '\[\[Old Name'` first. Skill `vault-ops` at `.agent/skills/vault-ops/SKILL.md` has full procedures.
+9. Run `python3 tools/vault.py check` before committing structural changes; before any rename/move, `grep -rn -- '\[\[Old Name'` first. Procedures: `.agent/skills/vault-ops/SKILL.md`; handover contract: `doctrine/Agent Contract.md`; inline help: `python3 tools/vault.py help <topic>`.
 
 ## Invariants (two-tier)
 
-- **Hard gates** (exit 1, block commit): root drained; every `archives/material/` note has real `source:`; no NEW unresolved wikilinks (baseline whitelist in `tools/whitelist_unresolved.txt`).
-- **Report-level I1–I4** (weekly increments, never block): I1 unique Raw Index registration / I2 Links cross-area (same-area = violation, no-area = hint) / I3 Node ≥1 outbound link / I4 doctrine & Raw excluded from binding neighbors.
+- **Hard gates** (exit 1, block commit): root drained; every `archives/material/` note has real `source:`; no NEW unresolved wikilinks (baseline whitelist in `tools/whitelist_unresolved.txt`, currently 0 entries).
+- **Report-level** (weekly increments, never block): I1a 未登记 / I1b 重复登记边 / I1c Raw Index 环 / I2 Links cross-area (same-area = violation, no-area = hint) / I3 Node ≥1 outbound link / I4 doctrine & Raw excluded from binding neighbors / I5–I8 learning mechanisms / D21 未拆材料.
+- Every rule is one entry in `tools/vaultkit/rules.py`; every threshold lives once in `tools/vault.toml`. Never hardcode either in a doc.

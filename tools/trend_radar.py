@@ -1534,6 +1534,25 @@ def cmd_run(args) -> int:
 # ---------------------------------------------------------------- cli
 
 
+def _help_epilog() -> str:
+    """The single place sources / leaderboards / thresholds are listed for humans."""
+    lines = ["sources (id — label — layer):"]
+    for sid, label, _fn in SOURCES:
+        layer = "学术" if sid in ACADEMIC_SIDS else "精选"
+        lines.append(f"  {sid:<11} {label}  [{layer}]")
+    lines.append("")
+    lines.append("academic layer: " + ", ".join(ACADEMIC_SIDS))
+    lines.append("leaderboards: " + ", ".join(spec["id"] for spec in LEADERBOARDS)
+                 + f"  (top {LB_TOP} each, state: {LB_STATE_REL})")
+    lines.append("thresholds: " + ", ".join((
+        f"MIN_ITEMS={MIN_ITEMS}", f"SECTION_FLOOR={SECTION_FLOOR}",
+        f"REPORT_MIN/MAX={REPORT_MIN}/{REPORT_MAX}", f"BUCKET_QUOTA={BUCKET_QUOTA}",
+        f"LAYER_CUTOVER={LAYER_CUTOVER}")))
+    lines.append("snapshot: <snapshot-dir>/<date>/{raw.md,<sid>.raw}; "
+                 "base = --snapshot-dir, $TR_SNAPSHOT_DIR, else /tmp/trend-radar")
+    return "\n".join(lines)
+
+
 def main() -> int:
     # Shared flags are accepted both before and after the subcommand
     # (SUPPRESS keeps the top-level value when the subcommand omits them).
@@ -1545,7 +1564,10 @@ def main() -> int:
     common.add_argument("--date", type=date.fromisoformat, default=argparse.SUPPRESS,
                         help="run date (YYYY-MM-DD)")
 
-    parser = argparse.ArgumentParser(description="Trend Radar — daily trending → archive")
+    parser = argparse.ArgumentParser(
+        description="Trend Radar — daily trending → archive",
+        epilog=_help_epilog(),
+        formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--vault", default=str(ROOT), help="vault root (default: repo root)")
     parser.add_argument("--snapshot-dir", default="",
                         help="snapshot base dir (default $TR_SNAPSHOT_DIR or /tmp/trend-radar)")

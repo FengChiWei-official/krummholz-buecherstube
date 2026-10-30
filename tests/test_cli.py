@@ -216,3 +216,65 @@ def test_status_renders_dash_when_nothing_to_measure(vault):
     assert proc.returncode == 0
     assert "- 上次产出: —" in proc.stdout
     assert "- 上次聚簇: 今天" in proc.stdout
+
+
+def test_status_json_is_self_describing(vault):
+    import json
+
+    proc = run_vault(vault, "status", "--json")
+    assert proc.returncode == 0
+    data = json.loads(proc.stdout)
+    assert data["command"] == "status"
+    assert data["version"].startswith("6.")
+    assert data["state_location"].startswith("a_sticker/todos/")
+    assert data["contract"] == "doctrine/Agent Contract.md"
+    assert set(data["exit_codes"]) == {"0", "1", "2"}
+    assert data["trunk"]["nodes"] == 5
+    assert data["triage"]["root"] == 0
+    assert isinstance(data["next_moves"], list) and data["next_moves"]
+
+
+def test_json_on_every_subcommand(vault):
+    import json
+
+    for argv in (("check", "--json"), ("triage", "--json"), ("rawindex", "--json")):
+        proc = run_vault(vault, *argv)
+        data = json.loads(proc.stdout)
+        assert data["command"] in ("check", "triage", "rawindex")
+        assert data["vault_root"].endswith("mini_vault")
+
+
+def test_random_is_deterministic_with_a_seed(vault):
+    first = run_vault(vault, "random", "--seed", "1")
+    again = run_vault(vault, "random", "--seed", "1")
+    assert first.returncode == 0
+    assert first.stdout == again.stdout
+    assert "→ 问箱" in first.stdout
+
+    library = run_vault(vault, "random", "--scope", "library", "--seed", "2")
+    assert library.returncode == 0
+    assert "scope library" in library.stdout
+
+
+def test_suggest_lists_candidates_with_why(vault):
+    proc = run_vault(vault, "suggest", "Node A", "--n", "3")
+    assert proc.returncode == 0
+    assert "## suggest Node A" in proc.stdout
+    assert "共同邻居" in proc.stdout
+    # Node B already links to Node A, so it is not a candidate
+    assert "[[Node B]]" not in proc.stdout
+
+
+def test_suggest_unknown_name_exits_1(vault):
+    proc = run_vault(vault, "suggest", "No Such Note")
+    assert proc.returncode == 1
+    assert "not found." in proc.stdout
+
+
+def test_help_topics(vault):
+    for topic in ("triage", "rawindex", "dag", "links", "random", "suggest"):
+        proc = run_vault(vault, "help", topic)
+        assert proc.returncode == 0
+        assert topic in proc.stdout
+    assert run_vault(vault, "help").returncode == 0
+    assert run_vault(vault, "help", "nonsense").returncode == 2

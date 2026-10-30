@@ -9,68 +9,53 @@ Owner-facing purpose: **每天一次调用，把该看的链接挑好并挂进 t
 
 One call = one day. Nothing runs in the background; there is no daemon, no watcher, no cron.
 
-## Contract
+## Single source of truth
+
+Sources, academic layer, leaderboards and every threshold are listed by the tool itself:
+
+```bash
+python3 tools/trend_radar.py --help     # sources · leaderboards · thresholds · snapshot layout
+python3 tools/trend_radar.py <cmd> -h   # per-command flags
+```
+
+Do not copy those lists into this file — they drift. The only thing to remember here is the shape of the flow.
+
+## Artifacts
 
 | Layer | Path | Nature |
 |---|---|---|
-| 候选池（当日快照） | `<snapshot-dir>/<date>/raw.md` + 每源 `<sid>.raw`（默认 `/tmp/trend-radar/<date>/`） | 机器生成，零 AI 改写，每条 = 源侧字段原样映射，当日可回溯到 API 快照字节流；**不落库、不滚动、不保留** |
-| 报告 | `archives/work/TR-D-<YYYY-MM-DD>.md` | 两节：`## 精选`（工业/社区热点）+ `## 学术`（论文）。条数随当日信号浮动（sanity 界 4–24，无固定配额），每条 = 链接 + 来源 + 一句"为什么值得看" |
-| 榜单快照 | `archives/work/TR-leaderboards.md` | **每次抓取整体覆盖**，只留当前榜单 + Δ 列；`TR-leaderboards.state.json` 存上一份用于算 Δ（已 gitignore：Δ 只在本机当日有效）。两者都不参与滚动合并 |
-| 索引 | `a_sticker/todos/Trend Radar.md` | v5：无 frontmatter（tags 已退役）；只链当前仍在的件 |
-| 滚动件 | `archives/work/TR-{W,M,Y}-*.md` | 7 日报→周报、月内 ≥4 周报→月报、年内 ≥12 月报→年报；**被合并件删除，不保留** |
+| 候选池（当日快照） | `<snapshot-dir>/<date>/raw.md` + one `<sid>.raw` per source | machine-generated, zero AI rewriting, traceable to the day's API bytes; **never written into the vault, never merged, never kept** |
+| 报告 | `archives/work/TR-D-<YYYY-MM-DD>.md` | two sections `## 精选` + `## 学术`; size follows the day's signal (sanity bounds in `--help`); each item = link + source + one why-line |
+| 榜单快照 | `archives/work/TR-leaderboards.md` | **overwritten on every fetch**, current boards + Δ column; `TR-leaderboards.state.json` holds the previous copy to compute Δ (gitignored — Δ is per-machine, per-day) |
+| 索引 | `a_sticker/todos/Trend Radar.md` | no frontmatter (tags retired); links only the artifacts that still exist |
+| 滚动件 | `archives/work/TR-{W,M,Y}-*.md` | 7 dailies → weekly, ≥4 weeklies → monthly, ≥12 monthlies → yearly; **merged children are deleted, not kept** |
 
-Tool: `tools/trend_radar.py`（stdlib only）。
+Tool: `tools/trend_radar.py` (stdlib only).
 
-## Sources
+## Layer rules
 
-| 节 | 内容 | 分层 |
-|---|---|---|
-| `hf-models` / `hf-datasets` / `hf-spaces` | HF trendingScore | 精选 |
-| `hf-papers` | HF Daily Papers（upvotes = 真人信号） | 学术 |
-| `arxiv` | cs.AI·cs.LG·cs.CL，**按提交时间倒序**（谁新谁前，无质量信号） | 学术 |
-| `arxiv-ml` | **stat.ML·math.OC·cs.NA**，同上（主偏好：ML 算法与优化） | 学术 |
-| `arxiv-plse` | cs.SE·cs.PL·cs.AR·cs.OS，同上（工程向添头） | 学术 |
-| `arxiv-ds` | cs.DS·cs.CG·cs.CC，同上（算法与复杂度拓展） | 学术 |
-| `s2` | Semantic Scholar Graph API，近 7 天 CS 论文按 `citationCount` 降序（被引/影响力引用/venue） | 学术 |
-| `openalex` | 近 7 天 **期刊/会议** CS 文章（`primary_location.source.type:journal|conference`，排掉 Zenodo/预印本存取库）按被引降序 | 学术 |
-| `hackernews` / `lobsters` | 当日前排/热榜 | 精选 |
-| `github` | 7 天内新建仓库按 stars 降序 | 精选 |
-
-- 学术层＝`ACADEMIC_SIDS`（hf-papers / arxiv / arxiv-ml / arxiv-plse / arxiv-ds / s2 / openalex）。**两层互斥**：学术源出来的条目只能进 `## 学术`，`## 精选` 只收非学术源（web_search 条目两节都可以）。
-- **学术节偏好＝ML 算法优先**（`BUCKET_QUOTA`，`cmd_report` 与 `verify` 都强制）：`arxiv-ml` **≥2 条**（主），`arxiv-plse` **≤2 条**（添头），`arxiv-ds` **≤2 条**（拓展）。配额与当天信号冲突时停下来问 owner，别为凑数硬塞、也别把好条目静默丢掉。
-- arXiv 的类目是 `cat:` 过滤，所以会收到**交叉列表**论文（主类目不是桶内类目），meta 里写的是响应返回的 primary category；同一篇可能同时落进两个桶（选报告时按它实际命中的 `sid` 归类，配额按那个桶算）。
-- `openalex` 的条目下限是 10（`SECTION_FLOOR`），其余节默认 20（`MIN_ITEMS`）；过滤后不够就放宽窗口，别把阈值偷偷降掉。
-
-## Leaderboards（`fetch` 自动抓，无需额外命令）
-
-| 榜 | 取数方式 | 备注 |
-|---|---|---|
-| Arena AI 文本榜 / 代码榜（原 LMArena） | 每日镜像 `github.com/oolong-tea-2026/arena-ai-leaderboards` → `data/<date>/text.json`｜`code.json` | 官网无公开 API（`lmarena.ai/api/*` 403）。表头写明 `source_url=arena.ai/...` 与上游 `last_updated`；镜像当天没出就退回其 `latest.json` 指针 |
-| SWE-bench Verified | 官方仓库 `swe-bench.github.io/data/leaderboards.json`，取 `Verified` 子榜，按 `resolved` 降序 | 表里给 Agent/组织/%Resolved/提交日期 |
-| Artificial Analysis Intelligence Index | 官方 API v2 `data/llms/models`，`x-api-key` | 只在设置了 `ARTIFICIAL_ANALYSIS_API_KEY` 时才抓；没设写"未启用"，key 无效写"降级" |
-
-- 每榜列前 10（`LB_TOP`），表头带来源、抓取时间、条目数、快照 sha256；`Δ` 列对比上一份快照（`▲n`/`▼n`/`NEW`），`ΔElo`/`Δ分数` 同源。
-- 同一天重复跑 `fetch` 不会污染 Δ：状态文件只在日期变化时推进。
-- 榜单**不写进候选池的 URL 列表**（快照不是链接流，且会被合并去重规则吃掉），日报里只放一行指针。
-- owner 想看新榜：改 `LEADERBOARDS` 加一个 `@leaderboard(...)` 函数即可；Terminal-Bench 这类只有 Next.js 页面的站点需要额外解析，别默认加。
+- The academic layer is the set `--help` prints as `academic layer:`; the two report layers are **disjoint** — an item from an academic source belongs in `## 学术`, and `## 精选` never borrows one (web_search items may go in either).
+- **Academic picks are ML-algorithms-first** (`BUCKET_QUOTA` in `--help`): `arxiv-ml` is the main line with a floor, the engineering and algorithms buckets are capped. When the quota fights the day's signal, stop and ask the owner — never pad the count, never silently drop a good item.
+- arXiv is filtered by `cat:`, so cross-listed papers appear; the meta line carries the primary category the API returned. The same paper may land in two buckets — classify it by the `sid` it actually matched.
+- `openalex` has a lower section floor than the rest (`SECTION_FLOOR` in `--help`); if a source comes in under its floor after filtering, widen the window rather than quietly lowering the threshold.
 
 ## Daily run
 
 ```bash
-# 1. 抓取 + 写当日 /tmp 快照 + 打印候选池（这是给你挑选用的事实来源）
+# 1. fetch + write the day's /tmp snapshot + print the candidate pool (your source of facts)
 python3 tools/trend_radar.py fetch
 
-# 2. 读候选池，必要时用 web_search 补 API 抓不到的漏
-#    （X/Twitter、中文源、博客、跨源在吵什么），写下 /tmp/tr-items-<date>.json
+# 2. read the pool, use web_search for what the APIs cannot see
+#    (X/Twitter, Chinese sources, blogs, cross-source chatter), write /tmp/tr-items-<date>.json
 
-# 3. 写报告 + 滚动合并 + 更新索引 + 自校验
+# 3. report + rolling merge + index + self-check
 python3 tools/trend_radar.py run --items /tmp/tr-items-<date>.json
 
-# 4. 向 owner 汇报：今天几条、两节各几条、覆盖哪些源、哪几条值得先看；然后清理快照
+# 4. report to the owner: how many items, the split, which sources, which ones to read first; then clean up
 python3 tools/trend_radar.py fetch --purge
 ```
 
-Override the date to rebuild a past day: `--date 2026-09-19`（`--vault` / `--snapshot-dir` 同理，写在子命令前后皆可）。
+Rebuild a past day with `--date 2026-09-19` (`--vault` / `--snapshot-dir` work before or after the subcommand).
 
 ### items.json
 
@@ -83,48 +68,42 @@ Override the date to rebuild a past day: `--date 2026-09-19`（`--vault` / `--sn
   "from": "websearch", "section": "精选", "query": "实际用过的搜索词", "why": "…"}]
 ```
 
-Hard rules enforced by the tool (non-zero exit, nothing written):
+Hard rules the tool enforces (non-zero exit, nothing written) are printed by `run -h` and stated in the failure output. In one line: size inside the sanity bounds, no duplicate URLs, `title`/`source`/`why` on every item, both sections non-empty, `from: raw` items must be verbatim in the day's snapshot, `from: websearch` items must carry their `query`, and the academic section must span ≥2 available academic sources while meeting the bucket quota.
 
-- 条数落在 sanity 界 4–24（`REPORT_MIN`/`REPORT_MAX`）；无重复 URL；每条要有 `title`/`source`/`why`。
-- `section` ∈ {`精选`, `学术`}，**两节都不能空**。
-- `from: raw` → URL 必须逐字出现在当天快照（`<snapshot-dir>/<date>/raw.md`）里，且所属节决定它能不能进这一节：学术源 → 只能进 `学术`，非学术源 → 只能进 `精选`。
-- `from: websearch` → 必须给 `query`，报告里标 `⟦ws: …⟧`，让来源缺口可见而不是被暗示。
-- 学术节至少要覆盖 2 个不同的学术源（当天可用 ≥2 个时），且满足 `BUCKET_QUOTA`：`arxiv-ml` ≥2、`arxiv-plse` ≤2、`arxiv-ds` ≤2。
-
-Pick for signal, not coverage — **强日多写、弱日少写，弱日宁可 6 条也不凑数**：跨源重复（同一条同时在 HN/Lobsters/GitHub）= 最强；某源 #1 次之。**学术节按 ML 算法与优化优先挑**（`arxiv-ml`：优化算法、学习理论、RL 算法），系统工程与 PL 只作添头（≤2），算法与复杂度作拓展（≤2）；工业/社区线里低分条目落在 owner 长期盯的线（systems、compilers、math、高效模型）也值得收。
+Pick for signal, not coverage — **strong day, longer report; weak day, six items is fine, never pad**. Cross-source repetition (the same link on HN + Lobsters + GitHub) is the strongest signal; a source's #1 is next. In the academic section prefer ML algorithms and optimisation; systems/PL is a garnish, algorithms and complexity an extension. Low-score industrial items on a line the owner watches long-term (systems, compilers, math, efficient models) are still worth taking.
 
 ## Rolling
 
 Runs inside `run` — nothing separate to call.
 
-- ISO week of a daily's date decides its weekly label (`TR-W-2026-W38`); a weekly belongs to the month of its ISO week's Thursday.
-- Weekly: 7 dailies in one ISO week → merge (dedupe by URL, cross-file repeats tagged `⟦YYYY-MM-DD⟧`), delete the 7 dailies.
-- 报告滚动件保留分层：被折叠的学术条目在 tail 带 `⟦学术⟧` 标记（与 `⟦YYYY-MM-DD⟧` 同族），合并后仍看得出哪条来自学术节。
+- A daily's ISO week decides its weekly label (`TR-W-2026-W38`); a weekly belongs to the month of its ISO week's Thursday.
+- Weekly: 7 dailies in one ISO week → merge (dedupe by URL, cross-file repeats tagged `⟦YYYY-MM-DD⟧`), then delete the 7 dailies.
+- Merged reports keep the layer: a folded academic item carries `⟦学术⟧` in its tail (same family as `⟦YYYY-MM-DD⟧`).
 - Monthly: ≥4 weeklies in one calendar month → merge, delete them. Yearly: ≥12 monthlies → merge, delete them.
-- 候选池只在 `/tmp`，不参与滚动合并 —— `archives/` 里没有任何原始清单可以增长。
-- Re-merging preserves the previous merged file as the base (no loss), and the index is regenerated from the filesystem, so it never points at a deleted file.
+- The candidate pool lives only in `/tmp` and never merges — nothing in `archives/` can grow without bound.
+- Re-merging keeps the previous merged file as the base (no loss), and the index is regenerated from the filesystem, so it never points at a deleted file.
 
 ## Failure handling
 
-- **One source down / rate-limited / 403** → that section is written as `> [降级] 抓取失败：<reason>`, the other sources proceed, exit code stays 0, and the report carries a 降级 line. Never abort the run for one source.
-- **`SEMANTIC_SCHOLAR_API_KEY` unset** → the `s2` section is written as `> [未启用] 未设置 SEMANTIC_SCHOLAR_API_KEY`（`SourceSkipped`，不是失败，exit 0）。key 只从环境变量读、只走 `x-api-key` 头，绝不写进笔记。key 设了但被拒（401/RateLimit）→ 该节降级。
-- **`OPENALEX_API_KEY` unset** → only OpenAlex degrades; report it to the owner and deliver the rest. The key is read from the environment only — never written to a note, never printed (the tool redacts `api_key=` in every path it writes).
-- **`ARTIFICIAL_ANALYSIS_API_KEY` unset** → the AA row reads 未启用 (not an error). Set but rejected → that board alone degrades (`HTTP 401`), other boards keep their tables. Same rule: key from env, `x-api-key` header only, never written down.
+- **One source down / rate-limited / 403** → that section is written as `> [降级] 抓取失败：<reason>`, the other sources proceed, exit code stays 0, and the report carries a 降级 line. Never abort a run for one source.
+- **`SEMANTIC_SCHOLAR_API_KEY` unset** → the `s2` section reads `> [未启用]` (`SourceSkipped`, not a failure, exit 0). The key is read from the environment only, sent as `x-api-key`, never written into a note.
+- **`OPENALEX_API_KEY` unset** → only OpenAlex degrades; report it to the owner and deliver the rest. The key is env-only, never printed (the tool redacts `api_key=` on every path it writes).
+- **`ARTIFICIAL_ANALYSIS_API_KEY` unset** → that leaderboard row reads 未启用 (not an error). Set but rejected → that board alone degrades (`HTTP 401`), the other boards keep their tables. Same rule: env only, `x-api-key` header, never written down.
 - **No network** → all sections degrade; still write the files, tell the owner it was a network failure, and do not treat the day as covered.
 - **`fetch` interrupted after writing the snapshot** → rerun `run`; `fetch` is safe to rerun (it overwrites and warns).
 
 ## Verify before reporting
 
 ```bash
-python3 tools/trend_radar.py verify                     # 当日快照 + 报告 + 索引 + 榜单
-python3 tools/vault.py check                            # 结构不变量（本流程不得引入新 problem）
+python3 tools/trend_radar.py verify     # day's snapshot + report + index + leaderboards
+python3 tools/vault.py check            # structural invariants (this flow must not add a finding)
 ```
 
-`verify` asserts: 当日快照存在且 `raw.md` 有候选池, 报告两节都存在且条数落在 sanity 界内，`候选池 N / 入选 M` 一行且 N 等于快照正常节合计、M ≤ N, 每条 URL 都能回溯到当日快照（或带 `⟦ws⟧`），学术节的 raw 条目全部来自学术源、精选节的 raw 条目全不来自学术源，学术节覆盖 ≥2 个可用学术源**且满足 ML 算法优先的配额（`arxiv-ml` ≥2 / `arxiv-plse` ≤2 / `arxiv-ds` ≤2）**, index links resolve and cover every current artifact (+ the leaderboard note), leaderboard tables each have ≥10 rows with a source line and snapshot hash, the Δ state file parses, and no ISO week holds ≥7 unmerged dailies. 各源条目下限与 provenance 命中率由 `fetch` 当场把关（不足即降级该节），不再留到 `verify` 复查。
+`verify` asserts the day's snapshot exists and has a candidate pool, both report sections exist with sizes inside the sanity bounds, the `候选池 N / 入选 M` line matches the snapshot totals, every URL traces back to the day's snapshot (or carries `⟦ws⟧`), the academic/精选 split matches the source layers, the academic section spans ≥2 available sources and meets the bucket quota, index links resolve and cover every current artifact, every leaderboard table has ≥10 rows with a source line and a snapshot hash, the Δ state file parses, and no ISO week holds ≥7 unmerged dailies. Per-source floors and provenance hit rates are enforced by `fetch` at capture time (a short section degrades instead of failing later).
 
-`vault.py check` under the new two-tier doctrine: hard gates (root drain / material source / new dangling wikilinks) must stay clean; report-level I1–I4 give weekly increments and never block. The requirement here: no hard-gate finding, and no new finding mentioning `TR-`/`Trend Radar`.
+`vault.py check` under the two-tier doctrine: hard gates (root drain / material source / new dangling wikilinks) must stay clean; report-level rules give weekly increments and never block. The requirement here: no hard-gate finding, and no new finding mentioning `TR-` / `Trend Radar`.
 
-旧契约日报（`date < LAYER_CUTOVER` = 2026-09-21）不套两节/条数/候选池/配额规则。**不回填历史日报**：HF trending / HN 前排这类源只能取"此刻"，补跑过去的日子只会用今天的数据污染旧日期。
+旧契约日报（`date < LAYER_CUTOVER`，见 `--help`）不套两节/条数/候选池/配额规则。**不回填历史日报**：HF trending / HN 前排这类源只能取"此刻"，补跑过去的日子只会用今天的数据污染旧日期。
 
 ## Boundaries
 
@@ -135,7 +114,7 @@ Never: `zzz_output/` contents, `.obsidian/`, `library/`, `README.md`, `AGENTS.md
 ## Stop and ask the owner when
 
 - A period threshold is reached but the files that would be deleted are not exclusively TR- artifacts.
-- **配额与当日信号冲突**：值得看的条目只能来自被限额桶（`arxiv-plse`/`arxiv-ds`），或 `arxiv-ml` 一天凑不出 2 条可读的 —— 停下问 owner，不硬塞也不静默丢。
+- **配额与当日信号冲突**：值得看的条目只能来自被限额桶，或主偏好桶一天凑不出可读条目 —— 停下问 owner，不硬塞也不静默丢。
 - The owner wants a new source, a different report size rule, a different bucket quota, or a different index location (contract change).
 - OpenAlex key is missing/permission-denied and a second run also fails.
 - Semantic Scholar answers 401/403 with a key set, and a second run also fails (key scope or endpoint change).

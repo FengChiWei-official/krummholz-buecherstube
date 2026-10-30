@@ -65,13 +65,13 @@ zzz_output/                终端产出（主树入口 Root.md）
 tools/                     脚本
 ```
 
-体裁判据：**名字 > 路径 > tag**。`Raw Index*` → Raw/；`Index of*` → Index/；`Links of*` → Links/；其余 → fold。名字与路径冲突 = 搬家，不是改判。
+体裁判据：**名字 > 路径 > tag**。`Raw Index*` → Raw/；`Index of*` → Index/；`Links of*` → Links/；`-MOC` 与 `Index of*` 同属 Index/；其余 → fold。名字与路径冲突 = 搬家，不是改判。`a_sticker/todos/Index of Todos.md` 是 todo 树的登记册，不套 library 体裁规则。
 
 ## 字段
 
 删：`tags` / `created` / `data-date` / `date`（全部退役——状态单点在 todo 树，体裁由名字+路径承载）。
 留：`aliases`（wikilink 解析依赖）、`source`（material 的硬门）。
-Node = 纯 markdown，无模板，无固定小节。
+Node = 纯 markdown。**工具不依赖模板；模板是可选脚手架**（`template/`，6 个模板保留原样，含 `aliases:`）。「无固定小节」只约束**笔记**：笔记不要求填满模板的小节，而不是禁止模板存在固定小节。
 
 ## 为什么这套不会重演旧死因
 
@@ -80,10 +80,26 @@ Node = 纯 markdown，无模板，无固定小节。
 | 旧死因 | 复发路径 | 堵法 |
 |---|---|---|
 | 门常红 → 门失效 | I1–I4 若做硬门 | 两级制：硬门只 3 条；I1–I4 给增量 |
-| 状态漂移 | todo 树无 GC | triage 报 >90 天 todo 老化；零出链信号加时间窗（近 7 天 + 零挂钩 = 疑似半成品） |
+| 状态漂移 | todo 树无 GC | triage 报 todo 老化；零出链信号加时间窗（时间窗 + 零挂钩 = 疑似半成品）——阈值单点在 `tools/vault.toml` |
 | 周期流程停摆无告警 | 聚簇/问箱停了没人知道 | `status` 顶部节律行：上次整理/聚簇/问箱/产出 距今 N 天（git log + mtime 推导，零手工记录） |
+
+## 决策台账
+
+形制沿用 v5（`archives/work/PLAN.md` §0）：一条决策一行，含编号、议题、裁决、落地含义。v5 用到 D22，v6 从 D30 起。
+
+| # | 议题 | 裁决（owner，2026-10-30） | 落地含义 |
+|---|---|---|---|
+| D30 | 模板 | **保留**，模板保留 `aliases:` | 模板文件不动；doctrine 措辞改为「工具不依赖模板；模板是可选脚手架」；「无固定小节」收窄为只约束笔记；清 12 处残留提示行 |
+| D31 | `Raw Index of Root` | **留着** | 新建 `library/Raw/Raw Index of Root.md` 并登记 topic indexes；`zzz_output/Root.md` 的链随即成立 |
+| D32 | 49 篇无 `source:` 材料 | **补默认 source** | 默认值须诚实（`source: 未记录（2026-10-30 补齐）`）；同时新增报告级计数器 I9；baseline 豁免表整体可弃 |
+| D33 | `a_sticker/other/` 四份提案 | **保留，逐份标注已过时部分** | 不删除；用显式区块标注哪些段落已被 v5 / v6 取代 |
+| D34 | 类型化边 | **不要** | 维持 v5 D1；「约定小节」方案成为正式路线 |
+| D35 | 记忆底座（间隔重复） | **做** | 只喂规则卡 + 核心概念卡；Obsidian 间隔重复插件，per-machine（`.obsidian/` 已 gitignore）；deck 须切按文件夹模式，否则与「无 tag」冲突 |
+| D36 | 原始清单 `TR-raw-D-*.md` | **不再保存** | 候选池只活在当日 `/tmp` 快照；滚动 raw 合并删除；索引不再挂 raw 链 |
+| D37 | 主干模型 | **树 → DAG** | 登记是边不是父：≥1 条登记边，同一 `(Raw Index, Node)` 对不得重复，多重登记合法，`Raw Index → Raw Index` 必须无环（I1a/I1b/I1c） |
 
 ## Related
 
 - [[Vault Workflow]]
+- [[Agent Contract]]
 - [[Index of Todos]]

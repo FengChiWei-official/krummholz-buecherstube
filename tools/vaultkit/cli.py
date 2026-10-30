@@ -8,7 +8,9 @@ from __future__ import annotations
 
 import argparse
 import collections
+import json
 import math
+import random as random_module
 import re
 import subprocess
 import sys
@@ -16,7 +18,7 @@ import time
 from itertools import combinations
 from pathlib import Path
 
-from . import model, parse, rules
+from . import __version__, model, parse, rules
 from .config import Config, ConfigError, load as load_config
 
 
@@ -90,6 +92,22 @@ def _git_porcelain(cfg: Config):
 
 def _rel(cfg: Config, path: Path) -> str:
     return path.relative_to(cfg.root).as_posix()
+
+
+def wants_json(args) -> bool:
+    return bool(getattr(args, "json", False))
+
+
+def emit_json(payload: dict) -> None:
+    """Machine-readable output: one JSON document on stdout, nothing else."""
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+
+
+EXIT_CODES = {
+    "0": "ok — every report, and any check whose hard gates are green",
+    "1": "hard gate failed (check) or unknown target (rawindex --around / suggest)",
+    "2": "missing or unreadable config (also a missing list file under --strict)",
+}
 
 
 # ---------------------------------------------------------------- check
@@ -186,11 +204,19 @@ def cmd_check(cfg: Config, g: model.Graph, args) -> int:
     """Render every `check` rule from the registry (rules.py)."""
     ctx = rules.Context(cfg=cfg, graph=g)
     problems = 0
-    print("# vault check — two-tier (D20): hard gates exit 1; I1–I4 report-level\n")
+    payload_rules = []
+    if not wants_json(args):
+        print("# vault check — two-tier (D20): hard gates exit 1; I1–I4 report-level\n")
     for rule in rules.RULES:
         if not rule.title:
             continue
         findings = rule.fn(ctx)
+        payload_rules.append({"id": rule.id, "tier": rule.tier, "title": rule.title,
+                              "count": len(findings), "findings": findings})
+        if wants_json(args):
+            if rule.tier == "hard" and findings:
+                problems += 1
+            continue
         print(f"## {rule.title}")
         if rule.note:
             print(f"  {rule.note(ctx)}")
@@ -202,15 +228,21 @@ def cmd_check(cfg: Config, g: model.Graph, args) -> int:
         elif rule.tier in ("hard", "info"):
             print("  OK — no violations")
         print()
+    if wants_json(args):
+        emit_json({"command": "check", "version": __version__, "vault_root": str(cfg.root),
+                   "problems": problems, "clean": problems == 0,
+                   "exit_codes": EXIT_CODES, "rules": payload_rules})
+        return 1 if problems else 0
     print("CLEAN — hard gates hold; report-level numbers above are weekly increments"
           if problems == 0 else f"PROBLEMS: {problems} (hard gates failed)")
     return 1 if problems else 0
 
 
 def collect_check(cfg: Config, g: model.Graph):
-    """(tier, title, findings) for every `check` rule — used by `status`."""
+    """[{id, tier, title, findings}] for every `check` rule — used by `status`."""
     ctx = rules.Context(cfg=cfg, graph=g)
-    return [(rule.tier, rule.title, rule.fn(ctx)) for rule in rules.RULES if rule.title]
+    return [{"id": rule.id, "tier": rule.tier, "title": rule.title, "findings": rule.fn(ctx)}
+            for rule in rules.RULES if rule.title]
 
 
 # ---------------------------------------------------------------- rawindex
@@ -275,31 +307,132 @@ def _rawindex_sync(cfg: Config, g: model.Graph, apply: bool) -> int:
     return 0
 
 
-def _rawindex_around(cfg: Config, g: model.Graph, nbr: dict, name: str) -> int:
+def _rawindex_around(cfg: Config, g: model.Graph, nbr: dict, name: str, args=None) -> int:
     """One node's neighborhood: registrations, areas, links, neighbors."""
     target = g.stems.get(name)
     if target is None:
         low = name.lower()
         cands = [s for s in g.stems if low in s.lower()][:10]
+        if wants_json(args):
+            emit_json({"command": "rawindex --around", "target": name, "found": False,
+                       "did_you_mean": cands})
+            return 1
         print(f"rawindex --around: `{name}` not found.")
         if cands:
             print("  did you mean: " + " / ".join(cands))
         return 1
+    registrations = [r.stem for r in sorted(g.reg.get(target, ()), key=lambda p: p.stem)]
+    areas = [i.stem for i in sorted(g.area.get(target, ()), key=lambda p: p.stem)]
+    outs = sorted(g.out.get(target, set()), key=lambda p: p.stem)
+    ins = sorted((p for p, qs in g.out.items() if target in qs), key=lambda p: p.stem)
+    nb = sorted(nbr.get(target, set()), key=lambda p: p.stem)
+    if wants_json(args):
+        emit_json({"command": "rawindex --around", "target": target.stem, "found": True,
+                   "path": _rel(cfg, target), "registrations": registrations,
+                   "areas": areas, "outlinks": [q.stem for q in outs],
+                   "inlinks": [p.stem for p in ins], "neighbors": [p.stem for p in nb]})
+        return 0
     print(f"## {target.stem}")
     print(f"  path: {_rel(cfg, target)}")
-    if target in g.reg:
-        print(f"  登记: {[r.stem for r in sorted(g.reg[target], key=lambda p: p.stem)]}")
-    else:
-        print("  登记: (queue — 未登记)")
-    if target in g.area:
-        print(f"  区域: {[i.stem for i in sorted(g.area[target], key=lambda p: p.stem)]}")
-    outs = g.out.get(target, set())
-    print(f"  出链 {len(outs)}: {[q.stem for q in sorted(outs, key=lambda p: p.stem)][:12]}")
-    ins = [p for p, qs in g.out.items() if target in qs]
-    print(f"  入链 {len(ins)}: {[p.stem for p in sorted(ins, key=lambda p: p.stem)][:12]}")
-    nb = nbr.get(target, set())
-    print(f"  邻居 {len(nb)} (绑定证据候选: "
-          f"{[p.stem for p in sorted(nb, key=lambda p: p.stem)][:8]})")
+    print(f"  登记: {registrations}" if registrations else "  登记: (queue — 未登记)")
+    if areas:
+        print(f"  区域: {areas}")
+    print(f"  出链 {len(outs)}: {[q.stem for q in outs][:12]}")
+    print(f"  入链 {len(ins)}: {[p.stem for p in ins][:12]}")
+    print(f"  邻居 {len(nb)} (绑定证据候选: {[p.stem for p in nb][:8]})")
+    return 0
+
+
+# ---------------------------------------------------------------- random / suggest
+
+
+def _scope_notes(cfg: Config, g: model.Graph, scope: str) -> list:
+    library_prefix = cfg.paths["library"] + "/"
+    if scope == "all":
+        return sorted(g.notes, key=lambda p: p.stem)
+    if scope == "library":
+        return sorted((p for p in g.notes if g.rel(p).startswith(library_prefix)),
+                      key=lambda p: p.stem)
+    return sorted(g.nodes, key=lambda p: p.stem)
+
+
+def cmd_random(cfg: Config, g: model.Graph, args) -> int:
+    """Random note + its backlinks — 问箱 material (S9). Signal only, never writes."""
+    notes = _scope_notes(cfg, g, args.scope)
+    if not notes:
+        if wants_json(args):
+            emit_json({"command": "random", "scope": args.scope, "found": False})
+            return 0
+        print(f"random: scope `{args.scope}` has no notes")
+        return 0
+    rng = random_module.Random(args.seed)
+    pick = rng.choice(notes)
+    backlinks = sorted((p for p, qs in g.out.items() if pick in qs), key=lambda p: p.stem)
+    if wants_json(args):
+        emit_json({"command": "random", "scope": args.scope, "seed": args.seed,
+                   "note": pick.stem, "path": _rel(cfg, pick),
+                   "backlinks": [p.stem for p in backlinks],
+                   "outlinks": sorted(q.stem for q in g.out.get(pick, set()))})
+        return 0
+    print(f"## {pick.stem}  (scope {args.scope}, seed {args.seed})")
+    print(f"  path: {_rel(cfg, pick)}")
+    print(f"  入链 {len(backlinks)}: {[p.stem for p in backlinks][:12]}")
+    print(f"  出链 {len(g.out.get(pick, set()))}: "
+          f"{sorted(q.stem for q in g.out.get(pick, set()))[:12]}")
+    print("  → 问箱: 补一条链接，产出落为 Links 卡 (S9)")
+    return 0
+
+
+def suggest_candidates(cfg: Config, g: model.Graph, target, n: int) -> list:
+    """[(note, why)] candidate links for `target`, strongest evidence first."""
+    nbr = g.binding_neighbors()
+    mine = nbr.get(target, set())
+    linked = set(g.out.get(target, set())) | {p for p, qs in g.out.items() if target in qs}
+    my_areas = g.area.get(target, set())
+    my_raws = g.reg.get(target, set())
+    scored = []
+    for q in sorted(g.notes, key=lambda p: p.stem):
+        if q == target or q in linked:
+            continue
+        shared = mine & nbr.get(q, set())
+        areas = my_areas & g.area.get(q, set())
+        raws = my_raws & g.reg.get(q, set())
+        if not shared and not areas and not raws:
+            continue
+        why = None
+        if shared:
+            names = " / ".join(p.stem for p in sorted(shared, key=lambda p: p.stem)[:3])
+            why = f"共同邻居 {len(shared)}: {names}"
+        elif raws:
+            why = f"同登记: {sorted(r.stem for r in raws)[0]}"
+        elif areas:
+            why = f"同区域: {sorted(i.stem for i in areas)[0]}"
+        scored.append((-len(shared), -len(raws), -len(areas), q.stem, q, why))
+    scored.sort()
+    return [(q, why) for _s, _r, _a, _stem, q, why in scored[:n]]
+
+
+def cmd_suggest(cfg: Config, g: model.Graph, args) -> int:
+    """Candidate links for one note — S2 capture. Signal only, never writes."""
+    target = g.stems.get(args.name)
+    if target is None:
+        cands = [s for s in g.stems if args.name.lower() in s.lower()][:10]
+        if wants_json(args):
+            emit_json({"command": "suggest", "target": args.name, "found": False,
+                       "did_you_mean": cands})
+            return 1
+        print(f"suggest: `{args.name}` not found.")
+        if cands:
+            print("  did you mean: " + " / ".join(cands))
+        return 1
+    picks = suggest_candidates(cfg, g, target, args.n)
+    if wants_json(args):
+        emit_json({"command": "suggest", "target": target.stem, "found": True,
+                   "candidates": [{"note": q.stem, "why": why} for q, why in picks]})
+        return 0
+    print(f"## suggest {target.stem} — {len(picks)} 个候选链接 (S2, 只给信号)")
+    for i, (q, why) in enumerate(picks, 1):
+        print(f"  {i}. [[{q.stem}]] — {why}")
     return 0
 
 
@@ -311,48 +444,81 @@ def cmd_rawindex(cfg: Config, g: model.Graph, args) -> int:
 
     registered = [n for n in nodes if reg[n]]
     queue = [n for n in nodes if not reg[n]]
-    print(f"nodes {len(nodes)} | Raw Index {len(raws)} | Index {len(g.idxs)} "
-          f"| Links {len(g.linksn)}")
-    print(f"registered {len(registered)} | queue {len(queue)}")
+    if not wants_json(args):
+        print(f"nodes {len(nodes)} | Raw Index {len(raws)} | Index {len(g.idxs)} "
+              f"| Links {len(g.linksn)}")
+        print(f"registered {len(registered)} | queue {len(queue)}")
 
-    if args.check:
+    if args.check and not wants_json(args):
         _rawindex_check(cfg, g)
 
     if args.sync:
         _rawindex_sync(cfg, g, apply=args.apply)
 
     if args.around:
-        return _rawindex_around(cfg, g, nbr, args.around)
+        return _rawindex_around(cfg, g, nbr, args.around, args)
 
     # ---------------- L0: affiliation proposals for the queue
-    print(f"\n## L0 归队提议（队列 {len(queue)} 条中，能定归属的）")
+    props = _l0_proposals(g, nbr, queue)
+    if not wants_json(args):
+        print(f"\n## L0 归队提议（队列 {len(queue)} 条中，能定归属的）")
+        for s, n, tot, v, r in props[:args.top]:
+            print(f"  {s:.0%} ({n}/{tot})  {v.stem}  ->  {r.stem}")
+        if props:
+            conf = sum(1 for p in props if p[0] >= cfg.thresholds["l0_confidence"])
+            print(f"\n  ≥{cfg.thresholds['l0_confidence']:.0%} 置信的提议: {conf} 条 — "
+                  "登记边是结构动作, AI 可直接追加 (D22); "
+                  "其余照人机分工: 共性/命名你定 (D16)")
+
+    if args.clusters:
+        clusters = _cluster_data(cfg, g, nbr, queue)
+        if not wants_json(args):
+            _render_clusters(cfg, g, nbr, queue, clusters)
+
+    if wants_json(args):
+        payload = {
+            "command": "rawindex",
+            "version": __version__,
+            "vault_root": str(cfg.root),
+            "trunk": {"nodes": len(nodes), "raw_index": len(raws), "index": len(g.idxs),
+                      "links": len(g.linksn), "registered": len(registered),
+                      "queue": len(queue)},
+            "l0": [{"node": v.stem, "raw_index": r.stem, "score": round(s, 4),
+                    "votes": n, "neighbors": tot} for s, n, tot, v, r in props],
+            "l0_high_confidence": sum(1 for p in props
+                                      if p[0] >= cfg.thresholds["l0_confidence"]),
+        }
+        if args.check:
+            payload["rules"] = [{"id": rule.id, "tier": rule.tier, "title": rule.short,
+                                 "findings": rule.fn(rules.Context(cfg=cfg, graph=g))}
+                                for rule in rules.RULES if rule.short]
+        if args.clusters:
+            payload["clusters"] = clusters
+        emit_json(payload)
+        return 0
+    return 0
+
+
+def _l0_proposals(g: model.Graph, nbr: dict, queue: list) -> list:
+    """[(score, votes, neighbors, node, raw)] for queue notes with a voting neighborhood."""
     props = []
     for v in queue:
         nb = nbr[v]
         if not nb:
             continue
-        sc = collections.Counter()
+        sc: dict = collections.Counter()
         for z in nb:
-            for r in reg.get(z, ()):
+            for r in g.reg.get(z, ()):
                 sc[r] += 1
         if sc:
             r, n = min(sc.items(), key=lambda kv: (-kv[1], kv[0].stem))
             props.append((n / len(nb), n, len(nb), v, r))
     props.sort(reverse=True)
-    for s, n, tot, v, r in props[:args.top]:
-        print(f"  {s:.0%} ({n}/{tot})  {v.stem}  ->  {r.stem}")
-    if props:
-        conf = sum(1 for p in props if p[0] >= cfg.thresholds["l0_confidence"])
-        print(f"\n  ≥90% 置信的提议: {conf} 条 — 登记边是结构动作, AI 可直接追加 (D22); "
-              "其余照人机分工: 共性/命名你定 (D16)")
-
-    if args.clusters:
-        _rawindex_clusters(cfg, g, nbr, queue)
-
-    return 0
+    return props
 
 
-def _rawindex_clusters(cfg: Config, g: model.Graph, nbr: dict, queue: list) -> None:
+def _cluster_data(cfg: Config, g: model.Graph, nbr: dict, queue: list) -> dict:
+    """L1 coarse components + L2 shared-neighbor clusters, as data."""
     Q = set(queue)
     dadj: dict = collections.defaultdict(set)
     for v in sorted(Q):
@@ -374,16 +540,12 @@ def _rawindex_clusters(cfg: Config, g: model.Graph, nbr: dict, queue: list) -> N
         seen |= c
         comps.append(c)
     comps.sort(key=lambda c: (-len(c), min(x.stem for x in c)))
-    print(f"\n## L1 直接互链粗簇: {len(comps)} 个, 覆盖 {len(seen)}/{len(Q)}")
-    for c in comps[:6]:
-        print(f"  ({len(c)}) " + " / ".join(sorted(x.stem for x in c)[:6]))
 
     z2u: dict = collections.defaultdict(set)
     for v in sorted(Q):
         for z in sorted(nbr[v]):
             z2u[z].add(v)
     w: dict = collections.defaultdict(float)
-    ev: dict = collections.defaultdict(collections.Counter)
     for z in sorted(z2u):
         us = sorted(z2u[z])
         if len(us) < 2:
@@ -391,7 +553,6 @@ def _rawindex_clusters(cfg: Config, g: model.Graph, nbr: dict, queue: list) -> N
         inc = 1.0 / math.log(max(3, len(nbr[z]) + 1))
         for x, y in combinations(us, 2):
             w[(x, y)] += inc
-            ev[(x, y)][z.stem] += 1
     vals = sorted(w.values())
     pct = cfg.thresholds["cluster_theta_percentile"]
     th = vals[int(len(vals) * pct)] if vals else 0
@@ -414,16 +575,38 @@ def _rawindex_clusters(cfg: Config, g: model.Graph, nbr: dict, queue: list) -> N
         seen2 |= c
         cs.append(c)
     cs.sort(key=lambda c: (-len(c), min(x.stem for x in c)))
-    print(f"\n## L2 共享邻居细分 θ=P97={th:.2f}: {len(cs)} 簇, "
-          f"最大 {len(cs[0]) if cs else 0}")
-    for c in cs[:5]:
-        sh = collections.Counter()
+
+    l2 = []
+    for c in cs:
+        sh: dict = collections.Counter()
         for x, y in combinations(sorted(c), 2):
             sh.update(nbr[x] & nbr[y])
-        print(f"  ({len(c)}) " + " / ".join(sorted(x.stem for x in c)[:5]))
         top = sorted(sh.items(), key=lambda kv: (-kv[1], kv[0].stem))[:3]
-        print(f"      绑定证据: {[s.stem for s, _ in top]}")
-    print(f"\n## L3 孤点: {len(Q) - len(seen | seen2)}")
+        l2.append({"members": sorted(x.stem for x in c),
+                   "binding_evidence": [{"note": s.stem, "shared": n} for s, n in top]})
+    return {
+        "theta": th,
+        "l1": {"count": len(comps), "covered": len(seen),
+               "components": [sorted(x.stem for x in c) for c in comps]},
+        "l2": {"count": len(cs), "largest": len(cs[0]) if cs else 0, "clusters": l2},
+        "l3_isolated": len(Q) - len(seen | seen2),
+    }
+
+
+def _render_clusters(cfg: Config, g: model.Graph, nbr: dict, queue: list, data: dict) -> None:
+    Q = set(queue)
+    comps = data["l1"]["components"]
+    print(f"\n## L1 直接互链粗簇: {data['l1']['count']} 个, "
+          f"覆盖 {data['l1']['covered']}/{len(Q)}")
+    for c in comps[:6]:
+        print(f"  ({len(c)}) " + " / ".join(c[:6]))
+    pct_label = f"P{round(cfg.thresholds['cluster_theta_percentile'] * 100)}"
+    print(f"\n## L2 共享邻居细分 θ={pct_label}={data['theta']:.2f}: {data['l2']['count']} 簇, "
+          f"最大 {data['l2']['largest']}")
+    for cluster in data["l2"]["clusters"][:5]:
+        print(f"  ({len(cluster['members'])}) " + " / ".join(cluster["members"][:5]))
+        print(f"      绑定证据: {[e['note'] for e in cluster['binding_evidence']]}")
+    print(f"\n## L3 孤点: {data['l3_isolated']}")
     print("\n## 粗主干归组 (D10-P3): AI 把簇归组进粗 Raw Index (一个含几个簇),")
     print("   细结构(簇+共性)进 Index — 绝不每簇一个 Raw Index。归组方案 AI 提,命名你定。")
 
@@ -447,7 +630,7 @@ def collect_triage(cfg: Config, g: model.Graph) -> dict:
         if p.name not in cfg.root_allowed:
             findings["root"].append(f"file me: {p.name} (root is the entry queue)")
 
-    # 2. todo aging (B1): todo-note entries untouched > 90 days
+    # 2. todo aging (B1): todo-note entries untouched beyond the stale threshold
     for p in sorted(cfg.todos_dir.glob("*.md")):
         age_days = (now - p.stat().st_mtime) / 86400
         if age_days > cfg.thresholds["todo_stale_days"]:
@@ -525,10 +708,19 @@ def collect_triage(cfg: Config, g: model.Graph) -> dict:
     return findings
 
 
+TRIAGE_CATEGORIES = ("root", "todo_stale", "halfdone", "unhooked", "genre", "dead_todo")
+
+
 def cmd_triage(cfg: Config, g: model.Graph, args) -> int:
     findings = collect_triage(cfg, g)
+    if wants_json(args):
+        emit_json({"command": "triage", "version": __version__, "vault_root": str(cfg.root),
+                   "counts": {c: len(findings[c]) for c in TRIAGE_CATEGORIES},
+                   "findings": {c: findings[c] for c in TRIAGE_CATEGORIES},
+                   "note": "mtime heuristic — treat as prompt, not verdict"})
+        return 0
     print("# mtime heuristic — treat as prompt, not verdict\n")
-    for category in ("root", "todo_stale", "halfdone", "unhooked", "genre", "dead_todo"):
+    for category in TRIAGE_CATEGORIES:
         items = findings[category]
         print(f"# {category}: {len(items)}")
         for line in items:
@@ -570,67 +762,15 @@ def _rhythm_line(cfg: Config) -> list:
     ]
 
 
-def cmd_status(cfg: Config, g: model.Graph, args) -> int:
-    """Session-entry state report: rhythm + git + check summary + triage counts + next moves."""
-    print("# vault status — session entry report (read-only)\n")
-
-    # (0) rhythm line (B3+B7)
-    print("## 节律 (B3+B7 — 停摆可见 = 停摆可治)")
-    for line in _rhythm_line(cfg):
-        print(f"- {line}")
-    print()
-
-    # (a) git state
+def collect_status(cfg: Config, g: model.Graph) -> dict:
+    """Everything `status` shows, as data — the base of `status --json`."""
     porcelain = _git_porcelain(cfg)
-    print("## git")
-    if porcelain is None:
-        print("git: unavailable")
-    elif not porcelain:
-        print("clean")
-    else:
-        untracked = sum(1 for ln in porcelain if ln.startswith("??"))
-        print(f"{len(porcelain)} entries ({untracked} untracked)")
-        for ln in porcelain[:10]:
-            print(f"  {ln.strip()}")
-        if len(porcelain) > 10:
-            print(f"  … ({len(porcelain) - 10} more)")
-
-    # (b) check two-tier summary
-    print("\n## check (two-tier summary)")
-    for tier, title, findings in collect_check(cfg, g):
-        state = "OK" if not findings else f"{len(findings)} findings"
-        print(f"- [{tier}] {title}: {state}")
-
-    # (c) triage counts
+    check_rules = [{"id": rule["id"], "tier": rule["tier"], "title": rule["title"],
+                    "count": len(rule["findings"])} for rule in collect_check(cfg, g)]
     triage = collect_triage(cfg, g)
-    print("\n## triage (counts)")
-    print(f"- root files: {len(triage['root'])}")
-    print(f"- todo 老化 (> {cfg.thresholds['todo_stale_days']} 天): {len(triage['todo_stale'])}")
-    print(f"- 疑似半成品 (≤{cfg.thresholds['halfdone_window_days']} 天 + 零出链 + 零挂钩): "
-          f"{len(triage['halfdone'])}")
-    print(f"- unhooked root queue: {len(triage['unhooked'])}")
-    print(f"- 体裁错位: {len(triage['genre'])}")
-    print(f"- dead todo references: {len(triage['dead_todo'])}")
-
-    # (d) trunk summary
-    print("\n## 主干 (trunk)")
-    print(f"- nodes {len(g.nodes)} | Raw Index {len(g.raws)} | "
-          f"Index {len(g.idxs)} | Links {len(g.linksn)}")
     unreg = len(g.unregistered())
-    print(f"- queue (未登记): {unreg} — `vault.py rawindex` gives L0 归队提议")
     zero = len(g.zero_outlink())
-    print(f"- 零出链: {zero}/{len(g.nodes)} — I3 报告级增量 (B5)")
 
-    # (e) zzz_output git-state (content never read)
-    zzz_changes = [ln.strip() for ln in (porcelain or []) if "zzz_output/" in ln]
-    print("\n## zzz_output (owner's terminal output — git-state only)")
-    if zzz_changes:
-        print(f"unpublished-output changes: {len(zzz_changes)} files")
-    else:
-        print("no uncommitted changes")
-
-    # next moves
-    print("\n## next moves")
     moves = []
     if porcelain:
         moves.append("commit or tidy first (run `python3 tools/vault.py status` after)")
@@ -654,7 +794,108 @@ def cmd_status(cfg: Config, g: model.Graph, args) -> int:
         moves.append(f"零出链 {zero} — 捕获时 AI 给 3 候选链接 (S2); 存量靠 I3 增量,不设硬门 (B5)")
     if not moves:
         moves.append("vault clean — new capture (S2), 聚簇, or 问箱 available")
-    for i, move in enumerate(moves, 1):
+
+    return {
+        "rhythm": _rhythm_line(cfg),
+        "porcelain": porcelain,
+        "check": check_rules,
+        "triage": {c: len(triage[c]) for c in TRIAGE_CATEGORIES},
+        "trunk": {"nodes": len(g.nodes), "raw_index": len(g.raws), "index": len(g.idxs),
+                  "links": len(g.linksn), "registered": len(g.nodes) - unreg,
+                  "queue": unreg, "zero_outlink": zero},
+        "zzz_changes": [ln.strip() for ln in (porcelain or []) if "zzz_output/" in ln],
+        "next_moves": moves,
+    }
+
+
+def status_json(cfg: Config, data: dict) -> dict:
+    """`status --json` — the self-bootstrapping payload an AI needs."""
+    return {
+        "command": "status",
+        "version": __version__,
+        "vault_root": str(cfg.root),
+        "contract": "doctrine/Agent Contract.md",
+        "state_location": cfg.paths["todos"] + "/ (the todo tree is the only state store)",
+        "rhythm": dict(zip(("整理", "聚簇", "问箱", "产出"), data["rhythm"])),
+        "git": {
+            "available": data["porcelain"] is not None,
+            "clean": data["porcelain"] == [],
+            "entries": data["porcelain"] or [],
+        },
+        "check": data["check"],
+        "triage": data["triage"],
+        "trunk": data["trunk"],
+        "zzz_output": {"changed_files": len(data["zzz_changes"])},
+        "next_moves": data["next_moves"],
+        "exit_codes": EXIT_CODES,
+    }
+
+
+def cmd_status(cfg: Config, g: model.Graph, args) -> int:
+    """Session-entry state report: rhythm + git + check summary + triage counts + next moves."""
+    data = collect_status(cfg, g)
+    if wants_json(args):
+        emit_json(status_json(cfg, data))
+        return 0
+
+    porcelain = data["porcelain"]
+    print("# vault status — session entry report (read-only)\n")
+
+    # (0) rhythm line (B3+B7)
+    print("## 节律 (B3+B7 — 停摆可见 = 停摆可治)")
+    for line in data["rhythm"]:
+        print(f"- {line}")
+    print()
+
+    # (a) git state
+    print("## git")
+    if porcelain is None:
+        print("git: unavailable")
+    elif not porcelain:
+        print("clean")
+    else:
+        untracked = sum(1 for ln in porcelain if ln.startswith("??"))
+        print(f"{len(porcelain)} entries ({untracked} untracked)")
+        for ln in porcelain[:10]:
+            print(f"  {ln.strip()}")
+        if len(porcelain) > 10:
+            print(f"  … ({len(porcelain) - 10} more)")
+
+    # (b) check two-tier summary
+    print("\n## check (two-tier summary)")
+    for rule in data["check"]:
+        state = "OK" if not rule["count"] else f"{rule['count']} findings"
+        print(f"- [{rule['tier']}] {rule['title']}: {state}")
+
+    # (c) triage counts
+    triage = data["triage"]
+    print("\n## triage (counts)")
+    print(f"- root files: {triage['root']}")
+    print(f"- todo 老化 (> {cfg.thresholds['todo_stale_days']} 天): {triage['todo_stale']}")
+    print(f"- 疑似半成品 (≤{cfg.thresholds['halfdone_window_days']} 天 + 零出链 + 零挂钩): "
+          f"{triage['halfdone']}")
+    print(f"- unhooked root queue: {triage['unhooked']}")
+    print(f"- 体裁错位: {triage['genre']}")
+    print(f"- dead todo references: {triage['dead_todo']}")
+
+    # (d) trunk summary
+    trunk = data["trunk"]
+    print("\n## 主干 (trunk)")
+    print(f"- nodes {trunk['nodes']} | Raw Index {trunk['raw_index']} | "
+          f"Index {trunk['index']} | Links {trunk['links']}")
+    print(f"- queue (未登记): {trunk['queue']} — `vault.py rawindex` gives L0 归队提议")
+    print(f"- 零出链: {trunk['zero_outlink']}/{trunk['nodes']} — I3 报告级增量 (B5)")
+
+    # (e) zzz_output git-state (content never read)
+    print("\n## zzz_output (owner's terminal output — git-state only)")
+    if data["zzz_changes"]:
+        print(f"unpublished-output changes: {len(data['zzz_changes'])} files")
+    else:
+        print("no uncommitted changes")
+
+    # next moves
+    print("\n## next moves")
+    for i, move in enumerate(data["next_moves"], 1):
         print(f"{i}. {move}")
     return 0
 
@@ -662,20 +903,121 @@ def cmd_status(cfg: Config, g: model.Graph, args) -> int:
 # ---------------------------------------------------------------- main
 
 
+HELP_TOPICS = {
+    "triage": """triage — placement debt (read-only)
+
+    python3 tools/vault.py triage [--json]
+
+Six categories, all mtime/edge heuristics — treat as prompt, not verdict:
+  root        root files beyond the ones allowed in tools/vault.toml (root is the
+              entry queue)
+  todo_stale  todo notes untouched beyond todo_stale_days (file-level mtime, top
+              scan only; a_sticker/todos/archived/ is exempt)
+  halfdone    created within halfdone_window_days + zero outlink + no todo hook (A1)
+  unhooked    root-queue note with no todo hook (S5 anti-loss)
+  genre       name says Raw Index* / Index of* / Links of* but the file is not in
+              its home zone; `-MOC` also counts as index; `a_sticker/todos/Index
+              of Todos.md` is the todo-tree register (genre exception)
+  dead_todo   `- [x]` reference to a name that does not resolve
+
+All thresholds: tools/vault.toml. Nothing is written; `status` shows the same
+counts inline.""",
+    "rawindex": """rawindex — trunk operations
+
+    python3 tools/vault.py rawindex [--clusters] [--check] [--sync [--apply]]
+                                    [--around NAME] [--top N] [--json]
+
+  (no flag)    queue + L0 affiliation proposals: for every unregistered Node, the
+               Raw Index its neighbors' registrations vote for. Proposals at or
+               above l0_confidence (tools/vault.toml) may be appended directly (D22).
+  --clusters   L1 direct-interlink components, L2 shared-neighbor clusters at
+               theta = cluster_theta_percentile (binding evidence = common
+               neighbors), L3 isolated points. Group clusters into coarse Raw
+               Indexes — never one Raw Index per cluster (D10-P3).
+  --check      the report-level rules again, from the same registry `check` uses
+               (I1a/I1b/I1c, I2, I3, D21).
+  --sync       dry-run: prints the intended `## Core Concepts` member list of
+               `Raw Index of Everything`. Add --apply to write (L13 write safety).
+  --around     one note's registrations, Index areas, in/out links and binding
+               neighbors. Unknown name: exit 1 with did-you-mean.
+  --top        L0 proposals to show (default rawindex_top in tools/vault.toml).""",
+    "dag": """dag — why the trunk is a DAG, not a tree
+
+The trunk is `Raw Index -> Node` registration edges:
+  - every Node needs >=1 registration edge (I1a 未登记 reports the queue);
+  - the same (Raw Index, Node) pair may not appear twice (I1b 重复登记边);
+  - a Node MAY be registered by several Raw Indexes — uniqueness lives in the
+    edge, not in the parent (multiple parents are legal since v6);
+  - `Raw Index -> Raw Index` must stay acyclic (I1c). Peeling nodes without an
+    in- or out-edge leaves exactly the union of all cycles.
+Registration edges are structural: AI may append them directly (D22).
+`Node <-> Node` and `Index -> Node` links change meaning and need owner approval.
+See doctrine/Vault Design.md ("登记是边，不是父").""",
+    "links": """links — Links notes
+
+`library/Links/Links of X.md` is where a cross-cutting insight becomes a card.
+  - a Links note must span >= 2 Index areas; same-area is a violation, no-area is
+    a hint (I2, report-level);
+  - Links notes are the natural output of 问箱 (S9): a random note plus its
+    backlinks, then the link you actually found;
+  - `Links of X` is a genre: name prefix `Links ` decides the zone, not the path.
+
+    python3 tools/vault.py random --scope library   # 问箱 material
+    python3 tools/vault.py suggest "Group"          # 3 candidate links + why""",
+    "random": """random — 问箱 material (S9)
+
+    python3 tools/vault.py random [--scope nodes|library|all] [--seed N] [--json]
+
+Picks one note and prints its backlinks and outlinks. `--seed` makes the draw
+reproducible. Scopes: `nodes` (default: every Node, i.e. a `<fold>` note),
+`library` (anything under library/), `all` (every scanned note).
+Signal only — the tool never writes a note.""",
+    "suggest": """suggest — candidate links for a note (S2)
+
+    python3 tools/vault.py suggest NAME [--n 3] [--json]
+
+Ranks other notes by evidence and prints one why-line each:
+  - shared binding neighbors (doctrine and Raw Index notes excluded, I4),
+  - then same registration edge, then same Index area.
+Notes already linked (either direction) are skipped. Unknown name: exit 1.
+Signal only — the owner picks, the tool never writes a link.""",
+}
+
+
+def print_help(topic: str | None) -> int:
+    if topic in HELP_TOPICS:
+        print(HELP_TOPICS[topic])
+        return 0
+    if topic:
+        print(f"unknown help topic: {topic}")
+        print("topics: " + " / ".join(sorted(HELP_TOPICS)))
+        return 2
+    print(__doc__ or "vaultkit")
+    print("help topics: " + " / ".join(sorted(HELP_TOPICS)))
+    print("use `vault.py help <topic>`; exit codes: " + "; ".join(
+        f"{k} {v}" for k, v in EXIT_CODES.items()))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
-    # --strict is accepted both before and after the subcommand.
+    # --strict / --json are accepted both before and after the subcommand.
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument("--strict", action="store_true", default=argparse.SUPPRESS,
                         help="missing config / list files are fatal (exit 2), not warnings")
+    common.add_argument("--json", action="store_true", default=argparse.SUPPRESS,
+                        help="machine-readable output (one JSON document on stdout)")
 
     parser = argparse.ArgumentParser(
         description="Vault operating procedures (v6)",
         epilog=("exit codes: 0 = ok (all reports, and any check with green hard gates); "
-                "1 = hard gate failed (check) or unknown target (rawindex --around); "
-                "2 = missing/unreadable config (or a missing list file under --strict)"),
+                "1 = hard gate failed (check) or unknown target (rawindex --around / suggest); "
+                "2 = missing/unreadable config (or a missing list file under --strict). "
+                "Topics: `vault.py help triage|rawindex|dag|links|random|suggest`."),
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--strict", action="store_true", default=argparse.SUPPRESS,
                         help="missing config / list files are fatal (exit 2), not warnings")
+    parser.add_argument("--json", action="store_true", default=argparse.SUPPRESS,
+                        help="machine-readable output (one JSON document on stdout)")
     sub = parser.add_subparsers(dest="command", required=True)
 
     sub.add_parser("check", parents=[common],
@@ -684,6 +1026,20 @@ def build_parser() -> argparse.ArgumentParser:
                    help="placement-debt report: root, todo aging, suspected half-done (read-only)")
     sub.add_parser("status", parents=[common],
                    help="session entry: rhythm line + git + check + triage + trunk + next moves (read-only)")
+
+    p_help = sub.add_parser("help", help="topic help: " + " / ".join(sorted(HELP_TOPICS)))
+    p_help.add_argument("topic", nargs="?", default=None)
+
+    p_rand = sub.add_parser("random", parents=[common],
+                            help="random note + backlinks (S9 问箱 material)")
+    p_rand.add_argument("--scope", choices=("nodes", "library", "all"), default="nodes",
+                        help="which notes to draw from (default nodes)")
+    p_rand.add_argument("--seed", type=int, default=None, help="reproducible draw")
+
+    p_sug = sub.add_parser("suggest", parents=[common],
+                           help="candidate links for a note (S2)")
+    p_sug.add_argument("name", help="note name (stem)")
+    p_sug.add_argument("--n", type=int, default=3, help="candidates to show (default 3)")
 
     p_raw = sub.add_parser("rawindex", parents=[common],
                            help="trunk operations: queue + L0 归队提议")
@@ -701,6 +1057,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv=None) -> int:
     args = build_parser().parse_args(argv)
+    if args.command == "help":
+        return print_help(args.topic)
     try:
         cfg = load_config(strict=getattr(args, "strict", False))
     except ConfigError as exc:
@@ -717,6 +1075,10 @@ def main(argv=None) -> int:
         return cmd_triage(cfg, g, args)
     if args.command == "status":
         return cmd_status(cfg, g, args)
+    if args.command == "random":
+        return cmd_random(cfg, g, args)
+    if args.command == "suggest":
+        return cmd_suggest(cfg, g, args)
     return cmd_rawindex(cfg, g, args)
 
 

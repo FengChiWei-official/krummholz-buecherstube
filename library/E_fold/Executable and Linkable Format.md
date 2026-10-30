@@ -25,4 +25,3 @@ An [[Executable and Linkable Format|ELF]] can be a [[Executable File]], [[Reloca
 ---
 ## **Related**
 
-(链至少一个旧笔记,写一句为什么 — 链接在捕获时发生)
