@@ -56,6 +56,7 @@ class Config:
     root_allowed: frozenset
     trunk_root_stem: str
     trunk_model: str
+    docs_sync: tuple
     whitelist_unresolved: frozenset
     source: Path
     warnings: tuple = ()
@@ -158,6 +159,7 @@ def load(root: str | Path | None = None, config_path: Path | None = None,
         root_allowed=frozenset(data["scan"]["root_allowed"]),
         trunk_root_stem=data["trunk"]["root_stem"],
         trunk_model=data["trunk"]["model"],
+        docs_sync=tuple(data.get("docs_sync", {}).get("rules", ())),
         whitelist_unresolved=frozenset(whitelist),
         source=path,
         warnings=tuple(warnings),

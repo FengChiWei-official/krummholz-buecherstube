@@ -1,6 +1,7 @@
 # Vault Workflow
 
 > 版本：v6（2026-10-30）。
+> 同步组：改本文件语义按 [[Vault Extension]] §同步面 T9（新 D 号 + 重新生成记忆底座卡）。
 
 ## Definition
 

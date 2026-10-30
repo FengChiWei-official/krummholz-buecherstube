@@ -37,6 +37,7 @@ Root = 入口队列（Obsidian 默认落点）：新捕获落在那里，triage 
 
 - `python3 tools/vault.py status` — 会话入口：git + 检查摘要 + 整理债 + **节律行（上次整理/聚簇/问箱/产出）** + 编号选项（每条带可复制命令）。任何会话先跑它。
 - `python3 tools/vault.py check` — 两级判据：**硬门 G1/G2/G3**（root 排空 / material 出处 / 新增悬空 wikilink）exit 1 阻断；**报告级**（I1a 未登记 / I1b 重复登记边 / I1c Raw Index 环 / I2 Links 跨域 / I3 出链 / I4 绑定邻居 / I5 Mapping / I6 实例化 / I7 时间轴 / I8 挂点覆盖率 / I9 未记录 source / D21 未拆材料）给增量。提交前跑。
+- `python3 tools/vault.py docs-check [--against REV] [--gate]` — 文档同步面：按 `tools/vault.toml [docs_sync]`（＝ [[Vault Extension]] §同步面）diff 工作区，报出「碰了触发文件却没连带改」的连带文件。默认报告级，`--gate` exit 1。
 - `python3 tools/vault.py triage` — 整理债：root 积压、todo 老化、疑似半成品（时间窗 + 零出链 + 零挂钩）、unhooked、体裁错位、dead todo——每个阈值只定义在 `tools/vault.toml`。
 - `python3 tools/vault.py rawindex [--clusters|--check|--sync [--apply]|--around NAME]` — 主干作业：归队提议 L0 / 簇 L1–L3（含绑定证据）/ 规则注册表 / 同步主干根成员（默认 dry-run）/ 单点邻域。
 - `python3 tools/vault.py random [--scope …] [--seed N]` / `suggest NAME [--n 3]` — 问箱材料（S9）与候选链接（S2），只给信号不写笔记。

@@ -1,7 +1,7 @@
 # Vault Extension
 
 > 版本：v6（2026-10-30）。
-> 同步组：改任何文档或工具文案前，先读本文件 §同步面。
+> 同步组：本文件是同步面本身；新增 doctrine 文件按 T11。
 
 ## Definition
 
@@ -16,7 +16,7 @@
 | P1 | **硬门恰 3 条**（G1/G2/G3） | `tools/vaultkit/rules.py` 里 `tier="hard"` 的 Rule 数 == 3；新判据默认 `report` |
 | P2 | **单解析器** | `grep -rln '_WIKILINK_RE\|def parse_frontmatter\|def extract_links\|_FENCE_RE' tools/vaultkit/` 只命中 `parse.py` |
 | P3 | **单配置** | zone / genre / threshold / path 字面量只在 `tools/vault.toml`；代码与文档只引用键名 |
-| P4 | **单规则表** | `check` 与 `rawindex --check` 都从 `rules.RULES` 渲染；加规则 = 追加一个 `Rule` |
+| P4 | **单规则表** | `check` / `rawindex --check` / `status` 都从 `rules.RULES` 渲染；加规则 = 追加一个 `Rule` |
 | P5 | **退出码固定** | 0 正常 / 1 硬门失败或未知目标 / 2 配置缺失——不复用为别的含义 |
 | P6 | **写操作默认 dry-run** | `rawindex --sync` 不带 `--apply` 不落盘；新增写命令沿用同一默认 |
 | P7 | **性能预算** | `vault.py status` < 2 s；git 考古一次性批量（`cli.git_first_seen_index`），不得回到每笔记一个子进程 |
@@ -27,7 +27,7 @@
 
 | 关注点 | 文件 |
 |---|---|
-| 常量 / 区域 / 体裁 / 阈值 / 路径 | `tools/vault.toml`（`tools/vaultkit/config.py` 读取） |
+| 常量 / 区域 / 体裁 / 阈值 / 路径 / 文档同步面 | `tools/vault.toml`（`tools/vaultkit/config.py` 读取） |
 | 文本解析（唯一） | `tools/vaultkit/parse.py` |
 | 图 / 登记边 / 环 / 绑定邻居 | `tools/vaultkit/model.py` |
 | 判据 | `tools/vaultkit/rules.py` |
@@ -55,51 +55,73 @@
 1. `cli.py build_parser()` 用 `parents=[common]`（继承 `--strict` / `--json`）。
 2. 实现拆 `collect_*`（返回 dict，供 `--json`）与 `cmd_*`（渲染文本）；`wants_json(args)` 分支里 `emit_json(payload)`。
 3. `HELP_TOPICS` 加一个 topic（面向使用者时）。
-4. 按 §同步面 第 5 行同步入口表与 README。
+4. 按 §同步面 T5 同步入口表、README 与 `tests/`；跑 `python3 tools/vault.py docs-check --gate` 确认没漏。
 
 ### 4. 改主干模型 / 登记语义
 
 `tools/vault.toml [trunk] model`（`tree` | `dag`）是唯一开关；`model.Graph.registration_violations()` 按模型分流。
-改语义按 §同步面 第 4 行同步。
+改语义按 §同步面 T4 同步。
+
+### 5. 新增一份 doctrine 文件
+
+1. 文件放 `doctrine/`，头部两行：`> 版本：v6（YYYY-MM-DD）。` 与 `> 同步组：…`（同步组里引用 T 号）。
+2. 按 §同步面 T11 同步那四处注册点。
+3. `python3 tools/vault.py docs-check --gate` 会替你盯着 T11——新增 doctrine 文件本身是探针。
 
 ## 同步面
 
 左列是触发点，右列必须同改，同一提交内完成。
 
-| # | 触发改动 | 必须同步 |
-|---|---|---|
-| 1 | `tools/vault.toml` | 无需改文档；核对 `cli.py` 的 `HELP_TOPICS` / epilog 是否引用了被改的键名 |
-| 2 | `tools/vaultkit/rules.py` 判据增删改名 | `README.md` §工具；`AGENTS.md` §Invariants；`doctrine/Agent Contract.md` §6；`doctrine/Vault Design.md` §判据两级制；`tools/vaultkit/cli.py`（`cmd_check` 头行、`help rawindex` 文案）；`a_sticker/or/记忆底座-首批卡片.md` 规则卡；`tests/` |
-| 3 | 硬门增删 | 先要 owner 裁决 + `doctrine/Vault Design.md` §决策台账 新 D 号；再第 2 行全部 + `tests/` + `.github/workflows/ci.yml` |
-| 4 | `tools/vaultkit/model.py` 登记语义 / 主干模型 | `doctrine/Vault Design.md` §两棵树 + §关键 doctrine；`README.md` §两棵树；`AGENTS.md` 硬规则 3；`cli.py help dag` |
-| 5 | `cli.py` 子命令 / 旗标 / 退出码 | `README.md` §工具；`doctrine/Agent Contract.md` §1 + §Exit codes；`cli.py` 顶层 epilog |
-| 6 | 体裁 / 分区规则 | `AGENTS.md` 硬规则 2、4；`doctrine/Vault Design.md` §区域；`README.md` §区域；记忆底座卡「体裁由什么决定」 |
-| 7 | 字段政策 | `AGENTS.md` 硬规则 4；`doctrine/Vault Design.md` §字段；`README.md` §最小记忆集；记忆底座卡「保留哪些 frontmatter 字段」 |
-| 8 | 模板政策 | `AGENTS.md` 硬规则 4；`doctrine/Vault Design.md` §字段；`README.md` §最小记忆集第 1 条 |
-| 9 | doctrine 任何语义变化 | `doctrine/Vault Design.md` §决策台账（新 D 号）；`a_sticker/or/记忆底座-首批卡片.md` 重新生成（该文件头部自带漂移规则） |
-| 10 | 本机 / Obsidian / 插件设置 | `doctrine/New Machine.md` §本机状态表 |
-| 11 | 新增 doctrine 文件 | `AGENTS.md` §Source of truth；`README.md` §协作 + §Related Files；`doctrine/Vault Design.md` §区域；`.agent/skills/vault-ops/SKILL.md` §Load order；本表自身 |
+**机器副本**：`tools/vault.toml [docs_sync]`——id 与本表一一对应（`tests/test_docs.py` 断言两边 id 集合相等）。
+`python3 tools/vault.py docs-check [--against REV] [--gate]` 按它 diff 工作区，报出触发但没连带改的文件：
+默认报告级（exit 0），`--gate` 才 exit 1。
+
+探针是**精确的**，不是「文件碰了就红」：`rules.py` 只改注释不触发 T2；`cli.py` 只改实现、不动子命令名不触发 T5。
+没有探针的行（T3、T6–T10）在 `docs-check` 里列为 `manual`——机器看不见，只能靠本表。
+
+| # | 触发改动 | 必须同步 | 探针 |
+|---|---|---|---|
+| T1 | `tools/vault.toml` | 无需改文档；核对 `cli.py` 的 `HELP_TOPICS` / epilog 是否引用了被改的键名 | 路径 |
+| T2 | `tools/vaultkit/rules.py` 判据增删改名 | `README.md` §工具；`AGENTS.md` §Invariants；`doctrine/Agent Contract.md` §6；`doctrine/Vault Design.md` §判据两级制；`tools/vaultkit/cli.py`（`cmd_check` 头行、`help rawindex` 文案）；`a_sticker/or/记忆底座-首批卡片.md` 规则卡；`tests/` | 判据 id 集合 |
+| T3 | 硬门增删 | 先要 owner 裁决 + `doctrine/Vault Design.md` §决策台账 新 D 号；再 T2 全部 + `tests/` + `.github/workflows/ci.yml` | manual（要人裁决） |
+| T4 | `tools/vaultkit/model.py` 登记语义 / 主干模型 | `doctrine/Vault Design.md` §两棵树 + §关键 doctrine；`README.md` §两棵树；`AGENTS.md` 硬规则 3；`cli.py help dag` | 路径 |
+| T5 | `cli.py` 子命令 / 旗标 / 退出码 | `README.md` §工具；`doctrine/Agent Contract.md` §1 + §Exit codes；`cli.py` 顶层 epilog；`tests/` | 子命令名集合 |
+| T6 | 体裁 / 分区规则 | `AGENTS.md` 硬规则 2、4；`doctrine/Vault Design.md` §区域；`README.md` §区域；记忆底座卡「体裁由什么决定」 | manual |
+| T7 | 字段政策 | `AGENTS.md` 硬规则 4；`doctrine/Vault Design.md` §字段；`README.md` §最小记忆集；记忆底座卡「保留哪些 frontmatter 字段」 | manual |
+| T8 | 模板政策 | `AGENTS.md` 硬规则 4；`doctrine/Vault Design.md` §字段；`README.md` §最小记忆集第 1 条 | manual |
+| T9 | doctrine 任何语义变化 | `doctrine/Vault Design.md` §决策台账（新 D 号）；`a_sticker/or/记忆底座-首批卡片.md` 重新生成（该文件头部自带漂移规则） | manual |
+| T10 | 本机 / Obsidian / 插件设置 | `doctrine/New Machine.md` §仓库里有的 vs 每机各异的 | manual（`.obsidian/` 不在 git） |
+| T11 | 新增 doctrine 文件 | `AGENTS.md` §Source of truth；`README.md` §协作 + §Related Files；`doctrine/Vault Design.md` §区域；`.agent/skills/vault-ops/SKILL.md` §Load order；若新文件有自己的同步组，本表加一行 | 新增文件 |
 
 ## 自检
 
+内容一致性由 `tests/test_docs.py` 强制（CI 跑 `pytest`，不过就红）：
+
+| 检查 | 断言 |
+|---|---|
+| 判据 id 齐全 | 5 份文档（README / AGENTS / Vault Design / Agent Contract / 记忆底座卡）都点到 `RULES` 里的每个 id |
+| 无幽灵 id | 扫描范围内出现的判据写法必须真的存在——v5 遗留的旧编号会红 |
+| 无 id 区间 | 不许用区间简写（区间查不了成员，而且最先过期） |
+| 阈值无副本 | 文档只写键名，不写数值 |
+| 同步面 id 对齐 | `tools/vault.toml [docs_sync]` 的 id 集合 == 本表 id 集合 |
+| 同步面目标存在 | 每行的 `sync` / `paths` 指向的文件真的在 |
+| doctrine 头齐 | 每份 `doctrine/*.md` 有 `> 版本：` 与 `> 同步组：`，且引用的 T 号存在 |
+
+「改了一处有没有连带改」由 `docs-check` 管（提交前跑，见 §同步面）：
+
 ```bash
-# 1) 无过时的 v5 判据措辞（只应命中本文件的示例命令）
-grep -rn 'I1–I4\|I1-I4' README.md AGENTS.md doctrine/ tools/vaultkit/ | grep -v 'Vault Extension'
+python3 tools/vault.py docs-check --against HEAD          # 报告级：列出漏改
+python3 tools/vault.py docs-check --against HEAD --gate   # 漏改则 exit 1
+```
 
-# 2) 阈值数值无副本（只应命中 tools/vault.toml）
+不需要 pytest 时的粗筛（只扫散文——下面围栏里的示例不会被上面的检查扫到）：
+
+```bash
+# 幽灵 id / id 区间
+grep -rnE '(^|[^A-Za-z0-9_])(I[0-9]+[a-c]?|G[0-9]+)([^0-9A-Za-z_]|$)' README.md AGENTS.md doctrine/ tools/vaultkit/cli.py
+
+# 阈值数值副本（只应命中 tools/vault.toml）
 grep -rnE '(^|[^0-9])90([^0-9]|$)|0\.97|(^|[^0-9])0\.9([^0-9]|$)' README.md AGENTS.md doctrine/*.md .agent/skills/*/SKILL.md
-
-# 3) 规则 id 与四处文档一致（期望打印 OK）
-python3 - <<'PY'
-import sys
-from pathlib import Path
-sys.path.insert(0, "tools")
-from vaultkit import rules
-ids = [r.id for r in rules.RULES]
-docs = ("README.md", "AGENTS.md", "doctrine/Vault Design.md", "doctrine/Agent Contract.md")
-missing = {d: [i for i in ids if i not in Path(d).read_text(encoding="utf-8")] for d in docs}
-print({d: m for d, m in missing.items() if m} or "OK")
-PY
 ```
 
 ## Related

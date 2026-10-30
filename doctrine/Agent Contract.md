@@ -1,6 +1,7 @@
 # Agent Contract
 
 > 版本：v6（2026-10-30）。
+> 同步组：本文件是 [[Vault Extension]] §同步面 T2（判据清单）/ T3（硬门）/ T5（命令与退出码）的连带文件；语义变化按 T9。
 
 Self-contained handover contract for an AI (or a new human) with **zero history**.
 If you read only this file plus run `python3 tools/vault.py status --json`, you can
@@ -13,8 +14,9 @@ take over correctly. Deeper why: [[Vault Design]]; operational procedures:
 |---|---|
 | `python3 tools/vault.py status` | session entry. Rhythm line + git + check summary + triage counts + trunk + numbered next moves (every move carries a copy-pasteable command) |
 | `python3 tools/vault.py status --json` | the same as data — **this is the machine entry point**; every field below is in it |
-| `python3 tools/vault.py help <topic>` | inline help: `triage` / `rawindex` / `dag` / `links` / `random` / `suggest` |
+| `python3 tools/vault.py help <topic>` | inline help: `triage` / `rawindex` / `dag` / `links` / `random` / `suggest` / `docs-check` |
 | `python3 tools/vault.py check` | two-tier invariant report; exit 1 only when a hard gate fails |
+| `python3 tools/vault.py docs-check [--against REV] [--gate]` | docs sync map vs the diff: triggered rows whose co-owners did not move (report-level; `--gate` exits 1) |
 | `python3 tools/vault.py triage` | placement debt (root, todo aging, half-done, unhooked, genre, dead todo) |
 | `python3 tools/vault.py rawindex [...]` | trunk operations: queue + L0 归队 / `--clusters` / `--check` / `--sync` / `--around NAME` |
 | `python3 tools/vault.py random [--scope …] [--seed N]` | 问箱 material (S9): one note + its backlinks |
@@ -30,7 +32,7 @@ Every subcommand accepts `--json` (one JSON document on stdout, nothing else) an
 | code | meaning |
 |---|---|
 | 0 | ok — every report, and any `check` whose hard gates are green |
-| 1 | a hard gate failed (`check`), or an unknown target (`rawindex --around`, `suggest`) |
+| 1 | a hard gate failed (`check`), an unknown target (`rawindex --around`, `suggest`), or a docs-sync violation under `docs-check --gate` |
 | 2 | missing/unreadable config; a missing list file under `--strict`; unknown `help` topic |
 
 ## 2. Where state lives
@@ -80,10 +82,13 @@ not in a note is not in the system.
 | `python3 tools/vault.py triage` | 6 category counts; every line is a *prompt*, not a verdict |
 | `python3 tools/vault.py status` | rhythm line, git state, check summary, trunk counts, numbered moves |
 | `python3 tools/vault.py rawindex --check` | the same rule registry as `check`, trunk-facing |
+| `python3 tools/vault.py docs-check --against HEAD` | triggered sync rows and the co-owner files they are missing; `--gate` makes it exit 1 |
 | `python3 tools/trend_radar.py verify` | the day's snapshot + report + index + leaderboards |
 
 `check` before and after any structural change. `python3 -m pytest -q` runs the
-tool's own suite (`tests/`), including a fixture vault.
+tool's own suite (`tests/`), including a fixture vault and `tests/test_docs.py`
+(doc↔tool consistency: rule ids, no ghost ids or id ranges, no threshold value
+copies, sync-map id parity, doctrine headers).
 
 ### Facts the tools rely on (do not "fix" them)
 

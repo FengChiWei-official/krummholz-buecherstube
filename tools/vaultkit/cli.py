@@ -105,99 +105,13 @@ def emit_json(payload: dict) -> None:
 
 EXIT_CODES = {
     "0": "ok — every report, and any check whose hard gates are green",
-    "1": "hard gate failed (check) or unknown target (rawindex --around / suggest)",
+    "1": "hard gate failed (check), unknown target (rawindex --around / suggest), "
+         "or a docs-sync violation under docs-check --gate",
     "2": "missing or unreadable config (also a missing list file under --strict)",
 }
 
 
 # ---------------------------------------------------------------- check
-
-
-def collect_check(cfg: Config, g: model.Graph):
-    """Gather all check findings, two-tier (D20).
-
-    Returns an ordered list of (tier, title, findings):
-    tier "gate"    -> hard gate: any finding makes check exit 1.
-    tier "report"  -> report-level: weekly increments, never blocks.
-    tier "info"    -> informational baseline, never blocks.
-    """
-    basenames = g.resolvable()
-
-    # ---- G1 (gate): root drained
-    root_findings = [f"{p.name}: file me (root is the entry queue)"
-                     for p in cfg.root.glob("*.md") if p.name not in cfg.root_allowed]
-
-    # ---- G2 (gate): every archives/material/ note has a real source:
-    # lit detection by PATH (doctrine v5: material/ is the lit zone).
-    lit_findings = []
-    lit_baseline = []
-    material_prefix = cfg.paths["archives_material"] + "/"
-    for p, text in g.notes.items():
-        rel = _rel(cfg, p)
-        if not rel.startswith(material_prefix):
-            continue
-        source = parse.parse_frontmatter(text).get("source", "")
-        if not source or str(source).strip() in ("", '""', "''"):
-            entry = f"{rel}: no real source:"
-            if p.stem in cfg.baseline_lit_nosource_stems:
-                lit_baseline.append(entry)
-            else:
-                lit_findings.append(entry)
-
-    # ---- G3 (gate): wikilink integrity (NEW unresolved only)
-    unresolved_findings = []
-    for p, text in g.notes.items():
-        for target, line_no in parse.extract_wikilinks(text):
-            if target in basenames or target in cfg.whitelist_unresolved:
-                continue
-            if parse.is_image_embed(target):
-                continue
-            unresolved_findings.append(f"{_rel(cfg, p)}:{line_no}: unresolved [[{target}]]")
-
-    # ---- R-I1..R-I4 (report): the weekly increments
-    nodes = g.nodes
-
-    i1_unregistered = g.unregistered()
-    i1_lines = [f"未登记: {len(i1_unregistered)}  (queue — see rawindex L0)"]
-    for stem, raws in sorted(g.multi_registered().items())[:8]:
-        i1_lines.append(f"  多重登记: {stem} -> {raws}")
-
-    area = g.area
-    i2_lines = []
-    cross = intra = noarea = 0
-    for L in g.linksn:
-        members = [q for q in g.out[L] if q in area]
-        areas = set().union(*[area[q] for q in members]) if members else set()
-        if len(areas) >= 2:
-            cross += 1
-        elif areas:
-            intra += 1
-            i2_lines.append(f"  同区域(违规): {L.stem} ({len(members)} 成员)")
-        else:
-            noarea += 1
-    i2_lines.insert(0, f"跨界 {cross} | 同区域 {intra}(违规) | 无区域 {noarea}(提示)")
-
-    zero = g.zero_outlink()
-    i3_lines = [f"零出链: {len(zero)}/{len(nodes)} ({len(zero) * 100 // max(1, len(nodes))}%)"
-                " — 捕获规则增量,不阻断 (B5)"]
-
-    # I4: doctrine & Raw excluded from binding neighbors — enforced structurally
-    # by the trunk-graph builder; report the exclusion counts.
-    i4_lines = [f"绑定邻居排除 doctrine({len(g.doctrine)}) 与 Raw({len(g.raws)}) — "
-                "结构性排除,无违规"]
-
-    return [
-        ("gate", "G1 root drained (hard gate)", root_findings),
-        ("gate", "G2 archives/material/ has real source (hard gate)", lit_findings),
-        ("info", "G2-baseline material without source (2026-09 baseline, informational)",
-         lit_baseline),
-        ("gate", "G3 wikilink integrity — NEW unresolved only (hard gate)",
-         unresolved_findings),
-        ("report", "I1 唯一归属 (report: weekly increment)", i1_lines),
-        ("report", "I2 Links 跨区域 — 同区域=违规 无区域=提示 (report)", i2_lines),
-        ("report", "I3 Node ≥1 出链 (report: weekly increment)", i3_lines),
-        ("report", "I4 doctrine/Raw 不做绑定邻居 (report)", i4_lines),
-    ]
 
 
 def cmd_check(cfg: Config, g: model.Graph, args) -> int:
@@ -236,13 +150,6 @@ def cmd_check(cfg: Config, g: model.Graph, args) -> int:
     print("CLEAN — hard gates hold; report-level numbers above are weekly increments"
           if problems == 0 else f"PROBLEMS: {problems} (hard gates failed)")
     return 1 if problems else 0
-
-
-def collect_check(cfg: Config, g: model.Graph):
-    """[{id, tier, title, findings}] for every `check` rule — used by `status`."""
-    ctx = rules.Context(cfg=cfg, graph=g)
-    return [{"id": rule.id, "tier": rule.tier, "title": rule.title, "findings": rule.fn(ctx)}
-            for rule in rules.RULES if rule.title]
 
 
 # ---------------------------------------------------------------- rawindex
@@ -771,8 +678,9 @@ def _rhythm_line(cfg: Config) -> list:
 def collect_status(cfg: Config, g: model.Graph) -> dict:
     """Everything `status` shows, as data — the base of `status --json`."""
     porcelain = _git_porcelain(cfg)
-    check_rules = [{"id": rule["id"], "tier": rule["tier"], "title": rule["title"],
-                    "count": len(rule["findings"])} for rule in collect_check(cfg, g)]
+    ctx = rules.Context(cfg=cfg, graph=g)
+    check_rules = [{"id": rule.id, "tier": rule.tier, "title": rule.title,
+                    "count": len(rule.fn(ctx))} for rule in rules.RULES if rule.title]
     triage = collect_triage(cfg, g)
     unreg = len(g.unregistered())
     zero = len(g.zero_outlink())
@@ -906,10 +814,146 @@ def cmd_status(cfg: Config, g: model.Graph, args) -> int:
     return 0
 
 
+# ---------------------------------------------------------------- docs sync
+
+
+def _ids_in(text: str) -> set:
+    """Rule ids declared by rules.py (`Rule("G1", ...)`)."""
+    return set(re.findall(r'Rule\(\s*"([^"]+)"', text or ""))
+
+
+def _subcommands_in(text: str) -> set:
+    """Subcommand names declared by build_parser (`add_parser("check", ...)`)."""
+    return set(re.findall(r'add_parser\(\s*"([^"]+)"', text or ""))
+
+
+_PROBES = {
+    "ids_file": _ids_in,
+    "subcommands_file": _subcommands_in,
+}
+
+
+def _sync_scope_match(entry: str, paths: set) -> bool:
+    """A sync entry matches a changed path: exact, `dir/` prefix, or glob."""
+    if entry.endswith("/"):
+        return any(p.startswith(entry) for p in paths)
+    return any(p == entry or Path(p).match(entry) for p in paths)
+
+
+def collect_docs_sync(cfg: Config, *, changed: set, added: set,
+                      texts: dict) -> dict:
+    """Compare the diff against the docs sync map (`tools/vault.toml [docs_sync]`).
+
+    Pure: `changed` / `added` are repo-relative paths; `texts` maps a probe file
+    to `(base_text, current_text)` (either may be None). No git access here.
+    """
+    touched = set(changed) | set(added)
+    findings = []
+    manual = []
+    for rule in cfg.docs_sync:
+        rid = rule["id"]
+        if not any(k in rule for k in ("paths", "paths_added", *_PROBES)):
+            manual.append({"id": rid, "note": rule.get("note", ""),
+                           "sync": list(rule.get("sync", ()))})
+            continue
+        fired = False
+        if any(p in changed for p in rule.get("paths", ())):
+            fired = True
+        if not fired and any(Path(a).match(g) for a in added
+                             for g in rule.get("paths_added", ())):
+            fired = True
+        for probe, extract in _PROBES.items():
+            path = rule.get(probe)
+            if fired or not path or path not in changed:
+                continue
+            base_text, cur_text = texts.get(path, (None, None))
+            if base_text is None or extract(base_text) != extract(cur_text):
+                fired = True
+        if not fired:
+            continue
+        missing = [s for s in rule.get("sync", ()) if not _sync_scope_match(s, touched)]
+        if missing:
+            findings.append({"id": rid, "note": rule.get("note", ""),
+                             "missing": missing})
+    return {"findings": findings, "manual": manual}
+
+
+def cmd_docs_check(cfg: Config, g: model.Graph, args) -> int:
+    """Docs sync map vs the diff: report-level by default, a gate under --gate."""
+    base = args.against or "HEAD"
+    gate = bool(getattr(args, "gate", False))
+    diff = _git(cfg.root, ["diff", "--name-only", base])
+    added_out = _git(cfg.root, ["diff", "--name-only", "--diff-filter=A", base])
+    untracked = _git(cfg.root, ["ls-files", "--others", "--exclude-standard"])
+    if diff is None or added_out is None or untracked is None:
+        print(f"ERROR: cannot diff against {base} (no git repo, or unknown revision)")
+        return 2
+    untracked = {p for p in untracked.splitlines() if p}
+    changed = {p for p in diff.splitlines() if p} | untracked
+    added = {p for p in added_out.splitlines() if p} | untracked
+
+    texts = {}
+    for rule in cfg.docs_sync:
+        for probe in _PROBES:
+            path = rule.get(probe)
+            if not path or path in texts or path not in changed:
+                continue
+            cur = cfg.root / path
+            base_text = _git(cfg.root, ["show", f"{base}:{path}"])
+            texts[path] = (base_text, cur.read_text(encoding="utf-8") if cur.exists() else None)
+
+    data = collect_docs_sync(cfg, changed=changed, added=added, texts=texts)
+    data.update({"base": base, "changed": sorted(changed),
+                 "gate": gate, "exit": 1 if (gate and data["findings"]) else 0})
+
+    if wants_json(args):
+        emit_json(data)
+        return data["exit"]
+
+    print(f"# vault docs-check — sync map vs {base} (two-tier: report-level unless --gate)\n")
+    for finding in data["findings"]:
+        print(f"## {finding['id']} fired — 未同步 {len(finding['missing'])} 处")
+        if finding["note"]:
+            print(f"  {finding['note']}")
+        for path in finding["missing"]:
+            print(f"  - {path}")
+        print()
+    if not data["findings"]:
+        print("OK — every triggered sync row carries its co-owners")
+    if data["manual"]:
+        print(f"\nmanual rows (no path probe — read `doctrine/Vault Extension.md` §同步面): "
+              f"{', '.join(m['id'] for m in data['manual'])}")
+    if data["findings"]:
+        print(f"\n{len(data['findings'])} violation(s) — "
+              f"{'exit 1 (--gate)' if gate else 'report-level, exit 0 (add --gate to gate)'}")
+    else:
+        print("\n0 violations — nothing to sync")
+    return data["exit"]
+
+
 # ---------------------------------------------------------------- main
 
 
 HELP_TOPICS = {
+    "docs-check": """docs-check — docs sync map vs the diff (report-level)
+
+    python3 tools/vault.py docs-check [--against REV] [--gate] [--json]
+
+The sync map (`doctrine/Vault Extension.md` §同步面; machine copy in
+`tools/vault.toml [docs_sync]`) says: change this, also change these. This
+command diffs the working tree against REV (default HEAD) and reports every
+triggered row whose co-owners were not touched.
+
+Two-tier, like `check`: report-level by default (exit 0, prints); a gate under
+--gate (exit 1). Probes are precise — a row fires only when its own probe fires:
+a path changed, a NEW file appeared, the rule-id set in rules.py changed, or the
+subcommand set in cli.py changed. A comment-only edit to rules.py fires nothing.
+Rows with no probe are listed as `manual` (read the handbook for those).
+
+Run it before committing a change to rules.py / cli.py / model.py / vault.toml,
+or when adding a doctrine file. Content checks that always gate live in
+`tests/test_docs.py` (rule ids present and non-ghost, no id ranges, no threshold
+value copies, sync-map id parity, doctrine version/sync-group headers).""",
     "triage": """triage — placement debt (read-only)
 
     python3 tools/vault.py triage [--json]
@@ -1018,9 +1062,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Vault operating procedures (v6)",
         epilog=("exit codes: 0 = ok (all reports, and any check with green hard gates); "
-                "1 = hard gate failed (check) or unknown target (rawindex --around / suggest); "
+                "1 = hard gate failed (check), unknown target (rawindex --around / suggest) "
+                "or a docs-sync violation under docs-check --gate; "
                 "2 = missing/unreadable config (or a missing list file under --strict). "
-                "Topics: `vault.py help triage|rawindex|dag|links|random|suggest`."),
+                "Topics: `vault.py help triage|rawindex|dag|links|random|suggest|docs-check`."),
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--strict", action="store_true", default=argparse.SUPPRESS,
                         help="missing config / list files are fatal (exit 2), not warnings")
@@ -1030,6 +1075,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("check", parents=[common],
                    help="two-tier invariant report: hard gates exit 1; report-level rules never block")
+    p_docs = sub.add_parser("docs-check", parents=[common],
+                            help="docs sync map vs the diff: report-level, --gate gates")
+    p_docs.add_argument("--against", metavar="REV", default=None,
+                        help="base revision to diff against (default HEAD)")
+    p_docs.add_argument("--gate", action="store_true", default=argparse.SUPPRESS,
+                        help="exit 1 on a violation (default: report only)")
     sub.add_parser("triage", parents=[common],
                    help="placement-debt report: root, todo aging, suspected half-done (read-only)")
     sub.add_parser("status", parents=[common],
@@ -1053,7 +1104,8 @@ def build_parser() -> argparse.ArgumentParser:
                            help="trunk operations: queue + L0 归队提议")
     p_raw.add_argument("--clusters", action="store_true",
                        help="L1/L2 clusters + binding evidence + grouping advice")
-    p_raw.add_argument("--check", action="store_true", help="I1–I3 + material 未拆 report")
+    p_raw.add_argument("--check", action="store_true",
+                       help="the report-level rules again, from the same registry as check")
     p_raw.add_argument("--sync", action="store_true",
                        help="B6: rewrite the trunk root member list (dry-run unless --apply)")
     p_raw.add_argument("--apply", action="store_true",
@@ -1079,6 +1131,8 @@ def main(argv=None) -> int:
     g = model.load(cfg)
     if args.command == "check":
         return cmd_check(cfg, g, args)
+    if args.command == "docs-check":
+        return cmd_docs_check(cfg, g, args)
     if args.command == "triage":
         return cmd_triage(cfg, g, args)
     if args.command == "status":

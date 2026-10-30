@@ -44,4 +44,86 @@ model = "dag"
 [files]
 whitelist_unresolved = "tools/whitelist_unresolved.txt"
 
+# ── docs sync map ────────────────────────────────────────────────────────────
+# Machine copy of doctrine/Vault Extension.md §同步面. The handbook owns the
+# prose (what each row means and why); this table owns what is checkable.
+# Ids must match the handbook table 1:1 — tests/test_docs.py asserts that.
+#
+# Probes (a row fires when any one of its probes fires):
+#   paths             any of these paths changed
+#   paths_added       a NEW file matches one of these globs
+#   ids_file          the set of rule ids in this file changed (rules.py)
+#   subcommands_file  the set of subcommand names in this file changed (cli.py)
+# A row with no probe is manual: the handbook names its trigger, no path can see
+# it. `sync` entries ending in "/" mean "any file under this directory".
+
+[[docs_sync.rules]]
+id = "T1"
+note = "无需改文档"
+paths = ["tools/vault.toml"]
+sync = []
+
+[[docs_sync.rules]]
+id = "T2"
+note = "判据增删改名（id 集合变化即触发）"
+ids_file = "tools/vaultkit/rules.py"
+sync = ["README.md", "AGENTS.md", "doctrine/Agent Contract.md",
+        "doctrine/Vault Design.md", "tools/vaultkit/cli.py",
+        "a_sticker/or/记忆底座-首批卡片.md", "tests/"]
+
+[[docs_sync.rules]]
+id = "T3"
+note = "manual — 硬门增删：owner 裁决 + 新 D 号，机器无法判定"
+sync = ["README.md", "AGENTS.md", "doctrine/Agent Contract.md",
+        "doctrine/Vault Design.md", "tools/vaultkit/cli.py",
+        "a_sticker/or/记忆底座-首批卡片.md", "tests/",
+        ".github/workflows/ci.yml"]
+
+[[docs_sync.rules]]
+id = "T4"
+note = "登记语义 / 主干模型"
+paths = ["tools/vaultkit/model.py"]
+sync = ["doctrine/Vault Design.md", "README.md", "AGENTS.md",
+        "tools/vaultkit/cli.py"]
+
+[[docs_sync.rules]]
+id = "T5"
+note = "子命令增删（子命令名集合变化即触发）"
+subcommands_file = "tools/vaultkit/cli.py"
+sync = ["README.md", "doctrine/Agent Contract.md", "tests/"]
+
+[[docs_sync.rules]]
+id = "T6"
+note = "manual — 体裁 / 分区规则"
+sync = ["AGENTS.md", "doctrine/Vault Design.md", "README.md",
+        "a_sticker/or/记忆底座-首批卡片.md"]
+
+[[docs_sync.rules]]
+id = "T7"
+note = "manual — 字段政策"
+sync = ["AGENTS.md", "doctrine/Vault Design.md", "README.md",
+        "a_sticker/or/记忆底座-首批卡片.md"]
+
+[[docs_sync.rules]]
+id = "T8"
+note = "manual — 模板政策"
+sync = ["AGENTS.md", "doctrine/Vault Design.md", "README.md"]
+
+[[docs_sync.rules]]
+id = "T9"
+note = "manual — doctrine 语义变化"
+sync = ["doctrine/Vault Design.md", "a_sticker/or/记忆底座-首批卡片.md"]
+
+[[docs_sync.rules]]
+id = "T10"
+note = "manual — 本机 / Obsidian / 插件设置（.obsidian 不在 git）"
+sync = ["doctrine/New Machine.md"]
+
+[[docs_sync.rules]]
+id = "T11"
+note = "新增 doctrine 文件"
+paths_added = ["doctrine/*.md"]
+sync = ["AGENTS.md", "README.md", "doctrine/Vault Design.md",
+        ".agent/skills/vault-ops/SKILL.md"]
+
 

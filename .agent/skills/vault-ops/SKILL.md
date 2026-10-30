@@ -18,7 +18,7 @@ Read in this order before acting:
 5. `doctrine/Vault Workflow.md` — the 3 verbs + 1 loop, S1–S10, 心法
 6. `doctrine/Vault Extension.md` — 改系统 / 改文档前读 §同步面（`doctrine/New Machine.md` 面向 owner 装配，不在 AI 载入序）
 
-Inline help: `python3 tools/vault.py help <topic>` for `triage` / `rawindex` / `dag` / `links` / `random` / `suggest`.
+Inline help: `python3 tools/vault.py help <topic>` for `triage` / `rawindex` / `dag` / `links` / `random` / `suggest` / `docs-check`.
 
 ## Session entry
 
@@ -72,6 +72,14 @@ At capture time (S2): give 3 candidate links with a why-line each (`python3 tool
 4. Register: append `[[Node]]` lines to the Raw Index (structural, direct). `Node↔Node` and `Index→Node` links need owner approval.
 5. `python3 tools/vault.py rawindex --check` — the report-level rules again, trunk-facing.
 6. `python3 tools/vault.py rawindex --sync` — dry-run; `--apply` writes the trunk root member list.
+
+### Changing the system itself (rules, config, commands, doctrine)
+
+1. Read `doctrine/Vault Extension.md` §同步面 — the trigger → co-owner table (ids `T1`–`T11`). Pick your row *before* editing.
+2. Edit the code or doc.
+3. `python3 tools/vault.py docs-check --against HEAD` — report-level; lists every triggered row whose co-owners did not move. `--gate` exits 1 (use it before committing).
+4. `python3 tools/vault.py check` and `python3 -m pytest -q` — `tests/test_docs.py` holds the content checks that always gate (rule ids present and non-ghost, no id ranges, no threshold value copies, sync-map id parity, doctrine headers).
+5. New doctrine file → also register it in the four places named by row T11.
 
 ### Health audit
 

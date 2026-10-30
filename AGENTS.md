@@ -24,7 +24,7 @@ Read this first, then the source-of-truth files it points to. Do not improvise d
 7. One note, one idea. Prefer short definitions; link instead of inlining. AI never writes own-voice body prose; AI-generated prose belongs in `a_sticker/or/`.
 8. No commits or pushes unless the owner asks. Deletions and renames need the owner's sign-off.
 9. Run `python3 tools/vault.py check` before committing structural changes; before any rename/move, `grep -rn -- '\[\[Old Name'` first. Procedures: `.agent/skills/vault-ops/SKILL.md`; handover contract: `doctrine/Agent Contract.md`; inline help: `python3 tools/vault.py help <topic>`.
-10. **改文档或工具文案前**，先读 `doctrine/Vault Extension.md` §同步面——它列了「改一处要同步哪几处」；文档与 `check` 的报告级输出互相矛盾就是漂移。
+10. **改文档或工具文案前**，先读 `doctrine/Vault Extension.md` §同步面——它列了「改一处要同步哪几处」；文档与 `check` 的报告级输出互相矛盾就是漂移。机器门：`python3 tools/vault.py docs-check --gate`（默认报告级；`tests/test_docs.py` 在 CI 里强制内容一致性）。
 
 ## Invariants (two-tier)
 
