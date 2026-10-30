@@ -39,7 +39,8 @@ Root = 入口队列（Obsidian 默认落点）：新捕获落在那里，triage 
 - `python3 tools/vault.py check` — 两级判据：**硬门 G1/G2/G3**（root 排空 / material 出处 / 新增悬空 wikilink）exit 1 阻断；**报告级**（I1a 未登记 / I1b 重复登记边 / I1c Raw Index 环 / I2 Links 跨域 / I3 出链 / I4 绑定邻居 / I5 Mapping / I6 实例化 / I7 时间轴 / I8 挂点覆盖率 / I9 未记录 source / D21 未拆材料）给增量。提交前跑。
 - `python3 tools/vault.py docs-check [--against REV] [--gate]` — 文档同步面：按 `tools/vault.toml [docs_sync]`（＝ [[Vault Extension]] §同步面）diff 工作区，报出「碰了触发文件却没连带改」的连带文件。默认报告级，`--gate` exit 1。
 - `python3 tools/vault.py triage` — 整理债：root 积压、todo 老化、疑似半成品（时间窗 + 零出链 + 零挂钩）、unhooked、体裁错位、dead todo——每个阈值只定义在 `tools/vault.toml`。
-- `python3 tools/vault.py rawindex [--clusters|--check|--sync [--apply]|--around NAME]` — 主干作业：归队提议 L0 / 簇 L1–L3（含绑定证据）/ 规则注册表 / 同步主干根成员（默认 dry-run）/ 单点邻域。
+- `python3 tools/vault.py rawindex [--clusters|--check|--sync [--apply]]` — 主干作业：归队提议 L0 / 簇 L1–L3（含绑定证据）/ 规则注册表 / 同步主干根成员（默认 dry-run）。
+- `python3 tools/vault.py place NAME` — **一篇笔记在图里的位置**（只读）：登记边、归队提议（邻居投票 + 谁投的）、语义区域、出入链、先链哪几篇（含 why）、I1a/I3/I1c/D21 信号。别名可查；查不到 exit 1 + did-you-mean。
 - `python3 tools/vault.py rename OLD NEW [--apply]` — 改名 + 级联：把全库指向 `OLD` 的 wikilink 一次改完（`|alias` 与 `#标题` 原样保留，只改名字那一段）。同名冲突 / 路径分隔符 / root 契约文件 / `zzz_output/` 里的文件都会**拒绝**（exit 1）。默认 dry-run。
 - `python3 tools/vault.py new NAME [--zone Z] [--source S] [--todo NOTE --into TODO_NOTE] [--apply]` — 按模板新建：分区由**状态**定（root 入口队列 / library / material / work / todos），体裁由**名字**定，脚手架从 `tools/vault.toml [templates]` 按体裁取（可选，D30）。`material` 缺 `source:` 会拒绝（G2 硬门）；落地后给 3 个候选链接（S2）。默认 dry-run。
 - `python3 tools/vault.py random [--scope …] [--seed N]` / `suggest NAME [--n 3]` — 问箱材料（S9）与候选链接（S2），只给信号不写笔记。

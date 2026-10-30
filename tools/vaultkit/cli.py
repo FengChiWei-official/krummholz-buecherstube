@@ -105,7 +105,7 @@ def emit_json(payload: dict) -> None:
 
 EXIT_CODES = {
     "0": "ok — every report, and any check whose hard gates are green",
-    "1": "hard gate failed (check), unknown target (rawindex --around / suggest), "
+    "1": "hard gate failed (check), unknown target (place / suggest), "
          "a refused rename or a refused new, or a docs-sync violation under docs-check --gate",
     "2": "missing or unreadable config (also a missing list file under --strict)",
 }
@@ -214,40 +214,154 @@ def _rawindex_sync(cfg: Config, g: model.Graph, apply: bool) -> int:
     return 0
 
 
-def _rawindex_around(cfg: Config, g: model.Graph, nbr: dict, name: str, args=None) -> int:
-    """One node's neighborhood: registrations, areas, links, neighbors."""
-    target = g.stems.get(name)
+# ---------------------------------------------------------------- place
+
+
+def _vote_evidence(g: model.Graph, nbr: dict, target) -> list:
+    """[{raw, votes, of, score, via}] — which Raw Indexes the neighborhood votes for.
+
+    The DAG reading of "where does this belong": a Node's position is decided by
+    the registrations of the notes around it. `via` names the voters, so the
+    proposal can always be traced back to evidence (never a guess).
+    """
+    neighbours = nbr.get(target, set())
+    votes: dict = collections.defaultdict(list)
+    for z in neighbours:
+        for r in g.reg.get(z, ()):
+            votes[r].append(z)
+    out = []
+    for r, voters in votes.items():
+        names = sorted(q.stem for q in voters)
+        out.append({"raw": r.stem, "votes": len(voters), "of": len(neighbours),
+                    "score": round(len(voters) / len(neighbours), 4) if neighbours else 0.0,
+                    "via": names[:6]})
+    out.sort(key=lambda d: (-d["votes"], d["raw"]))
+    return out
+
+
+def _role_of(g: model.Graph, cfg: Config, path) -> str:
+    if path in set(g.raws):
+        return "raw"
+    if path in set(g.idxs):
+        return "index"
+    if path in set(g.linksn):
+        return "links"
+    if path in set(g.doctrine):
+        return "doctrine"
+    rel = g.rel(path)
+    if rel.startswith(cfg.paths["archives_material"] + "/"):
+        return "material"
+    if rel.startswith(cfg.paths["todos"] + "/"):
+        return "todo"
+    if path in set(g.nodes):
+        return "node"
+    return "other"
+
+
+def collect_place(cfg: Config, g: model.Graph, name: str) -> dict:
+    """Where one note sits in the relation graph, and where it could sit.
+
+    Read-only: it reports registrations, the neighborhood's voting evidence for
+    further registration (the trunk is a DAG — several registration edges are
+    legal), the semantic areas, the links, and the notes worth linking first.
+    """
+    data = {"command": "place", "target": name, "found": False, "did_you_mean": [],
+            "stem": None, "path": None, "alias_of": None, "role": None, "genre": None,
+            "zone": None, "registered": [], "proposals": [], "areas": [],
+            "outlinks": [], "inlinks": [], "link_candidates": [], "signals": [],
+            "note": None}
+    target = g.resolve(name)
     if target is None:
         low = name.lower()
-        cands = [s for s in g.stems if low in s.lower()][:10]
-        if wants_json(args):
-            emit_json({"command": "rawindex --around", "target": name, "found": False,
-                       "did_you_mean": cands})
-            return 1
-        print(f"rawindex --around: `{name}` not found.")
-        if cands:
-            print("  did you mean: " + " / ".join(cands))
-        return 1
-    registrations = [r.stem for r in sorted(g.reg.get(target, ()), key=lambda p: p.stem)]
-    areas = [i.stem for i in sorted(g.area.get(target, ()), key=lambda p: p.stem)]
-    outs = sorted(g.out.get(target, set()), key=lambda p: p.stem)
-    ins = sorted((p for p, qs in g.out.items() if target in qs), key=lambda p: p.stem)
-    nb = sorted(nbr.get(target, set()), key=lambda p: p.stem)
+        data["did_you_mean"] = sorted(
+            [s for s in g.stems if low in s.lower()]
+            + [a for a in g.aliases if low in a.lower()])[:10]
+        data["note"] = ("库里没有这个名字，图里也就没有它的位置——先 `vault.py new` 建一篇、"
+                        "当场链 ≥1 篇旧笔记（S2），再跑 place 就有归队提议了")
+        return data
+
+    data["found"] = True
+    data["stem"] = target.stem
+    data["path"] = g.rel(target)
+    data["role"] = _role_of(g, cfg, target)
+    data["genre"] = cfg.genre(target.stem)
+    data["zone"] = cfg.zone(target) or ""
+    if name != target.stem and name in g.aliases:
+        data["alias_of"] = target.stem
+
+    nbr = g.binding_neighbors()
+    data["registered"] = sorted(r.stem for r in g.reg.get(target, ()))
+    proposals = _vote_evidence(g, nbr, target)
+    data["proposals"] = proposals
+    data["areas"] = sorted(i.stem for i in g.area.get(target, ()))
+    data["outlinks"] = sorted(q.stem for q in g.out.get(target, ()))
+    data["inlinks"] = sorted(p.stem for p, qs in g.out.items() if target in qs)
+    data["link_candidates"] = [{"note": q.stem, "why": why}
+                               for q, why in suggest_candidates(cfg, g, target, 3)]
+
+    if data["role"] == "node" and not data["registered"]:
+        data["signals"].append("未登记（I1a）——从上面的提议里挑一条追加登记边（D22，结构动作）")
+    if data["role"] == "node" and not data["outlinks"]:
+        data["signals"].append("零出链（I3）——捕获时至少链 1 篇旧笔记（S2）")
+    if data["role"] == "raw":
+        if target in set(g.raw_index_cycle_core()):
+            data["signals"].append("在环上（I1c）——`Raw Index → Raw Index` 子图必须无环")
+        parents = sorted(r.stem for r in g.raws if target in g.out.get(r, ()))
+        if parents:
+            data["signals"].append("被登记为子主干: " + ", ".join(parents))
+    if data["role"] == "material" and not data["outlinks"]:
+        data["signals"].append("未拆（D21）——材料被拆过的标记 = 有指向所拆 Node 的出链")
+    if not data["inlinks"]:
+        data["signals"].append("零入链——没有笔记指向它（先链别人，别人回链由你决定）")
+    return data
+
+
+def _render_place(cfg: Config, data: dict) -> None:
+    if not data["found"]:
+        print(f"# vault place — {data['target']}")
+        print(f"  {data['note']}")
+        if data["did_you_mean"]:
+            print("  did you mean: " + " / ".join(data["did_you_mean"]))
+        return
+    print(f"# vault place — {data['stem']}")
+    alias = f"  (经别名 `{data['target']}` 命中)" if data["alias_of"] else ""
+    print(f"  在库: {data['path']}{alias}")
+    print(f"  角色: {data['role']} | 体裁 {data['genre']} | 分区 {data['zone'] or '(root)'}")
+    if data["registered"]:
+        print(f"  登记于 {len(data['registered'])} 条边: {', '.join(data['registered'])}"
+              "   ← DAG 允许 >1 条登记边")
+    else:
+        print("  登记: (queue — 未登记)")
+    if data["proposals"]:
+        print(f"  归队提议（邻居投票，{len(data['proposals'])} 个候选）:")
+        for prop in data["proposals"][:5]:
+            mark = "  ✓ 已登记" if prop["raw"] in data["registered"] else ""
+            print(f"    {prop['score']:.0%} ({prop['votes']}/{prop['of']})  {prop['raw']}"
+                  f"   ← via {', '.join(prop['via'])}{mark}")
+    else:
+        print("  归队提议: 无——邻居都没登记，先让周围几篇归队")
+    if data["areas"]:
+        print(f"  语义区域: {', '.join(data['areas'])}")
+    print(f"  出链 {len(data['outlinks'])}: {data['outlinks'][:8]}")
+    print(f"  入链 {len(data['inlinks'])}: {data['inlinks'][:8]}")
+    if data["link_candidates"]:
+        print("  先链这几篇（S2 候选，含 why）:")
+        for i, cand in enumerate(data["link_candidates"], 1):
+            print(f"    {i}. [[{cand['note']}]] — {cand['why']}")
+    else:
+        print("  先链候选: 无（周围还没有可投票的证据）")
+    for signal in data["signals"]:
+        print(f"  ⚠ {signal}")
+
+
+def cmd_place(cfg: Config, g: model.Graph, args) -> int:
+    """One note's position in the relation graph (read-only)."""
+    data = collect_place(cfg, g, args.name)
     if wants_json(args):
-        emit_json({"command": "rawindex --around", "target": target.stem, "found": True,
-                   "path": _rel(cfg, target), "registrations": registrations,
-                   "areas": areas, "outlinks": [q.stem for q in outs],
-                   "inlinks": [p.stem for p in ins], "neighbors": [p.stem for p in nb]})
-        return 0
-    print(f"## {target.stem}")
-    print(f"  path: {_rel(cfg, target)}")
-    print(f"  登记: {registrations}" if registrations else "  登记: (queue — 未登记)")
-    if areas:
-        print(f"  区域: {areas}")
-    print(f"  出链 {len(outs)}: {[q.stem for q in outs][:12]}")
-    print(f"  入链 {len(ins)}: {[p.stem for p in ins][:12]}")
-    print(f"  邻居 {len(nb)} (绑定证据候选: {[p.stem for p in nb][:8]})")
-    return 0
+        emit_json(data)
+        return 0 if data["found"] else 1
+    _render_place(cfg, data)
+    return 0 if data["found"] else 1
 
 
 # ---------------------------------------------------------------- random / suggest
@@ -344,7 +458,7 @@ def cmd_suggest(cfg: Config, g: model.Graph, args) -> int:
 
 
 def cmd_rawindex(cfg: Config, g: model.Graph, args) -> int:
-    """Trunk operations: queue + L0 proposals; --clusters / --check / --sync / --around."""
+    """Trunk operations: queue + L0 proposals; --clusters / --check / --sync."""
     out, reg = g.out, g.reg
     nodes, raws = g.nodes, g.raws
     nbr = g.binding_neighbors()          # I4: doctrine/Raw are not binding neighbors
@@ -361,9 +475,6 @@ def cmd_rawindex(cfg: Config, g: model.Graph, args) -> int:
 
     if args.sync:
         _rawindex_sync(cfg, g, apply=args.apply)
-
-    if args.around:
-        return _rawindex_around(cfg, g, nbr, args.around, args)
 
     # ---------------- L0: affiliation proposals for the queue
     props = _l0_proposals(g, nbr, queue)
@@ -1488,6 +1599,30 @@ moves (each with a copy-pasteable command).
 
 On a fresh clone the rhythm line reads 今天 — it takes the max of git commit
 time and mtime, and a checkout refreshes mtime. Known limitation, not a signal.""",
+    "place": """place — where a note sits in the relation graph (read-only)
+
+    python3 tools/vault.py place NAME [--json]
+
+One call answers "where does this belong, and what should it link first":
+
+  in库 / 角色 / 体裁 / 分区   what the name resolves to (alias-aware; unknown
+                             name → exit 1 with did-you-mean, and an honest note
+                             that a note with no links has no graph position yet)
+  登记于                     its registration edges (the trunk is a DAG: several
+                             edges are legal)
+  归队提议                   for an unregistered Node: which Raw Index the
+                             neighborhood votes for, with the score (voters /
+                             neighbours) and `via` — the names that voted, so the
+                             proposal is always traceable to evidence
+  语义区域                   the Index areas it belongs to
+  出链 / 入链                Node↔Node edges
+  先链这几篇                 up to 3 candidate links with a why-line (S2) — the
+                             owner picks one; the tool never links for you
+  ⚠ 信号                     未登记 (I1a), 零出链 (I3), 在环上 (I1c),
+                             未拆 (D21), 零入链
+
+Read-only: it reports, it never registers or links (registration edges are a
+structural action you may take yourself afterwards, D22).""",
     "new": """new — create a note from a scaffold, in the zone its state belongs to
 
     python3 tools/vault.py new NAME [--zone Z] [--template KEY] [--no-template]
@@ -1577,7 +1712,7 @@ counts inline.""",
     "rawindex": """rawindex — trunk operations
 
     python3 tools/vault.py rawindex [--clusters] [--check] [--sync [--apply]]
-                                    [--around NAME] [--top N] [--json]
+                                    [--top N] [--json]
 
   (no flag)    queue + L0 affiliation proposals: for every unregistered Node, the
                Raw Index its neighbors' registrations vote for. Proposals at or
@@ -1590,9 +1725,11 @@ counts inline.""",
                (I1a/I1b/I1c, I2, I3, I5, I6, I7, I8, I9, D21).
   --sync       dry-run: prints the intended `## Core Concepts` member list of
                `Raw Index of Everything`. Add --apply to write (L13 write safety).
-  --around     one note's registrations, Index areas, in/out links and binding
-               neighbors. Unknown name: exit 1 with did-you-mean.
-  --top        L0 proposals to show (default rawindex_top in tools/vault.toml).""",
+  --top        L0 proposals to show (default rawindex_top in tools/vault.toml).
+
+One note's own position — registrations, the neighborhood's voting evidence,
+Index areas, in/out links and the notes worth linking first — is `vault.py
+place NAME` (this command works the queue as a whole).""",
     "dag": """dag — why the trunk is a DAG, not a tree
 
 The trunk is `Raw Index -> Node` registration edges:
@@ -1662,11 +1799,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Vault operating procedures (v6)",
         epilog=("exit codes: 0 = ok (all reports, and any check with green hard gates); "
-                "1 = hard gate failed (check), unknown target (rawindex --around / suggest), "
+                "1 = hard gate failed (check), unknown target (place / suggest), "
                 "a refused rename or new, or a docs-sync violation under docs-check --gate; "
                 "2 = missing/unreadable config (or a missing list file under --strict). "
                 "Topics: `vault.py help check|status|triage|rawindex|dag|links|random|suggest"
-                "|docs-check|rename|new`."),
+                "|docs-check|rename|new|place`."),
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--strict", action="store_true", default=argparse.SUPPRESS,
                         help="missing config / list files are fatal (exit 2), not warnings")
@@ -1700,6 +1837,10 @@ def build_parser() -> argparse.ArgumentParser:
                            help="candidate links for a note (S2)")
     p_sug.add_argument("name", help="note name (stem)")
     p_sug.add_argument("--n", type=int, default=3, help="candidates to show (default 3)")
+
+    p_place = sub.add_parser("place", parents=[common],
+                             help="where a note sits in the relation graph (read-only)")
+    p_place.add_argument("name", help="note name or alias")
 
     p_new = sub.add_parser("new", parents=[common],
                            help="create a note from a scaffold, placed by zone (dry-run)")
@@ -1736,7 +1877,6 @@ def build_parser() -> argparse.ArgumentParser:
                        help="B6: rewrite the trunk root member list (dry-run unless --apply)")
     p_raw.add_argument("--apply", action="store_true",
                        help="with --sync: actually write the trunk root (default: dry-run)")
-    p_raw.add_argument("--around", metavar="NAME", help="one node's neighborhood")
     p_raw.add_argument("--top", type=int, default=None, help="L0 proposals to show (default 10)")
     return parser
 
@@ -1771,6 +1911,8 @@ def main(argv=None) -> int:
         return cmd_rename(cfg, g, args)
     if args.command == "new":
         return cmd_new(cfg, g, args)
+    if args.command == "place":
+        return cmd_place(cfg, g, args)
     return cmd_rawindex(cfg, g, args)
 
 

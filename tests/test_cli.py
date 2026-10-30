@@ -81,18 +81,11 @@ def test_status_renders_all_sections(vault):
     assert "queue (未登记): 2" in proc.stdout
 
 
-def test_rawindex_around_known_node(vault):
+def test_rawindex_no_longer_carries_a_per_note_view(vault):
+    """One note's position is `place`; rawindex works the queue as a whole."""
     proc = run_vault(vault, "rawindex", "--around", "Node Shared")
-    assert proc.returncode == 0
-    assert "## Node Shared" in proc.stdout
-    assert "登记: ['Raw Index of Alpha', 'Raw Index of Beta']" in proc.stdout
-    assert "区域: ['Index of Alpha Area']" in proc.stdout
-
-
-def test_rawindex_around_unknown_exits_1(vault):
-    proc = run_vault(vault, "rawindex", "--around", "No Such Note")
-    assert proc.returncode == 1
-    assert "not found." in proc.stdout
+    assert proc.returncode == 2  # argparse: unknown flag, loud not silent
+    assert "--around" in proc.stderr
 
 
 def test_rawindex_check_renders_the_rule_registry(vault):

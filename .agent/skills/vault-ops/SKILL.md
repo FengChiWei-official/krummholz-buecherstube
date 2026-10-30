@@ -18,7 +18,7 @@ Read in this order before acting:
 5. `doctrine/Vault Workflow.md` — the 3 verbs + 1 loop, S1–S10, 心法
 6. `doctrine/Vault Extension.md` — 改系统 / 改文档前读 §同步面（`doctrine/New Machine.md` 面向 owner 装配，不在 AI 载入序）
 
-Inline help: `python3 tools/vault.py help <topic>` for `check` / `status` / `triage` / `rawindex` / `dag` / `links` / `random` / `suggest` / `docs-check`.
+Inline help: `python3 tools/vault.py help <topic>` for `check` / `status` / `triage` / `rawindex` / `dag` / `links` / `random` / `suggest` / `docs-check` / `rename` / `new` / `place`.
 
 ## Session entry
 
@@ -36,6 +36,7 @@ Run `python3 tools/vault.py status` first — rhythm line, git state, check summ
 2. Unfinished work → hook it in the same call: `--todo "5–10 word continuation" --into "<owning todo note>"` (rule 5). A `--zone todos` note is registered in `Index of Todos.md` instead.
 3. Owner confirms → add `--apply`. It then prints 3 candidate links (S2): pick one and write it into `## Related` with a why-line. The tool never links for you — links change meaning (Agent Contract §4).
 4. `python3 tools/vault.py check`; `triage` lists whatever placement debt the new note created (root, unhooked, genre, zero-link).
+5. Once it has at least one link, `python3 tools/vault.py place "<Name>"` says where it sits in the relation graph: registration edges, which Raw Index the neighbourhood votes for (with the voters named), and the notes worth linking next. Use it again whenever a note feels misplaced.
 
 It refuses rather than leaving the vault in a state its gates would flag: an existing name (ambiguity), a genre name outside its home zone (体裁错位), `--zone material` without `--source` (G2), `--todo` without `--into`.
 
@@ -59,7 +60,7 @@ At capture time (S2): give 3 candidate links with a why-line each (`python3 tool
 
 1. Backlinks (Obsidian).
 2. `grep -rn -- '\[\[NAME' .`
-3. `python3 tools/vault.py rawindex --around NAME`
+3. `python3 tools/vault.py place NAME` — one note's position: registration edges, 归队提议 with the voters named, areas, links, and the notes worth linking first.
 4. `python3 tools/vault.py random --scope library` (问箱 material, S9)
 
 ### Renaming
