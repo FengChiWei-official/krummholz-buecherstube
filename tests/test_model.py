@@ -99,6 +99,27 @@ def test_multi_parent_registration_is_visible(graph):
     assert sorted(n.stem for n in graph.unregistered()) == ["Fence Node", "Node Zero"]
 
 
+def test_multi_parent_is_legal_under_dag(graph):
+    """DAG: uniqueness lives in the edge, so two parents are not a violation."""
+    violations = graph.registration_violations()
+    assert violations["multi_parent"] == {}
+    assert violations["duplicate_edges"] == []
+    assert graph.config.trunk_model == "dag"
+
+
+def test_tree_model_still_reports_multi_parent(tmp_path, vault):
+    """The trunk model is the single switch: flip it and the rule comes back."""
+    text = config.CONFIG_PATH.read_text(encoding="utf-8")
+    cfg_path = tmp_path / "vault.toml"
+    cfg_path.write_text(text.replace('model = "dag"', 'model = "tree"'), encoding="utf-8")
+    cfg = config.load(root=vault, config_path=cfg_path)
+    model.clear_cache()
+    g = model.load(cfg)
+    assert g.config.trunk_model == "tree"
+    assert g.registration_violations()["multi_parent"] == {
+        "Node Shared": ["Raw Index of Alpha", "Raw Index of Beta"]}
+
+
 def test_alias_resolution_in_graph(graph):
     node_a = graph.stems["Node A"]
     assert node_a in graph.out[graph.stems["Node B"]]
@@ -134,7 +155,7 @@ def test_graph_is_built_once_per_process(cfg):
 def test_config_has_no_hardcoded_thresholds():
     cfg = config.load(root=FIXTURE)
     assert cfg.thresholds["todo_stale_days"] == 90
-    assert cfg.trunk_model == "tree"
+    assert cfg.trunk_model == "dag"
     assert cfg.trunk_root_stem == "Raw Index of Everything"
     assert cfg.zones["node_suffix"] == "_fold"
 

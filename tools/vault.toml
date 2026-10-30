@@ -35,7 +35,11 @@ root_allowed = ["README.md", "AGENTS.md"]
 
 [trunk]
 root_stem = "Raw Index of Everything"
-model = "tree"
+# "tree": a Node belongs to exactly one Raw Index (multi-parent = violation).
+# "dag":  registration is an edge — a Node needs >=1 edge, may have several;
+#         uniqueness lives in the (Raw Index, Node) pair; Raw Index -> Raw Index
+#         must stay acyclic (I1c).
+model = "dag"
 
 [files]
 whitelist_unresolved = "tools/whitelist_unresolved.txt"

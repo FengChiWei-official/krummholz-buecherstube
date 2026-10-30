@@ -42,9 +42,10 @@ def test_check_flags_root_file(vault):
 def test_check_reports_trunk_numbers(vault):
     proc = run_vault(vault, "check")
     assert "未登记: 2  (queue — see rawindex L0)" in proc.stdout
-    assert "多重登记: Node Shared -> ['Raw Index of Alpha', 'Raw Index of Beta']" in proc.stdout
     assert "零出链: 2/5 (40%)" in proc.stdout
     assert "绑定邻居排除 doctrine(1) 与 Raw(3)" in proc.stdout
+    # DAG: the fixture's two-parent Node is legal, so no multi-parent line appears.
+    assert "多重登记" not in proc.stdout
 
 
 def test_triage_categories_and_dead_todo(vault):
@@ -89,9 +90,9 @@ def test_rawindex_check_renders_the_rule_registry(vault):
     assert "## I1a 每个 Node 至少登记在一个 Raw Index" in proc.stdout
     assert "未登记: 2  (queue — see rawindex L0)" in proc.stdout
     assert "## I1b 重复登记边（同一 (Raw Index, Node) 出现两次）" in proc.stdout
-    assert "重复登记边: 0   多重登记: 1" in proc.stdout
+    assert "重复登记边: 0" in proc.stdout
     assert "## I1c Raw Index 子图无环" in proc.stdout
-    assert "Raw Index 环: 0  (登记边构成的子图无环)" in proc.stdout
+    assert "Raw Index 环: 0  (登记边构成的子图无环 — 主干是 DAG,不是树)" in proc.stdout
     assert "零出链: 2/5 (40%) — 捕获规则增量,不阻断 (B5)" in proc.stdout
     assert "## 材料 出链=已拆 (D21)" in proc.stdout
     assert "未拆材料: 1/1  (零出链 = 未拆)" in proc.stdout
@@ -106,7 +107,7 @@ def test_check_reports_i1c_cycle_and_i1b_duplicate(vault):
     proc = run_vault(vault, "check")
     assert proc.returncode == 1                      # only the seeded G2 gate
     assert "PROBLEMS: 1 (hard gates failed)" in proc.stdout
-    assert "重复登记边: 1   多重登记: 1" in proc.stdout
+    assert "重复登记边: 1" in proc.stdout
     assert "重复边: Raw Index of Alpha -> Node A ×2" in proc.stdout
     assert "Raw Index 环: 2 个 Raw Index 落在环上" in proc.stdout
     assert "环上: Raw Index of Alpha" in proc.stdout

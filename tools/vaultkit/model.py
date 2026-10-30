@@ -59,7 +59,12 @@ class Graph:
     # -- registration edges (the structural trunk) ------------------------
     @property
     def registration_edges(self) -> list:
-        """Unique (Raw Index, Node) pairs — registration is an edge, not a parent."""
+        """Unique (Raw Index, Node) pairs — registration is an edge, not a parent.
+
+        The trunk is a DAG (v6): uniqueness lives in the edge, so a Node may
+        legitimately carry several registration edges, while the same
+        (Raw Index, Node) pair may not appear twice.
+        """
         return sorted({(r, n) for n, raws in self.reg.items() for r in raws},
                       key=lambda pair: (pair[0].stem, pair[1].stem))
 
@@ -90,13 +95,19 @@ class Graph:
     def registration_violations(self) -> dict:
         """Registration-edge problems, per the configured trunk model.
 
-        Duplicate (Raw Index, Node) pairs are always a violation. Multi-parent
-        Nodes are a violation only under the tree model — under the DAG the
-        uniqueness lives in the edge, not the parent (P5).
+        Under both models the same (Raw Index, Node) pair must not be repeated,
+        and a Node needs at least one registration edge (`unregistered()`).
+
+        tree — a Node belongs to exactly one Raw Index, so a second parent is a
+               violation.
+        dag  — multi-parent is legal; only repeated edges are, and the
+               Raw Index → Raw Index subgraph must stay acyclic
+               (`raw_index_cycle_core`).
         """
+        multi_parent = self.multi_registered() if self.config.trunk_model == "tree" else {}
         return {
             "duplicate_edges": self.duplicate_registration_edges(),
-            "multi_parent": self.multi_registered() if self.config.trunk_model == "tree" else {},
+            "multi_parent": multi_parent,
         }
 
     def raw_index_cycle_core(self) -> list:

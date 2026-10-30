@@ -111,8 +111,11 @@ def rule_i1a(ctx: Context) -> list:
 
 
 def i1b_note(ctx: Context) -> str:
-    return ("登记面 = Raw Index 笔记内的全部 [[Node]] 链接（含正文提及）；"
-            "重复 = 同一 (Raw Index, Node) 对出现两次以上")
+    surface = ("登记面 = Raw Index 笔记内的全部 [[Node]] 链接（含正文提及）；"
+               "重复 = 同一 (Raw Index, Node) 对出现两次以上")
+    if ctx.graph.config.trunk_model == "dag":
+        return surface + "。唯一性在边不在父：Node 可被多个 Raw Index 登记（DAG）"
+    return surface + "；tree 模型下每个 Node 只允许一个父"
 
 
 def rule_i1b(ctx: Context) -> list:
@@ -132,10 +135,10 @@ def rule_i1b(ctx: Context) -> list:
 
 
 def rule_i1c(ctx: Context) -> list:
-    """I1c: the Raw Index → Raw Index subgraph must stay acyclic."""
+    """I1c: the Raw Index → Raw Index subgraph must stay acyclic (DAG invariant)."""
     core = ctx.graph.raw_index_cycle_core()
     if not core:
-        return ["Raw Index 环: 0  (登记边构成的子图无环)"]
+        return ["Raw Index 环: 0  (登记边构成的子图无环 — 主干是 DAG,不是树)"]
     lines = [f"Raw Index 环: {len(core)} 个 Raw Index 落在环上"]
     for raw in core[:8]:
         lines.append(f"环上: {raw.stem}")
