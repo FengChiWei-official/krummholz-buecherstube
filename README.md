@@ -27,7 +27,7 @@ Modified Zettelkasten，按**状态**组织，不按主题树。两棵树 + 原�
 - `archives/work/` — 我的档案：AI 报告、调研、决策材料。
 - `a_sticker/` — `todos/`（唯一状态存储 + 任务树，`Index of Todos.md` 登记）、`or/`（AI 对话捕获）、`new_terms/`、`other/`。
 - `zzz_output/` — 终端产出（**人的专属**：手动创建即产出）。`Root.md` = 主树入口。
-- `doctrine/` — 系统文档：[[Vault Design]]、[[Vault Workflow]]、[[Agent Contract]]。
+- `doctrine/` — 系统文档：[[Vault Design]]、[[Vault Workflow]]、[[Agent Contract]]、[[Vault Extension]]（维护者手册 + 文档同步面）、[[New Machine]]（新设备复现）。
 
 Root = 入口队列（Obsidian 默认落点）：新捕获落在那里，triage 排空。永久 root 文件只有 `README.md` / `AGENTS.md`。
 
@@ -36,7 +36,7 @@ Root = 入口队列（Obsidian 默认落点）：新捕获落在那里，triage 
 所有子命令都接受 `--json`（机器可读）与 `--strict`（缺配置文件即 exit 2）；`help <topic>` 给就地说明。
 
 - `python3 tools/vault.py status` — 会话入口：git + 检查摘要 + 整理债 + **节律行（上次整理/聚簇/问箱/产出）** + 编号选项（每条带可复制命令）。任何会话先跑它。
-- `python3 tools/vault.py check` — 两级判据：**硬门**（root 排空 / material 出处 / 新增悬空 wikilink）exit 1 阻断；**报告级**（I1a 未登记 / I1b 重复登记边 / I1c Raw Index 环 / I2 Links 跨域 / I3 出链 / I4 绑定邻居 / I5–I8 学习机制 / D21 未拆材料）给增量。提交前跑。
+- `python3 tools/vault.py check` — 两级判据：**硬门 G1/G2/G3**（root 排空 / material 出处 / 新增悬空 wikilink）exit 1 阻断；**报告级**（I1a 未登记 / I1b 重复登记边 / I1c Raw Index 环 / I2 Links 跨域 / I3 出链 / I4 绑定邻居 / I5 Mapping / I6 实例化 / I7 时间轴 / I8 挂点覆盖率 / I9 未记录 source / D21 未拆材料）给增量。提交前跑。
 - `python3 tools/vault.py triage` — 整理债：root 积压、todo 老化、疑似半成品（时间窗 + 零出链 + 零挂钩）、unhooked、体裁错位、dead todo——每个阈值只定义在 `tools/vault.toml`。
 - `python3 tools/vault.py rawindex [--clusters|--check|--sync [--apply]|--around NAME]` — 主干作业：归队提议 L0 / 簇 L1–L3（含绑定证据）/ 规则注册表 / 同步主干根成员（默认 dry-run）/ 单点邻域。
 - `python3 tools/vault.py random [--scope …] [--seed N]` / `suggest NAME [--n 3]` — 问箱材料（S9）与候选链接（S2），只给信号不写笔记。
@@ -46,12 +46,14 @@ Root = 入口队列（Obsidian 默认落点）：新捕获落在那里，triage 
 
 ## 协作
 
-场景协议（S1–S10）与 AI 边界见 [[Vault Workflow]]；AI 接手契约见 [[Agent Contract]]；系统原理见 [[Vault Design]]。
+场景协议（S1–S10）与 AI 边界见 [[Vault Workflow]]；AI 接手契约见 [[Agent Contract]]；系统原理见 [[Vault Design]]。维护者手册（怎么改系统、改一处要同步哪几处）见 [[Vault Extension]]；新设备复现见 [[New Machine]]。
 
 ## Related Files
 
 - [Vault Design](doctrine/Vault%20Design.md)
 - [Vault Workflow](doctrine/Vault%20Workflow.md)
 - [Agent Contract](doctrine/Agent%20Contract.md)
+- [Vault Extension](doctrine/Vault%20Extension.md)
+- [New Machine](doctrine/New%20Machine.md)
 - [Index of Todos](a_sticker/todos/Index%20of%20Todos.md)
 - [Index of Knowledge](library/Index/Index%20of%20Knowledge.md)

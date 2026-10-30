@@ -206,7 +206,7 @@ def cmd_check(cfg: Config, g: model.Graph, args) -> int:
     problems = 0
     payload_rules = []
     if not wants_json(args):
-        print("# vault check — two-tier (D20): hard gates exit 1; I1–I4 report-level\n")
+        print("# vault check — two-tier (D20): hard gates exit 1; report-level rules give increments\n")
     for rule in rules.RULES:
         if not rule.title:
             continue
@@ -943,7 +943,7 @@ counts inline.""",
                neighbors), L3 isolated points. Group clusters into coarse Raw
                Indexes — never one Raw Index per cluster (D10-P3).
   --check      the report-level rules again, from the same registry `check` uses
-               (I1a/I1b/I1c, I2, I3, D21).
+               (I1a/I1b/I1c, I2, I3, I5, I6, I7, I8, I9, D21).
   --sync       dry-run: prints the intended `## Core Concepts` member list of
                `Raw Index of Everything`. Add --apply to write (L13 write safety).
   --around     one note's registrations, Index areas, in/out links and binding
@@ -1029,7 +1029,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
 
     sub.add_parser("check", parents=[common],
-                   help="two-tier invariant report: hard gates exit 1, I1–I4 report-level")
+                   help="two-tier invariant report: hard gates exit 1; report-level rules never block")
     sub.add_parser("triage", parents=[common],
                    help="placement-debt report: root, todo aging, suspected half-done (read-only)")
     sub.add_parser("status", parents=[common],

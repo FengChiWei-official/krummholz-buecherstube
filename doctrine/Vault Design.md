@@ -44,8 +44,8 @@ Node       点     默认体裁（<A–Z>_fold）
 
 | 级别 | 判据 | 失败动作 |
 |---|---|---|
-| **硬门** | root 排空；`archives/material/` 每篇有 `source:`；wikilink 新增悬空 | exit code 1，阻断提交 |
-| **报告级** | I1a 未登记 / I1b 重复登记边 / I1c Raw Index 环 / I2 Links 跨域（同区域 = 违规，无区域 = 提示）/ I3 Node ≥1 出链 / I4 doctrine 与 Raw 不做绑定邻居 | 每周增量数字，不阻断 |
+| **硬门** | G1 root 排空；G2 `archives/material/` 每篇有 `source:`；G3 wikilink 新增悬空 | exit code 1，阻断提交 |
+| **报告级** | I1a 未登记 / I1b 重复登记边 / I1c Raw Index 环 / I2 Links 跨域（同区域 = 违规，无区域 = 提示）/ I3 Node ≥1 出链 / I4 doctrine 与 Raw 不做绑定邻居 / I5 `## Mapping` / I6 `## 实例化` / I7 学科 Index `## 时间轴` / I8 挂点覆盖率 / I9 未记录 source / D21 未拆材料 | 每周增量数字，不阻断 |
 
 理由（CRITIQUE A5）：上线即 674 未登记、392 零出链——全部做成硬门 = 门常红 = 门失效。旧体系死于红灯常态。报告级给增量，让改善可见而不是让检查失败。
 
@@ -53,7 +53,7 @@ Node       点     默认体裁（<A–Z>_fold）
 
 ```
 README.md / AGENTS.md    入口与硬规则
-doctrine/                 本设计 + [[Vault Workflow]]
+doctrine/                 系统文档：本设计 · [[Vault Workflow]] · [[Agent Contract]] · [[Vault Extension]] · [[New Machine]]
 library/
   <A–Z>_fold/             Node（默认体裁）
   Links/                   Links
@@ -81,7 +81,7 @@ Node = 纯 markdown。**工具不依赖模板；模板是可选脚手架**（`te
 
 | 旧死因 | 复发路径 | 堵法 |
 |---|---|---|
-| 门常红 → 门失效 | I1–I4 若做硬门 | 两级制：硬门只 3 条；I1–I4 给增量 |
+| 门常红 → 门失效 | 报告级判据若做成硬门 | 两级制：硬门只 3 条；其余给增量 |
 | 状态漂移 | todo 树无 GC | triage 报 todo 老化；零出链信号加时间窗（时间窗 + 零挂钩 = 疑似半成品）——阈值单点在 `tools/vault.toml` |
 | 周期流程停摆无告警 | 聚簇/问箱停了没人知道 | `status` 顶部节律行：上次整理/聚簇/问箱/产出 距今 N 天（git log + mtime 推导，零手工记录） |
 

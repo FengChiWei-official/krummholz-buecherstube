@@ -8,6 +8,8 @@ Read this first, then the source-of-truth files it points to. Do not improvise d
 - `doctrine/Agent Contract.md` — AI handover contract: entry commands, direct vs owner-approval actions, never-do list, self-verification, bootstrap checklist.
 - `doctrine/Vault Design.md` — why the system works, the two trees, two-tier invariants.
 - `doctrine/Vault Workflow.md` — 3 verbs + 1 loop, scenarios S1–S10, 心法, AI boundary.
+- `doctrine/Vault Extension.md` — 维护者手册：不可破坏的特性、改法配方、**文档同步面**（改一处要同步哪几处）。
+- `doctrine/New Machine.md` — 新设备复现清单：仓库里有 vs 每机各异、插件与设置、验收。
 - `.agent/skills/vault-ops/SKILL.md` — operational procedures (load order, common problems → exact steps).
 - `tools/vault.toml` — the single definition of zones, genres, thresholds and paths; `python3 tools/vault.py help <topic>` for inline help.
 
@@ -22,9 +24,10 @@ Read this first, then the source-of-truth files it points to. Do not improvise d
 7. One note, one idea. Prefer short definitions; link instead of inlining. AI never writes own-voice body prose; AI-generated prose belongs in `a_sticker/or/`.
 8. No commits or pushes unless the owner asks. Deletions and renames need the owner's sign-off.
 9. Run `python3 tools/vault.py check` before committing structural changes; before any rename/move, `grep -rn -- '\[\[Old Name'` first. Procedures: `.agent/skills/vault-ops/SKILL.md`; handover contract: `doctrine/Agent Contract.md`; inline help: `python3 tools/vault.py help <topic>`.
+10. **改文档或工具文案前**，先读 `doctrine/Vault Extension.md` §同步面——它列了「改一处要同步哪几处」；文档与 `check` 的报告级输出互相矛盾就是漂移。
 
 ## Invariants (two-tier)
 
-- **Hard gates** (exit 1, block commit): root drained; every `archives/material/` note has real `source:`; no NEW unresolved wikilinks (baseline whitelist in `tools/whitelist_unresolved.txt`, currently 0 entries).
-- **Report-level** (weekly increments, never block): I1a 未登记 / I1b 重复登记边 / I1c Raw Index 环 / I2 Links cross-area (same-area = violation, no-area = hint) / I3 Node ≥1 outbound link / I4 doctrine & Raw excluded from binding neighbors / I5–I8 learning mechanisms / D21 未拆材料.
+- **Hard gates** (exit 1, block commit): G1 root drained; G2 every `archives/material/` note has real `source:`; G3 no NEW unresolved wikilinks (baseline whitelist in `tools/whitelist_unresolved.txt`, currently 0 entries).
+- **Report-level** (weekly increments, never block): I1a 未登记 / I1b 重复登记边 / I1c Raw Index 环 / I2 Links cross-area (same-area = violation, no-area = hint) / I3 Node ≥1 outbound link / I4 doctrine & Raw excluded from binding neighbors / I5 Mapping / I6 实例化 / I7 时间轴 / I8 挂点覆盖率 / I9 un-recorded material source / D21 未拆材料.
 - Every rule is one entry in `tools/vaultkit/rules.py`; every threshold lives once in `tools/vault.toml`. Never hardcode either in a doc.

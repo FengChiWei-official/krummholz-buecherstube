@@ -76,7 +76,7 @@ not in a note is not in the system.
 
 | command | expected |
 |---|---|
-| `python3 tools/vault.py check` | hard gates (G1 root drained / G2 material `source:` / G3 NEW unresolved wikilinks) green → exit 0; report-level I1a/I1b/I1c, I2, I3, I4, I5–I8, D21 lines carry counts that should trend down, never block |
+| `python3 tools/vault.py check` | hard gates (G1 root drained / G2 material `source:` / G3 NEW unresolved wikilinks) green → exit 0; report-level I1a/I1b/I1c, I2, I3, I4, I5, I6, I7, I8, I9, D21 lines carry counts that should trend down, never block |
 | `python3 tools/vault.py triage` | 6 category counts; every line is a *prompt*, not a verdict |
 | `python3 tools/vault.py status` | rhythm line, git state, check summary, trunk counts, numbered moves |
 | `python3 tools/vault.py rawindex --check` | the same rule registry as `check`, trunk-facing |
@@ -114,7 +114,7 @@ tool's own suite (`tests/`), including a fixture vault.
 1. `python3 tools/vault.py status --json` — read `trunk`, `triage`, `next_moves`,
    `exit_codes`.
 2. Read this file (you are here), then [[Vault Design]] §两棵树 and
-   [[Vault Workflow]] §心法 if you need the why.
+   [[Vault Workflow]] §心法 if you need the why. 改任何文档或工具文案前，读 [[Vault Extension]] §同步面。
 3. `python3 tools/vault.py check` — confirm hard gates are green before touching
    anything. If a gate is red, fix that first and nothing else.
 4. `python3 tools/vault.py help rawindex` — learn the trunk operations you are
@@ -128,3 +128,5 @@ tool's own suite (`tests/`), including a fixture vault.
 
 - [[Vault Design]]
 - [[Vault Workflow]]
+- [[Vault Extension]]
+- [[New Machine]]
