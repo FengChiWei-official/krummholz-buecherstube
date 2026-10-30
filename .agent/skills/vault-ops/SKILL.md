@@ -61,8 +61,15 @@ At capture time (S2): give 3 candidate links with a why-line each (`python3 tool
 
 ### Renaming
 
-1. `grep -rn -- '\[\[Old Name' .` — wikilinks resolve by note name, so every inbound form must be updated.
-2. Update every form (incl. `|alias`, path-style), `git mv`, then `python3 tools/vault.py check`. Owner sign-off first.
+Wikilinks resolve by note name, so a rename must cascade. The tool does it; the owner still signs off.
+
+1. `python3 tools/vault.py rename "Old Name" "New Name"` — dry-run: prints the file pair, every inbound reference per file, and every refusal/warning. Nothing is written.
+2. Read the warnings: a genre change (`node → raw` — the name decides the genre), a case-only twin, another note's `aliases:` already holding the new name, the old name in `whitelist_unresolved`, the old name inside the note's own `aliases:`.
+3. Owner confirms → `python3 tools/vault.py rename "Old Name" "New Name" --apply`. It moves the file (`git mv` when available) and rewrites `[[Old]]`, `[[Old|alias]]`, `[[Old#Heading]]`, `![[Old]]`, `[[folder/Old]]`, `[[Old.md]]` — alias and heading untouched, fenced code and inline code spans skipped.
+4. It re-scans and prints the remaining references; that number must be 0. Then `python3 tools/vault.py check`.
+
+Refusals (exit 1): no such note, several files with that stem, a note already named NEW, a path separator in NEW, a root contract file (`README.md` / `AGENTS.md`), a file inside `zzz_output/`, or `zzz_output/` links pointing at OLD (the tool never writes there — the owner fixes those, or `--allow-unwritable` accepts the dangling links).
+Moving a file is NOT renaming: a move never breaks a link, so `git mv` alone is correct.
 
 ### Trunk workflow (rawindex) — the weekly core loop
 

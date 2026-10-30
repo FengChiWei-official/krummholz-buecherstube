@@ -40,6 +40,7 @@ Root = 入口队列（Obsidian 默认落点）：新捕获落在那里，triage 
 - `python3 tools/vault.py docs-check [--against REV] [--gate]` — 文档同步面：按 `tools/vault.toml [docs_sync]`（＝ [[Vault Extension]] §同步面）diff 工作区，报出「碰了触发文件却没连带改」的连带文件。默认报告级，`--gate` exit 1。
 - `python3 tools/vault.py triage` — 整理债：root 积压、todo 老化、疑似半成品（时间窗 + 零出链 + 零挂钩）、unhooked、体裁错位、dead todo——每个阈值只定义在 `tools/vault.toml`。
 - `python3 tools/vault.py rawindex [--clusters|--check|--sync [--apply]|--around NAME]` — 主干作业：归队提议 L0 / 簇 L1–L3（含绑定证据）/ 规则注册表 / 同步主干根成员（默认 dry-run）/ 单点邻域。
+- `python3 tools/vault.py rename OLD NEW [--apply]` — 改名 + 级联：把全库指向 `OLD` 的 wikilink 一次改完（`|alias` 与 `#标题` 原样保留，只改名字那一段）。同名冲突 / 路径分隔符 / root 契约文件 / `zzz_output/` 里的引用都会**拒绝**（exit 1）。默认 dry-run。
 - `python3 tools/vault.py random [--scope …] [--seed N]` / `suggest NAME [--n 3]` — 问箱材料（S9）与候选链接（S2），只给信号不写笔记。
 - `python3 tools/trend_radar.py` — 每日情报（详见 `.agent/skills/trend-radar/`）。
 

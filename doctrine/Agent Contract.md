@@ -21,6 +21,7 @@ take over correctly. Deeper why: [[Vault Design]]; operational procedures:
 | `python3 tools/vault.py rawindex [...]` | trunk operations: queue + L0 归队 / `--clusters` / `--check` / `--sync` / `--around NAME` |
 | `python3 tools/vault.py random [--scope …] [--seed N]` | 问箱 material (S9): one note + its backlinks |
 | `python3 tools/vault.py suggest NAME [--n 3]` | candidate links for a note, one why-line each (S2) |
+| `python3 tools/vault.py rename OLD NEW [--apply]` | rename a note + cascade every inbound wikilink (dry-run; refuses a name collision, a path separator, a root contract file, and `zzz_output/` links) |
 | `python3 tools/trend_radar.py …` | daily intel flow (see `.agent/skills/trend-radar/SKILL.md`) |
 
 Every subcommand accepts `--json` (one JSON document on stdout, nothing else) and
@@ -32,7 +33,7 @@ Every subcommand accepts `--json` (one JSON document on stdout, nothing else) an
 | code | meaning |
 |---|---|
 | 0 | ok — every report, and any `check` whose hard gates are green |
-| 1 | a hard gate failed (`check`), an unknown target (`rawindex --around`, `suggest`), or a docs-sync violation under `docs-check --gate` |
+| 1 | a hard gate failed (`check`), an unknown target (`rawindex --around`, `suggest`), a refused rename (collision, ambiguity, unwritable links), or a docs-sync violation under `docs-check --gate` |
 | 2 | missing/unreadable config; a missing list file under `--strict`; unknown `help` topic |
 
 ## 2. Where state lives
@@ -82,6 +83,7 @@ not in a note is not in the system.
 | `python3 tools/vault.py triage` | 6 category counts; every line is a *prompt*, not a verdict |
 | `python3 tools/vault.py status` | rhythm line, git state, check summary, trunk counts, numbered moves |
 | `python3 tools/vault.py rawindex --check` | the same rule registry as `check`, trunk-facing |
+| `python3 tools/vault.py rename OLD NEW` | the file pair, every inbound reference per file, and every refusal/warning — nothing is written without `--apply` |
 | `python3 tools/vault.py docs-check --against HEAD` | triggered sync rows and the co-owner files they are missing; `--gate` makes it exit 1 |
 | `python3 tools/trend_radar.py verify` | the day's snapshot + report + index + leaderboards |
 

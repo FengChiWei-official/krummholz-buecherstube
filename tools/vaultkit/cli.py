@@ -106,7 +106,7 @@ def emit_json(payload: dict) -> None:
 EXIT_CODES = {
     "0": "ok — every report, and any check whose hard gates are green",
     "1": "hard gate failed (check), unknown target (rawindex --around / suggest), "
-         "or a docs-sync violation under docs-check --gate",
+         "a docs-sync violation under docs-check --gate, or a refused rename",
     "2": "missing or unreadable config (also a missing list file under --strict)",
 }
 
@@ -955,6 +955,214 @@ def cmd_docs_check(cfg: Config, g: model.Graph, args) -> int:
     return data["exit"]
 
 
+# ---------------------------------------------------------------- rename
+
+
+def _rename_scan(cfg: Config):
+    """The G3 scan scope, split by writability (zzz_output/ is never written)."""
+    writable, unwritable = [], []
+    zzz = cfg.paths["zzz"] + "/"
+    for path in sorted(parse.iter_notes(cfg.root, cfg.skip_dirs)):
+        target = unwritable if _rel(cfg, path).startswith(zzz) else writable
+        target.append(path)
+    return writable, unwritable
+
+
+def _agent_notes(cfg: Config) -> list:
+    return sorted((cfg.root / ".agent").rglob("*.md"))
+
+
+def collect_rename(cfg: Config, g: model.Graph, old: str, new: str) -> dict:
+    """Plan a rename without writing anything (P6: writes need `--apply`).
+
+    `error` is a refusal reason (exit 1) or None. Warnings are hints that need
+    the owner's judgement, not blockers.
+    """
+    data = {"command": "rename", "old": old, "new": new, "error": None,
+            "warnings": [], "hits": [], "unwritable": [], "agent_hits": 0,
+            "case_variants": [], "genre_change": None,
+            "refs": 0, "files": 0, "old_path": None, "new_path": None,
+            "self_alias": False, "whitelist": old in cfg.whitelist_unresolved,
+            "applied": False, "remaining": None}
+
+    name = new.strip()
+    if name.endswith(".md"):
+        name = name[:-3].strip()
+        data["warnings"].append("已去掉 `.md` 后缀——这里给的是笔记名")
+    data["new"] = name
+    if not name:
+        data["error"] = "新名字为空"
+        return data
+    if "/" in name or "\\" in name:
+        data["error"] = "新名字不能含路径分隔符——改名不是搬家（移动不破坏链接，改名才要级联）"
+        return data
+
+    candidates = [p for p in parse.iter_notes(cfg.root, cfg.skip_dirs) if p.stem == old]
+    if not candidates:
+        data["error"] = f"没有叫 `{old}` 的笔记"
+        return data
+    if len(candidates) > 1:
+        data["error"] = (f"`{old}` 有 {len(candidates)} 个同名文件，改哪个不明："
+                         + ", ".join(_rel(cfg, p) for p in candidates))
+        return data
+    old_path = candidates[0]
+    data["old_path"] = _rel(cfg, old_path)
+    data["new_path"] = _rel(cfg, old_path.parent / f"{name}.md")
+    if data["old_path"].startswith(cfg.paths["zzz"] + "/"):
+        data["error"] = "拒绝改名：文件在 zzz_output/（owner 区，工具不写）"
+        return data
+    if old_path.parent == cfg.root and old_path.name in cfg.root_allowed:
+        data["error"] = (f"拒绝改名：`{old_path.name}` 是 root 契约文件"
+                         "（AGENTS 硬规则 2 只允许它俩常驻 root）")
+        return data
+    if old_path.stem == name:
+        data["warnings"].append("新旧同名——无需改名")
+        return data
+
+    # Genre is decided by the name (name > path): a rename can move a note
+    # between the trunk, the semantic tree and the fold — that is a meaning
+    # change, so it is called out loudly.
+    old_genre, new_genre = cfg.genre(old), cfg.genre(name)
+    if old_genre != new_genre:
+        data["genre_change"] = [old_genre, new_genre]
+        data["warnings"].append(f"体裁会变：{old_genre} → {new_genre}"
+                                "——名字决定体裁（名字 > 路径），这会把它挪出原来的树/区")
+
+    # A name a wikilink could resolve to is taken: `[[name]]` would be ambiguous.
+    stems = {p.stem: p for p in parse.iter_notes(cfg.root, cfg.skip_dirs)}
+    agent = {p.stem: p for p in _agent_notes(cfg)}
+    taken = (set(stems) | set(agent)) - {old}
+    if name in taken:
+        where = stems.get(name) or agent.get(name)
+        data["error"] = (f"已有同名笔记 `{name}`：{_rel(cfg, where)}"
+                         "——`[[{0}]]` 会二义，改名会让链接指向错的笔记".format(name))
+        return data
+    if name in g.aliases:
+        data["warnings"].append(f"`{name}` 已是另一篇笔记的别名（{_rel(cfg, g.aliases[name])}）"
+                                "——本工具里 stem 优先，Obsidian 可能二义")
+    case_only = sorted(n for n in taken if n.lower() == name.lower())
+    if case_only:
+        data["warnings"].append(f"仅大小写不同的同名：{', '.join(case_only)}"
+                                "——本工具大小写敏感，Obsidian 不敏感")
+
+    writable, unwritable = _rename_scan(cfg)
+    for path in writable:
+        _, count = parse.rename_links(path.read_text(encoding="utf-8", errors="replace"),
+                                      old, name)
+        if count:
+            data["hits"].append({"path": _rel(cfg, path), "count": count})
+            data["refs"] += count
+            data["files"] += 1
+    for path in unwritable:
+        _, count = parse.rename_links(path.read_text(encoding="utf-8", errors="replace"),
+                                      old, name)
+        if count:
+            data["unwritable"].append({"path": _rel(cfg, path), "count": count})
+    for path in writable:
+        variants = sum(1 for link in parse.extract_links(
+            path.read_text(encoding="utf-8", errors="replace"))
+            if (nm := parse.link_name(link.target)).lower() == old.lower() and nm != old)
+        if variants:
+            data["case_variants"].append({"path": _rel(cfg, path), "count": variants})
+    if data["case_variants"]:
+        total = sum(h["count"] for h in data["case_variants"])
+        data["warnings"].append(f"{total} 处引用只差大小写（未改）：本工具大小写敏感、"
+                                "Obsidian 不敏感——Obsidian 里它们会指向旧名")
+    data["agent_hits"] = sum(
+        parse.rename_links(p.read_text(encoding="utf-8", errors="replace"), old, name)[1]
+        for p in _agent_notes(cfg))
+
+    aliases = parse.parse_frontmatter(old_path.read_text(encoding="utf-8")).get("aliases") or []
+    data["self_alias"] = old in aliases
+    if data["self_alias"]:
+        data["warnings"].append(f"本文件的 `aliases:` 里仍有 `{old}`——`[[{old}]]` 仍会解析到它；"
+                                "要清掉须 owner 决定（别名改变解析，不是结构动作）")
+    if data["whitelist"]:
+        data["warnings"].append(f"`{old}` 在 whitelist_unresolved 里——改名后这条白名单作废")
+    return data
+
+
+def _render_rename(cfg: Config, data: dict, apply: bool) -> None:
+    print(f"# vault rename — {data['old']} → {data['new']}"
+          f"{'' if apply else '  [dry-run]'}")
+    if data["error"]:
+        print(f"REFUSED: {data['error']}")
+        return
+    print(f"  文件: {data['old_path']} → {data['new_path']}")
+    if data["hits"]:
+        print(f"  引用: {data['refs']} 处 / {data['files']} 个文件")
+        for hit in data["hits"][:12]:
+            print(f"    {hit['path']}: {hit['count']}")
+        if len(data["hits"]) > 12:
+            print(f"    … ({len(data['hits']) - 12} more files)")
+    else:
+        print("  引用: 0 处——没有任何链接指向它（改名不影响别的笔记）")
+    if data["unwritable"]:
+        total = sum(h["count"] for h in data["unwritable"])
+        print(f"  ⚠ zzz_output/ 另有 {total} 处引用，工具不写那里（owner 手工）：")
+        for hit in data["unwritable"][:5]:
+            print(f"    {hit['path']}: {hit['count']}")
+    if data["agent_hits"]:
+        print(f"  ⚠ .agent/ 另有 {data['agent_hits']} 处引用，未改（AI 指令区，多为占位示例）")
+    for warning in data["warnings"]:
+        print(f"  ⚠ {warning}")
+
+
+def cmd_rename(cfg: Config, g: model.Graph, args) -> int:
+    """Rename one note and cascade every inbound wikilink (dry-run by default)."""
+    data = collect_rename(cfg, g, args.old, args.new)
+    apply = bool(getattr(args, "apply", False))
+    allow_unwritable = bool(getattr(args, "allow_unwritable", False))
+    blocked = data["error"] or (data["unwritable"] and not allow_unwritable)
+    if apply and not blocked:
+        data["applied"] = _apply_rename(cfg, data)
+    data["exit"] = 1 if (data["error"] or (data["unwritable"] and not allow_unwritable)) else 0
+
+    if wants_json(args):
+        emit_json(data)
+        return data["exit"]
+
+    _render_rename(cfg, data, apply)
+    if data["error"]:
+        return 1
+    if data["unwritable"] and not allow_unwritable:
+        print("  拒绝：zzz_output/ 里还有指向旧名的链接，改名会让 G3 报新增悬空。"
+              "owner 先手工改，或加 --allow-unwritable 承担。")
+        return 1
+    if not apply:
+        print("  （不改文件；确认后加 --apply 落地）")
+        return 0
+    if not data["applied"]:
+        print("  未改动（见上）")
+        return 1
+    print(f"  已改 {data['files']} 个文件 / {data['refs']} 处引用，复检剩余 {data['remaining']}")
+    return 0 if data["remaining"] == 0 else 1
+
+
+def _apply_rename(cfg: Config, data: dict) -> bool:
+    """Move the file, then rewrite every inbound link. Returns True when done."""
+    old_path = cfg.root / data["old_path"]
+    new_path = cfg.root / data["new_path"]
+    moved = _git(cfg.root, ["mv", data["old_path"], data["new_path"]]) is not None
+    if not moved:
+        try:
+            old_path.rename(new_path)
+        except OSError as exc:
+            print(f"ERROR: 改名失败 {exc}")
+            return False
+    print(f"  {'git mv' if moved else 'rename'}: {data['old_path']} → {data['new_path']}")
+    for hit in data["hits"]:
+        path = new_path if hit["path"] == data["old_path"] else cfg.root / hit["path"]
+        text = path.read_text(encoding="utf-8")
+        new_text, _ = parse.rename_links(text, data["old"], data["new"])
+        path.write_text(new_text, encoding="utf-8")
+    data["remaining"] = sum(
+        parse.rename_links(path.read_text(encoding="utf-8", errors="replace"),
+                           data["old"], data["new"])[1]
+        for path in _rename_scan(cfg)[0])
+    return True
+
+
 # ---------------------------------------------------------------- main
 
 
@@ -1008,6 +1216,39 @@ moves (each with a copy-pasteable command).
 
 On a fresh clone the rhythm line reads 今天 — it takes the max of git commit
 time and mtime, and a checkout refreshes mtime. Known limitation, not a signal.""",
+    "rename": """rename — rename one note and cascade every inbound wikilink
+
+    python3 tools/vault.py rename OLD NEW [--apply] [--allow-unwritable] [--json]
+
+Wikilinks resolve by note NAME, so renaming a file breaks every `[[OLD]]` that
+pointed at it. This rewrites them all in one pass. Dry-run by default (L13):
+nothing moves until `--apply`. The file stays in its folder — that is a move,
+and moves never break links.
+
+Forms rewritten in the same pass:
+  [[OLD]] · [[OLD|alias]] · [[OLD#Heading]] · [[OLD#Heading|alias]]
+  ![[OLD]] (embed) · [[folder/OLD]] · [[folder/OLD|alias]]
+The `#Heading` and the `|alias` are kept verbatim: an alias is display text, not
+the target. Only the LAST path segment is compared, and it must equal OLD
+exactly — renaming `Old` never touches `[[OldName]]`. Fenced code blocks and
+inline code spans are skipped, exactly as the resolver sees them.
+
+Refuses (exit 1) when:
+  - no note is named OLD, or several files share that stem (ambiguous);
+  - a note named NEW already exists — `[[NEW]]` would resolve to the wrong one;
+  - NEW contains a path separator (that is a move, not a rename);
+  - OLD lives in zzz_output/ (owner's area — the tool never writes there);
+  - zzz_output/ still links to OLD (those would become NEW dangling links and
+    turn G3 red) unless --allow-unwritable.
+
+Warns, never blocks: NEW is another note's `aliases:` entry, or differs from an
+existing name only by case (this tool is case-sensitive, Obsidian is not); OLD
+is in whitelist_unresolved; OLD is in the note's own `aliases:` (clearing that
+changes resolution, so it is the owner's call).
+
+After --apply it re-scans and prints the remaining references in the writable
+scope; that number must be 0. Renames need the owner's sign-off (AGENTS hard
+rule 8): the dry-run is the proposal, --apply is the decision.""",
     "triage": """triage — placement debt (read-only)
 
     python3 tools/vault.py triage [--json]
@@ -1116,10 +1357,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Vault operating procedures (v6)",
         epilog=("exit codes: 0 = ok (all reports, and any check with green hard gates); "
-                "1 = hard gate failed (check), unknown target (rawindex --around / suggest) "
-                "or a docs-sync violation under docs-check --gate; "
+                "1 = hard gate failed (check), unknown target (rawindex --around / suggest), "
+                "a docs-sync violation under docs-check --gate, or a refused rename; "
                 "2 = missing/unreadable config (or a missing list file under --strict). "
-                "Topics: `vault.py help check|status|triage|rawindex|dag|links|random|suggest|docs-check`."),
+                "Topics: `vault.py help check|status|triage|rawindex|dag|links|random|suggest"
+                "|docs-check|rename`."),
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--strict", action="store_true", default=argparse.SUPPRESS,
                         help="missing config / list files are fatal (exit 2), not warnings")
@@ -1153,6 +1395,15 @@ def build_parser() -> argparse.ArgumentParser:
                            help="candidate links for a note (S2)")
     p_sug.add_argument("name", help="note name (stem)")
     p_sug.add_argument("--n", type=int, default=3, help="candidates to show (default 3)")
+
+    p_ren = sub.add_parser("rename", parents=[common],
+                           help="rename a note + cascade every inbound wikilink (dry-run)")
+    p_ren.add_argument("old", help="current note name (stem)")
+    p_ren.add_argument("new", help="new note name (stem; the file stays in its folder)")
+    p_ren.add_argument("--apply", action="store_true",
+                       help="actually rename and rewrite (default: dry-run)")
+    p_ren.add_argument("--allow-unwritable", action="store_true",
+                       help="proceed although zzz_output/ still links to the old name")
 
     p_raw = sub.add_parser("rawindex", parents=[common],
                            help="trunk operations: queue + L0 归队提议")
@@ -1195,6 +1446,8 @@ def main(argv=None) -> int:
         return cmd_random(cfg, g, args)
     if args.command == "suggest":
         return cmd_suggest(cfg, g, args)
+    if args.command == "rename":
+        return cmd_rename(cfg, g, args)
     return cmd_rawindex(cfg, g, args)
 
 

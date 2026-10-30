@@ -94,6 +94,50 @@ def is_image_embed(target: str) -> bool:
     return target.lower().endswith(_IMAGE_SUFFIXES)
 
 
+# One pass over (fenced block | inline code span | wikilink) so the rewrite sees
+# exactly what `extract_links` sees — a `[[x]]` inside a fence is not a link.
+_SCAN_RE = re.compile(r"```.*?```|`[^`\n]*`|(!?)\[\[([^\]\n]+?)(\|[^\]\n]*)?\]\]", re.DOTALL)
+
+
+def rename_links(text: str, old: str, new: str):
+    """Rewrite every link to `old` as `new`; return (text, replacements).
+
+    Keeps everything that is not the note name: the `!` of an embed, a path
+    prefix, the `#anchor`, and the `|alias` — the alias is display text, not the
+    target, so it never changes. Only the LAST path segment is compared, and it
+    must equal `old` exactly, so renaming `Old` leaves `[[OldName]]` alone.
+    The `.md` form Obsidian also accepts (`[[Old.md]]`) is rewritten too — this
+    tool's resolver does not strip the suffix, but Obsidian's does, so leaving it
+    would break the human's links while our own graph sees no difference.
+    Fenced blocks and inline code spans are skipped, exactly like `extract_links`.
+    """
+    count = 0
+
+    def repl(match):
+        nonlocal count
+        bang, target, alias = match.group(1), match.group(2), match.group(3)
+        if bang is None:                      # a fence or an inline code span
+            return match.group(0)
+        head, sep, anchor = target.partition("#")
+        parts = head.split("/")
+        last = parts[-1]
+        stem = last.strip()
+        suffix = ""
+        if stem == old:
+            pass
+        elif stem == f"{old}.md":
+            suffix = ".md"
+        else:
+            return match.group(0)
+        lead = last[:len(last) - len(last.lstrip())]
+        trail = last[len(last.rstrip()):]
+        parts[-1] = f"{lead}{new}{suffix}{trail}"
+        count += 1
+        return f"{bang}[[{'/'.join(parts)}{sep}{anchor}{alias or ''}]]"
+
+    return _SCAN_RE.sub(repl, text), count
+
+
 _HEADING_RE = re.compile(r"^#{1,6}\s+(\S.*?)\s*$")
 _TABLE_SEPARATOR_RE = re.compile(r"^\|[\s:|-]+\|$")
 
