@@ -39,6 +39,9 @@ model = "tree"
 
 [files]
 whitelist_unresolved = "tools/whitelist_unresolved.txt"
+
+# Optional override files: absence is normal, never warned about.
+[files.optional]
 baseline_lit_nosource = "tools/baseline_lit_nosource.txt"
 
 # Legacy lit notes that already lacked a real source at the 2026-09 baseline.

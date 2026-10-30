@@ -25,9 +25,16 @@ class ConfigError(RuntimeError):
     """A required config file is missing or unreadable."""
 
 
-def _load_extra_lines(path: Path) -> set:
-    """Read one-entry-per-line file, skipping blanks and # comments."""
+def _load_extra_lines(path: Path, *, strict: bool = False, warnings: list | None = None) -> set:
+    """Read one-entry-per-line file, skipping blanks and # comments.
+
+    A missing file is a warning by default and a hard error under `strict`.
+    """
     if not path.exists():
+        if strict:
+            raise ConfigError(f"missing config {path}")
+        if warnings is not None:
+            warnings.append(f"missing config {path} — continuing without it")
         return set()
     result = set()
     for line in path.read_text().splitlines():
@@ -52,6 +59,7 @@ class Config:
     baseline_lit_nosource_stems: frozenset
     whitelist_unresolved: frozenset
     source: Path
+    warnings: tuple = ()
 
     # -- path helpers (all relative to the vault root) --------------------
     def under(self, key: str) -> Path:
@@ -118,7 +126,8 @@ def resolve_root(explicit: str | Path | None = None) -> Path:
     return REPO_ROOT
 
 
-def load(root: str | Path | None = None, config_path: Path | None = None) -> Config:
+def load(root: str | Path | None = None, config_path: Path | None = None,
+         *, strict: bool = False) -> Config:
     path = Path(config_path) if config_path else CONFIG_PATH
     if not path.exists():
         raise ConfigError(f"missing config {path}")
@@ -127,6 +136,7 @@ def load(root: str | Path | None = None, config_path: Path | None = None) -> Con
     except tomllib.TOMLDecodeError as exc:
         raise ConfigError(f"unreadable config {path}: {exc}") from exc
 
+    warnings: list = []
     vault_root = resolve_root(root)
     zones = dict(data["zones"])
     genres = dict(data["genres"])
@@ -136,9 +146,10 @@ def load(root: str | Path | None = None, config_path: Path | None = None) -> Con
     notes_skip_dirs = skip_dirs | frozenset(data["scan"]["notes_extra_skip_dirs"])
 
     baseline = set(data["baseline"]["lit_nosource_stems"])
-    for entry in _load_extra_lines(vault_root / data["files"]["baseline_lit_nosource"]):
+    for entry in _load_extra_lines(vault_root / data["files"]["optional"]["baseline_lit_nosource"]):
         baseline.add(Path(entry).stem)
-    whitelist = _load_extra_lines(vault_root / data["files"]["whitelist_unresolved"])
+    whitelist = _load_extra_lines(vault_root / data["files"]["whitelist_unresolved"],
+                                  strict=strict, warnings=warnings)
 
     return Config(
         root=vault_root,
@@ -154,4 +165,5 @@ def load(root: str | Path | None = None, config_path: Path | None = None) -> Con
         baseline_lit_nosource_stems=frozenset(baseline),
         whitelist_unresolved=frozenset(whitelist),
         source=path,
+        warnings=tuple(warnings),
     )

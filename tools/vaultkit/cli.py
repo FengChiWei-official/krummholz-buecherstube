@@ -35,24 +35,46 @@ def _git(root: Path, args: list):
     return proc.stdout
 
 
-def _git_first_seen(cfg: Config, path: Path):
-    """First commit time a path was tracked, or None. Creation time that
-    survives moves/migrations (unlike mtime)."""
-    rel = path.relative_to(cfg.root).as_posix()
-    out = _git(cfg.root, ["log", "--diff-filter=A", "--follow", "--format=%ct", "--", rel])
-    if out is None:
-        return None
-    stamps = [ln for ln in out.splitlines() if ln.strip()]
-    return float(stamps[-1]) if stamps else None
+_FIRST_SEEN_CACHE: dict = {}
 
 
-def _git_last_commit(cfg: Config, paths: list) -> float:
-    """mtime of the last commit touching any of `paths`, else 0."""
+def git_first_seen_index(cfg: Config) -> dict:
+    """{repo-relative path: first commit time} in ONE git pass.
+
+    Creation time that survives moves/migrations (unlike mtime). Renames are
+    left to git's own rename detection: a moved path simply has no entry, which
+    is safer than reporting the move as a creation.
+    """
+    key = str(cfg.root)
+    if key in _FIRST_SEEN_CACHE:
+        return _FIRST_SEEN_CACHE[key]
+    index: dict = {}
+    top = _git(cfg.root, ["rev-parse", "--show-toplevel"])
+    # Paths are reported relative to the repository root, so only trust the index
+    # when the vault root *is* the repository root.
+    if top is not None and Path(top.strip()).resolve() == cfg.root.resolve():
+        out = _git(cfg.root, ["log", "--diff-filter=A", "--name-only", "--format=%ct"])
+        if out is not None:
+            stamp = None
+            for line in out.splitlines():
+                line = line.strip()
+                if not line:
+                    continue
+                if line.isdigit():
+                    stamp = float(line)
+                elif stamp is not None:
+                    index[line] = stamp      # newest-first: the last write is the oldest
+    _FIRST_SEEN_CACHE[key] = index
+    return index
+
+
+def _git_last_commit(cfg: Config, paths: list):
+    """mtime of the last commit touching any of `paths`, else None (no git/no commit)."""
     for p in paths:
         out = _git(cfg.root, ["log", "-1", "--format=%ct", "--", str(p)])
         if out and out.strip():
             return float(out.strip())
-    return 0.0
+    return None
 
 
 def _git_porcelain(cfg: Config):
@@ -224,12 +246,13 @@ def _rawindex_check(cfg: Config, g: model.Graph) -> None:
         print(f"    {_rel(cfg, p)}")
 
 
-def _rawindex_sync(cfg: Config, g: model.Graph) -> int:
+def _rawindex_sync(cfg: Config, g: model.Graph, apply: bool) -> int:
     """B6: maintain the trunk root's member list (registration edges).
 
     Structural action per D22 — AI may append directly. The root's
     `## Core Concepts` section lists one [[Node]] line per registered member
     grouped under each child Raw Index; existing prose is left alone.
+    Dry-run by default (L13 write safety): nothing is written without `--apply`.
     """
     root_note = None
     for r in g.raws:
@@ -257,13 +280,17 @@ def _rawindex_sync(cfg: Config, g: model.Graph) -> int:
         new = head + marker + "\n\n" + body + "\n" + after
     else:
         new = text.rstrip("\n") + "\n\n" + marker + "\n\n" + body + "\n"
-    root_note.write_text(new, encoding="utf-8")
-    print(f"rawindex --sync: {cfg.trunk_root_stem} — {len(children)} child Raw Indexes "
-          "registered")
+
+    verb = "已注册" if apply else "[dry-run] 将注册"
+    print(f"rawindex --sync: {cfg.trunk_root_stem} — {verb} {len(children)} 个 child Raw Index")
+    if not apply:
+        print("  （不改文件；确认后加 --apply 落地）")
     for ln in lines[:10]:
         print(f"  {ln}")
     if len(lines) > 10:
         print(f"  … ({len(lines) - 10} more)")
+    if apply:
+        root_note.write_text(new, encoding="utf-8")
     return 0
 
 
@@ -311,7 +338,7 @@ def cmd_rawindex(cfg: Config, g: model.Graph, args) -> int:
         _rawindex_check(cfg, g)
 
     if args.sync:
-        _rawindex_sync(cfg, g)
+        _rawindex_sync(cfg, g, apply=args.apply)
 
     if args.around:
         return _rawindex_around(cfg, g, nbr, args.around)
@@ -457,6 +484,9 @@ def collect_triage(cfg: Config, g: model.Graph) -> dict:
     # A1 scope: own-voice candidates only (library notes + root queue);
     # archives are reference material, a_sticker/or is AI-raw, doctrine is system.
     # Age = git first-commit time (creation), NOT mtime — mv/migration resets mtime.
+    # The cheap filters run first so the git index is only consulted for notes that
+    # already look half-done.
+    first_seen = git_first_seen_index(cfg)
     for p in notes:
         rel = _rel(cfg, p)
         zone = cfg.zone(p)
@@ -465,16 +495,18 @@ def collect_triage(cfg: Config, g: model.Graph) -> dict:
         in_scope = bool(in_scope) or p in root_queue
         if not in_scope:
             continue
-        created = _git_first_seen(cfg, p)
+        if any(True for _ in parse.extract_wikilinks(g.notes[p])):
+            continue
+        if p.stem in todo_targets:
+            continue
+        created = first_seen.get(rel)
         if created is None:
             continue
         age_days = (now - created) / 86400
         if age_days > cfg.thresholds["halfdone_window_days"]:
             continue
-        has_out = any(True for _ in parse.extract_wikilinks(g.notes[p]))
-        if not has_out and p.stem not in todo_targets:
-            findings["halfdone"].append(
-                f"疑似半成品: {rel} — git 创建 {int(age_days)} 天前, 零出链, 无 todo 挂钩 (A1)")
+        findings["halfdone"].append(
+            f"疑似半成品: {rel} — git 创建 {int(age_days)} 天前, 零出链, 无 todo 挂钩 (A1)")
 
     # 4. unhooked notes in root queue without todo entry (S5 anti-loss)
     for p in sorted(root_queue):
@@ -541,11 +573,11 @@ def _rhythm_line(cfg: Config) -> list:
 
     def days_since(paths: list) -> str:
         t = _git_last_commit(cfg, paths)
-        for p in paths:
-            if p.exists():
-                t = max(t, p.stat().st_mtime)
-        if not t:
-            return "从未"
+        mtimes = [p.stat().st_mtime for p in paths if p.exists()]
+        if mtimes:
+            t = max(mtimes) if t is None else max(t, max(mtimes))
+        if t is None:
+            return "—"
         d = int((now - t) / 86400)
         return f"{d} 天前" if d > 0 else "今天"
 
@@ -650,22 +682,32 @@ def cmd_status(cfg: Config, g: model.Graph, args) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
+    # --strict is accepted both before and after the subcommand.
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument("--strict", action="store_true", default=argparse.SUPPRESS,
+                        help="missing config / list files are fatal (exit 2), not warnings")
+
     parser = argparse.ArgumentParser(description="Vault operating procedures (v6)")
+    parser.add_argument("--strict", action="store_true", default=argparse.SUPPRESS,
+                        help="missing config / list files are fatal (exit 2), not warnings")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    sub.add_parser("check",
+    sub.add_parser("check", parents=[common],
                    help="two-tier invariant report: hard gates exit 1, I1–I4 report-level")
-    sub.add_parser("triage",
+    sub.add_parser("triage", parents=[common],
                    help="placement-debt report: root, todo aging, suspected half-done (read-only)")
-    sub.add_parser("status",
+    sub.add_parser("status", parents=[common],
                    help="session entry: rhythm line + git + check + triage + trunk + next moves (read-only)")
 
-    p_raw = sub.add_parser("rawindex", help="trunk operations: queue + L0 归队提议")
+    p_raw = sub.add_parser("rawindex", parents=[common],
+                           help="trunk operations: queue + L0 归队提议")
     p_raw.add_argument("--clusters", action="store_true",
                        help="L1/L2 clusters + binding evidence + grouping advice")
     p_raw.add_argument("--check", action="store_true", help="I1–I3 + material 未拆 report")
     p_raw.add_argument("--sync", action="store_true",
-                       help="B6: maintain trunk root member list (structural, D22)")
+                       help="B6: rewrite the trunk root member list (dry-run unless --apply)")
+    p_raw.add_argument("--apply", action="store_true",
+                       help="with --sync: actually write the trunk root (default: dry-run)")
     p_raw.add_argument("--around", metavar="NAME", help="one node's neighborhood")
     p_raw.add_argument("--top", type=int, default=None, help="L0 proposals to show (default 10)")
     return parser
@@ -674,10 +716,12 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv=None) -> int:
     args = build_parser().parse_args(argv)
     try:
-        cfg = load_config()
+        cfg = load_config(strict=getattr(args, "strict", False))
     except ConfigError as exc:
         print(f"ERROR: {exc}")
         return 2
+    for warning in cfg.warnings:
+        print(f"WARNING: {warning}", file=sys.stderr)
     if args.command == "rawindex" and args.top is None:
         args.top = cfg.thresholds["rawindex_top"]
     g = model.load(cfg)

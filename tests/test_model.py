@@ -103,3 +103,20 @@ def test_config_has_no_hardcoded_thresholds():
 def test_missing_config_raises(tmp_path):
     with pytest.raises(config.ConfigError):
         config.load(root=FIXTURE, config_path=tmp_path / "nope.toml")
+
+
+def test_git_first_seen_index_is_one_pass_and_cached(tmp_path):
+    from vaultkit import cli
+
+    cli._FIRST_SEEN_CACHE.clear()
+    real = config.load(root=config.REPO_ROOT)
+    index = cli.git_first_seen_index(real)
+    assert index, "expected the real repo to yield first-seen entries"
+    assert isinstance(index["README.md"], float)
+    assert cli.git_first_seen_index(real) is index          # cached, not re-shelled
+
+    # A vault nested inside another repo reports repo-relative paths, so the
+    # index must be refused rather than silently mis-keyed.
+    cli._FIRST_SEEN_CACHE.clear()
+    nested = config.load(root=FIXTURE)
+    assert cli.git_first_seen_index(nested) == {}

@@ -88,3 +88,44 @@ def test_rawindex_check_reports_registration_state(vault):
     assert proc.returncode == 0
     assert "未登记: 2   多重登记: 1" in proc.stdout
     assert "零出链: 2/5  (40%)" in proc.stdout
+
+
+def test_sync_is_dry_run_without_apply(vault):
+    before = (vault / "library" / "Raw" / "Raw Index of Everything.md").read_text(encoding="utf-8")
+    proc = run_vault(vault, "rawindex", "--sync")
+    assert proc.returncode == 0
+    assert "[dry-run] 将注册 2 个 child Raw Index" in proc.stdout
+    assert "- [[Raw Index of Alpha]] (2)" in proc.stdout
+    assert (vault / "library" / "Raw" / "Raw Index of Everything.md").read_text(
+        encoding="utf-8") == before
+
+
+def test_sync_apply_writes_member_list(vault):
+    proc = run_vault(vault, "rawindex", "--sync", "--apply")
+    assert proc.returncode == 0
+    assert "已注册 2 个 child Raw Index" in proc.stdout
+    text = (vault / "library" / "Raw" / "Raw Index of Everything.md").read_text(encoding="utf-8")
+    assert "## Core Concepts\n\n- [[Raw Index of Alpha]] (2)\n- [[Raw Index of Beta]] (2)\n" in text
+    # idempotent: a second apply changes nothing
+    again = run_vault(vault, "rawindex", "--sync", "--apply")
+    assert again.returncode == 0
+    assert (vault / "library" / "Raw" / "Raw Index of Everything.md").read_text(
+        encoding="utf-8") == text
+
+
+def test_strict_exits_2_on_missing_list_file(vault):
+    lenient = run_vault(vault, "check")
+    assert lenient.returncode == 1                      # only the seeded G2 violation
+    assert "WARNING: missing config" in lenient.stderr
+
+    strict = run_vault(vault, "check", "--strict")
+    assert strict.returncode == 2
+    assert "ERROR: missing config" in strict.stdout
+    assert "whitelist_unresolved.txt" in strict.stdout
+
+
+def test_status_renders_dash_when_nothing_to_measure(vault):
+    proc = run_vault(vault, "status")
+    assert proc.returncode == 0
+    assert "- 上次产出: —" in proc.stdout
+    assert "- 上次聚簇: 今天" in proc.stdout

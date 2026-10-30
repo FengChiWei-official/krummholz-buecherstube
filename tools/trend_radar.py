@@ -375,7 +375,7 @@ def provenance_check(sid, items, raw_bytes):
 
 
 def snapshot_dir(date_str: str, override: Path | None = None) -> Path:
-    base = override or Path("/tmp/trend-radar")
+    base = override or Path(os.environ.get("TR_SNAPSHOT_DIR", "/tmp/trend-radar"))
     return base / date_str
 
 
@@ -1541,13 +1541,14 @@ def main() -> int:
     common.add_argument("--vault", default=argparse.SUPPRESS,
                         help="vault root (default: repo root)")
     common.add_argument("--snapshot-dir", default=argparse.SUPPRESS,
-                        help="snapshot base dir (default /tmp/trend-radar)")
+                        help="snapshot base dir (default $TR_SNAPSHOT_DIR or /tmp/trend-radar)")
     common.add_argument("--date", type=date.fromisoformat, default=argparse.SUPPRESS,
                         help="run date (YYYY-MM-DD)")
 
     parser = argparse.ArgumentParser(description="Trend Radar — daily trending → archive")
     parser.add_argument("--vault", default=str(ROOT), help="vault root (default: repo root)")
-    parser.add_argument("--snapshot-dir", default="", help="snapshot base dir (default /tmp/trend-radar)")
+    parser.add_argument("--snapshot-dir", default="",
+                        help="snapshot base dir (default $TR_SNAPSHOT_DIR or /tmp/trend-radar)")
     parser.add_argument("--date", type=date.fromisoformat,
                         default=date.today(), help="run date (YYYY-MM-DD)")
     sub = parser.add_subparsers(dest="cmd", required=True)
