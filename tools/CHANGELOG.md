@@ -1,8 +1,10 @@
 # Changelog
 
-## Unreleased (inside v6, after 6.0.0)
+## v6.1.0 (2026-10-30)
 
-No version bump — `tools/vaultkit/__init__.py` still reports 6.0.0.
+Additive release: four read-only retrieval subcommands, the doc sync map with its
+machine gate, note creation and rename, and the scan-scope fix. `doctrine/` stays
+at v6 — the toolkit version is independent of the doctrine set. Tests 55 → 231.
 
 **Retrieval: four read-only graph-query subcommands** (they answer questions in
 the vault's own vocabulary — evidence, never a bare list):

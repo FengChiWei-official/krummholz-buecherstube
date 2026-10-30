@@ -74,6 +74,14 @@
 2. `tools/vault.toml [templates]` 加一个键（键 = 体裁/分区：`node` / `raw` / `index` / `links` / `material` / `todos`）。
 3. 无需改文档：文档只引用键名与 `[templates]`，不写文件数量（§自检 拦数值副本）。
 
+### 7. 发版
+
+1. `tools/vaultkit/__init__.py` 的 `__version__` 升到新版本（`status --json` / `check --json` 直接读它）。
+2. `tools/CHANGELOG.md`：把 `Unreleased` 段转成 `## v<版本>（日期）`，写清这一版是**加性**还是**破坏性**。
+3. `doctrine/` 的 `版本：v6` 头**不动**——那是 doctrine 集的版本，与工具版本独立；只有 doctrine 语义变化才动它（走 T9 + 新 D 号）。
+4. `python3 -m pytest -q` + `check` + `docs-check --gate` 全绿后提交，再打标签 `v<版本>`（仓库约定：每个版本一个标签）。
+5. 本仓库**不 push**，除非 owner 明确要求。
+
 ## 同步面
 
 左列是触发点，右列必须同改，同一提交内完成。
