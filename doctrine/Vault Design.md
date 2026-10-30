@@ -66,6 +66,7 @@ archives/
 a_sticker/                 todos / or / new_terms / other
 zzz_output/                终端产出（主树入口 Root.md）
 tools/                     脚本
+tests/                     测试与 fixture vault（不参与扫描，D38）
 ```
 
 体裁判据：**名字 > 路径 > tag**。`Raw Index*` → Raw/；`Index of*` → Index/；`Links of*` → Links/；`-MOC` 与 `Index of*` 同属 Index/；其余 → fold。名字与路径冲突 = 搬家，不是改判。`a_sticker/todos/Index of Todos.md` 是 todo 树的登记册，不套 library 体裁规则。
@@ -100,6 +101,7 @@ Node = 纯 markdown。**工具不依赖模板；模板是可选脚手架**（`te
 | D35 | 记忆底座（间隔重复） | **做** | 只喂规则卡 + 核心概念卡；Obsidian 间隔重复插件，per-machine（`.obsidian/` 已 gitignore）；deck 须切按文件夹模式，否则与「无 tag」冲突 |
 | D36 | 原始清单 `TR-raw-D-*.md` | **不再保存** | 候选池只活在当日 `/tmp` 快照；滚动 raw 合并删除；索引不再挂 raw 链 |
 | D37 | 主干模型 | **树 → DAG** | 登记是边不是父：≥1 条登记边，同一 `(Raw Index, Node)` 对不得重复，多重登记合法，`Raw Index → Raw Index` 必须无环（I1a/I1b/I1c） |
+| D38 | 扫描范围 | **排除 `tests/` 与 `.pytest_cache/`** | 两者都在进图：`tests/fixtures/mini_vault/` 是一整套假 vault（17 篇），`.pytest_cache/README.md` 由跑测试生成。实测危害：`[[README]]` 解析到 `.pytest_cache/README.md`；`[[Fence Node]]`、`[[No Source Lit]]` 这类 fixture 专有名字**能解析** → G3 漏报；5 个 stem 重名让 `rename` 误判二义。落地：进 `tools/vault.toml [scan] skip_dirs`；stems 1312 → 1300、aliases 171 → 169、`resolvable()` 1482 → 1468；**Nodes / Raw / Links / doctrine 计数不变**（fixture 不在 `library/` 下，本来就不算 Node）；G3 范围行本就从配置渲染（`rules.g3_scope_note`）；`Agent Contract` §6 不再抄字面量 |
 
 ## Related
 

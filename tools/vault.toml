@@ -29,7 +29,10 @@ zzz = "zzz_output"
 doctrine = "doctrine"
 
 [scan]
-skip_dirs = [".git", ".obsidian", ".agent"]
+# Scan scope. `tests/` holds a complete fixture vault and `.pytest_cache/` a
+# generated README — both would enter the graph as notes (duplicate stems, counts
+# that change depending on whether the suite ran). D38.
+skip_dirs = [".git", ".obsidian", ".agent", ".pytest_cache", "tests"]
 notes_extra_skip_dirs = ["zzz_output", "template"]
 root_allowed = ["README.md", "AGENTS.md"]
 

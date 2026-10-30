@@ -94,11 +94,12 @@ copies, sync-map id parity, doctrine headers).
 
 ### Facts the tools rely on (do not "fix" them)
 
-- **G3 scan scope**: every `*.md` except the `skip_dirs` in `tools/vault.toml`
-  (`.git`, `.obsidian`, `.agent`). Note *loading* additionally skips
-  `zzz_output/` and `template/`, but names found there still resolve links.
-  So a dangling link in a skipped dir is invisible — that is why an absent
-  `Raw Index of Root` went unnoticed.
+- **G3 scan scope**: every `*.md` except the `skip_dirs` in `tools/vault.toml` —
+  read them there; this file must not keep a copy (it drifts). Note *loading*
+  additionally skips `notes_extra_skip_dirs` (`zzz_output/`, `template/`), but
+  names found there still resolve links. So a dangling link in a skipped dir is
+  invisible — that is why an absent `Raw Index of Root` went unnoticed. `tests/`
+  is skipped: it holds a complete fixture vault (D38).
 - **Rhythm line is a proxy, not a log**: 整理 = todos dir mtime / last commit,
   聚簇 = `library/Raw/`, 问箱 = `library/Links/`, 产出 = `zzz_output/`. On a fresh
   clone (no git history) the mtimes are checkout time, so it reads 今天.

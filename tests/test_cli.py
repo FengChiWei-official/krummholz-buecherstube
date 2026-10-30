@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from conftest import run_vault
+from vaultkit import config
 
 MATERIAL = "archives/material/No Source Lit.md"
 
@@ -124,10 +125,13 @@ def test_check_reports_i1c_cycle_and_i1b_duplicate(vault):
     assert "环上: Raw Index of Beta" in proc.stdout
 
 
-def test_g3_scope_line_is_stated(vault):
+def test_g3_scope_line_is_rendered_from_the_config(vault):
+    """The scope line must be built from `tools/vault.toml`, never hardcoded."""
+    cfg = config.load(root=vault)
     proc = run_vault(vault, "check")
-    assert "扫描范围: 除 .agent、.git、.obsidian 之外的全部 *.md" in proc.stdout
-    assert "笔记载入另跳过 template、zzz_output" in proc.stdout
+    assert f"扫描范围: 除 {'、'.join(sorted(cfg.skip_dirs))} 之外的全部 *.md" in proc.stdout
+    extra = "、".join(sorted(cfg.notes_skip_dirs - cfg.skip_dirs))
+    assert f"笔记载入另跳过 {extra}" in proc.stdout
 
 
 def test_new_rule_renders_in_check_and_rawindex_check(vault, monkeypatch, capsys):
