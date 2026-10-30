@@ -959,13 +959,24 @@ def cmd_docs_check(cfg: Config, g: model.Graph, args) -> int:
 
 
 def _rename_scan(cfg: Config):
-    """The G3 scan scope, split by writability (zzz_output/ is never written)."""
-    writable, unwritable = [], []
+    """The G3 scan scope, split by writability.
+
+    `zzz_output/` is the owner's area and `template/` holds scaffolds — the tool
+    rewrites neither. `[[NAME]]` inside a scaffold is a placeholder, not a link,
+    so "renaming" it would corrupt the scaffold instead of fixing anything.
+    """
+    writable, unwritable, scaffolds = [], [], []
     zzz = cfg.paths["zzz"] + "/"
+    tpl = cfg.paths["template"] + "/"
     for path in sorted(parse.iter_notes(cfg.root, cfg.skip_dirs)):
-        target = unwritable if _rel(cfg, path).startswith(zzz) else writable
-        target.append(path)
-    return writable, unwritable
+        rel = _rel(cfg, path)
+        if rel.startswith(zzz):
+            unwritable.append(path)
+        elif rel.startswith(tpl):
+            scaffolds.append(path)
+        else:
+            writable.append(path)
+    return writable, unwritable, scaffolds
 
 
 def _agent_notes(cfg: Config) -> list:
@@ -980,7 +991,7 @@ def collect_rename(cfg: Config, g: model.Graph, old: str, new: str) -> dict:
     """
     data = {"command": "rename", "old": old, "new": new, "error": None,
             "warnings": [], "hits": [], "unwritable": [], "agent_hits": 0,
-            "case_variants": [], "genre_change": None,
+            "scaffold_hits": [], "case_variants": [], "genre_change": None,
             "refs": 0, "files": 0, "old_path": None, "new_path": None,
             "self_alias": False, "whitelist": old in cfg.whitelist_unresolved,
             "applied": False, "remaining": None}
@@ -1045,7 +1056,7 @@ def collect_rename(cfg: Config, g: model.Graph, old: str, new: str) -> dict:
         data["warnings"].append(f"仅大小写不同的同名：{', '.join(case_only)}"
                                 "——本工具大小写敏感，Obsidian 不敏感")
 
-    writable, unwritable = _rename_scan(cfg)
+    writable, unwritable, scaffolds = _rename_scan(cfg)
     for path in writable:
         _, count = parse.rename_links(path.read_text(encoding="utf-8", errors="replace"),
                                       old, name)
@@ -1053,11 +1064,12 @@ def collect_rename(cfg: Config, g: model.Graph, old: str, new: str) -> dict:
             data["hits"].append({"path": _rel(cfg, path), "count": count})
             data["refs"] += count
             data["files"] += 1
-    for path in unwritable:
-        _, count = parse.rename_links(path.read_text(encoding="utf-8", errors="replace"),
-                                      old, name)
-        if count:
-            data["unwritable"].append({"path": _rel(cfg, path), "count": count})
+    for key, paths in (("unwritable", unwritable), ("scaffold_hits", scaffolds)):
+        for path in paths:
+            _, count = parse.rename_links(path.read_text(encoding="utf-8", errors="replace"),
+                                          old, name)
+            if count:
+                data[key].append({"path": _rel(cfg, path), "count": count})
     for path in writable:
         variants = sum(1 for link in parse.extract_links(
             path.read_text(encoding="utf-8", errors="replace"))
@@ -1102,6 +1114,12 @@ def _render_rename(cfg: Config, data: dict, apply: bool) -> None:
         print(f"  ⚠ zzz_output/ 另有 {total} 处引用：工具不写那里（owner 手工），"
               "G3 也只扫载入的笔记，扫不到它们")
         for hit in data["unwritable"][:5]:
+            print(f"    {hit['path']}: {hit['count']}")
+    if data["scaffold_hits"]:
+        total = sum(h["count"] for h in data["scaffold_hits"])
+        print(f"  ⚠ template/ 另有 {total} 处引用（未改）：脚手架里的 `[[NAME]]` 是占位符，"
+              "不是链接")
+        for hit in data["scaffold_hits"][:5]:
             print(f"    {hit['path']}: {hit['count']}")
     if data["agent_hits"]:
         print(f"  ⚠ .agent/ 另有 {data['agent_hits']} 处引用，未改（AI 指令区，多为占位示例）")
@@ -1481,7 +1499,8 @@ Dry-run by default (P6): nothing is written without --apply.
 Zone from STATE (AGENTS hard rule 2), genre from NAME (rule 4, name > path):
   root      (default)  the entry queue — reversible, but triage will list it
   library              Raw / Index / Links by the name's genre, else <A–Z>_fold
-                       (a leading digit → 0_fold, CJK → 中_fold)
+                       (a leading digit and CJK each get their own fold — the
+                       names live in tools/vault.toml [zones])
   material             archives/material/ — needs --source (G2 hard gate)
   work                 archives/work/
   todos                a_sticker/todos/ (also registers it in Index of Todos.md)
@@ -1527,9 +1546,10 @@ Refuses (exit 1) when:
 
 Warns, never blocks: NEW is another note's `aliases:` entry, or differs from an
 existing name only by case (this tool is case-sensitive, Obsidian is not); OLD
-is in whitelist_unresolved; OLD is in the note's own `aliases:`; and
-zzz_output/ still links to OLD — the tool will not write there, and G3 does not
-scan it (G3 reads loaded notes only), so those links go stale silently.
+is in whitelist_unresolved; OLD is in the note's own `aliases:`; and a hit in
+`zzz_output/` or `template/`, neither of which the tool rewrites — G3 does not
+scan them either (it reads loaded notes only), and `[[NAME]]` in a scaffold is
+a placeholder, not a link.
 
 After --apply it re-scans and prints the remaining references in the writable
 scope; that number must be 0. Renames need the owner's sign-off (AGENTS hard

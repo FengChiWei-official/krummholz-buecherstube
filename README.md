@@ -21,7 +21,7 @@ Modified Zettelkasten，按**状态**组织，不按主题树。两棵树 + 原�
 
 ## 区域
 
-- `library/<A–Z>_fold/` — Node（默认体裁，按首字母分片；数字头 `0_fold`，CJK `中_fold`）。
+- `library/<A–Z>_fold/` — Node（默认体裁，按首字母分片；数字头与 CJK 各有自己的 fold，名字见 `tools/vault.toml [zones]`）。
 - `library/Links/` — `Links of*`：单概念多角度，横跨 ≥2 个 Index 区域。理解的产物。
 - `archives/material/` — 外部材料。`source:` 必填（硬门）。拆过判据 = 有指向所拆 Node 的出链。
 - `archives/work/` — 我的档案：AI 报告、调研、决策材料。

@@ -1,5 +1,33 @@
 # Changelog
 
+## Unreleased (inside v6, after 6.0.0)
+
+No version bump — `tools/vaultkit/__init__.py` still reports 6.0.0.
+
+- **`docs-check [--against REV] [--gate]`** — the doc sync map
+  (`doctrine/Vault Extension.md` §同步面, machine copy `tools/vault.toml
+  [docs_sync]`) diffed against the working tree: names every triggered row's
+  missing co-owner files. Report-level by default, `--gate` exits 1; CI runs it
+  against the base commit.
+- **`rename OLD NEW [--apply]`** — rename a note and cascade every inbound
+  wikilink: `|alias` and `#Heading` kept, path prefixes and embeds handled,
+  fenced code and inline code skipped, exact last-segment match only (renaming
+  `Old` never touches `[[OldName]]`). Dry-run by default; refuses a collision, a
+  path separator, a root contract file, a file inside `zzz_output/`.
+- **`new NAME [--zone Z] [--template KEY] [--source S] [--todo NOTE --into T]`** —
+  create a note from a scaffold: zone from state, genre from the name, template
+  from `tools/vault.toml [templates]` (optional — D30), `--apply` prints 3
+  candidate links (S2). Refuses a collision, a genre name outside its home zone,
+  and `--zone material` without `--source` (G2).
+- `check`'s scope line renders from config and now states what the code actually
+  scans (loaded notes only — `zzz_output/` and `template/` were never scanned).
+- `status`'s check summary renders from the rule registry; it had been reading a
+  shadowed, stale second copy of the rule list.
+- Doctrine: `doctrine/Vault Extension.md` (maintainer handbook + sync map),
+  `doctrine/New Machine.md` (new-device runbook); ledger **D38** keeps `tests/`
+  and `.pytest_cache/` out of the graph.
+- Tests: 55 → 190.
+
 ## v6.0.0 (2026-10-30)
 
 In-place overhaul of the vault tooling and doctrine, phased P0–P9 (plan slug

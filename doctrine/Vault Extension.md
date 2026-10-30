@@ -14,7 +14,7 @@
 | # | 特性 | 判据 |
 |---|---|---|
 | P1 | **硬门恰 3 条**（G1/G2/G3） | `tools/vaultkit/rules.py` 里 `tier="hard"` 的 Rule 数 == 3；新判据默认 `report` |
-| P2 | **单解析器** | `grep -rln '_WIKILINK_RE\|def parse_frontmatter\|def extract_links\|_FENCE_RE' tools/vaultkit/` 只命中 `parse.py` |
+| P2 | **单解析器** | `grep -rln --include='*.py' '_WIKILINK_RE\|def parse_frontmatter\|def extract_links\|_FENCE_RE' tools/vaultkit/` 只命中 `parse.py` |
 | P3 | **单配置** | zone / genre / threshold / path 字面量只在 `tools/vault.toml`；代码与文档只引用键名 |
 | P4 | **单规则表** | `check` / `rawindex --check` / `status` 都从 `rules.RULES` 渲染；加规则 = 追加一个 `Rule` |
 | P5 | **退出码固定** | 0 正常 / 1 硬门失败或未知目标 / 2 配置缺失——不复用为别的含义 |
@@ -27,7 +27,7 @@
 
 | 关注点 | 文件 |
 |---|---|
-| 常量 / 区域 / 体裁 / 阈值 / 路径 / 文档同步面 | `tools/vault.toml`（`tools/vaultkit/config.py` 读取） |
+| 常量 / 区域 / 体裁 / 阈值 / 路径 / 模板映射 / 文档同步面 | `tools/vault.toml`（`tools/vaultkit/config.py` 读取） |
 | 文本解析（唯一） | `tools/vaultkit/parse.py` |
 | 图 / 登记边 / 环 / 绑定邻居 | `tools/vaultkit/model.py` |
 | 判据 | `tools/vaultkit/rules.py` |
@@ -68,6 +68,12 @@
 2. 按 §同步面 T11 同步那四处注册点。
 3. `python3 tools/vault.py docs-check --gate` 会替你盯着 T11——新增 doctrine 文件本身是探针。
 
+### 6. 加一个脚手架
+
+1. 文件放 `template/`，含 `aliases:`（material 的还要 `source:`），`[[NAME]]` 会被 `new` 替换成笔记名——它是占位符，不是链接（`rename` 不碰它）。
+2. `tools/vault.toml [templates]` 加一个键（键 = 体裁/分区：`node` / `raw` / `index` / `links` / `material` / `todos`）。
+3. 无需改文档：文档只引用键名与 `[templates]`，不写文件数量（§自检 拦数值副本）。
+
 ## 同步面
 
 左列是触发点，右列必须同改，同一提交内完成。
@@ -78,6 +84,11 @@
 
 探针是**精确的**，不是「文件碰了就红」：`rules.py` 只改注释不触发 T2；`cli.py` 只改实现、不动子命令名不触发 T5。
 没有探针的行（T3、T6–T9）在 `docs-check` 里列为 `manual`——机器看不见，只能靠本表。
+
+探针**覆盖不到**的地方，写在这里免得被误信：
+
+- **T2 只比对判据 id 集合**：`*_note` 说明文字改了不触发。G3 范围行就这么漏过一次——靠 `tests/test_cli.py` 把渲染文字钉到配置上兜住，其余靠纪律。
+- **T5 只比对子命令名集合**：加旗标、改 `--help` 文案不触发。新增命令本身会被拦住（那是这套门的起点）。
 
 | # | 触发改动 | 必须同步 | 探针 |
 |---|---|---|---|
@@ -102,7 +113,7 @@
 | 判据 id 齐全 | 5 份文档（README / AGENTS / Vault Design / Agent Contract / 记忆底座卡）都点到 `RULES` 里的每个 id |
 | 无幽灵 id | 扫描范围内出现的判据写法必须真的存在——v5 遗留的旧编号会红 |
 | 无 id 区间 | 不许用区间简写（区间查不了成员，而且最先过期） |
-| 阈值无副本 | 文档只写键名，不写数值 |
+| 配置值无副本 | 文档只写键名，不写数值或名字——阈值数值、fold 名（`tools/vault.toml [thresholds]` / `[zones]`） |
 | 同步面 id 对齐 | `tools/vault.toml [docs_sync]` 的 id 集合 == 本表 id 集合 |
 | 同步面目标存在 | 每行的 `sync` / `paths` 指向的文件真的在 |
 | doctrine 头齐 | 每份 `doctrine/*.md` 有 `> 版本：` 与 `> 同步组：`，且引用的 T 号存在 |

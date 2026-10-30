@@ -92,6 +92,15 @@ def test_docs_carry_no_threshold_value_copies(path):
     assert not hits, f"{path.name} copies a threshold value: {hits}"
 
 
+@pytest.mark.parametrize("path", sorted(set(RULE_DOCS) | set(DOCTRINE) | {SKILL}), ids=_named)
+def test_docs_cite_fold_names_by_key_not_by_value(path, sync_cfg):
+    """Zone names live in `tools/vault.toml [zones]`; docs must cite the keys."""
+    names = [sync_cfg.zones["digit_fold"], sync_cfg.zones["cjk_fold"]]
+    hits = [f"{i}: {ln.strip()}" for i, ln in enumerate(prose(path).splitlines(), 1)
+            if any(name in ln for name in names)]
+    assert not hits, f"{path.name} copies a zone name: {hits}"
+
+
 # ---------------------------------------------------------------- sync map
 
 

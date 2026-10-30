@@ -66,6 +66,7 @@ archives/
 a_sticker/                 todos / or / new_terms / other
 zzz_output/                终端产出（主树入口 Root.md）
 tools/                     脚本
+template/                  可选脚手架（键 → 文件映射在 tools/vault.toml [templates]；不参与扫描）
 tests/                     测试与 fixture vault（不参与扫描，D38）
 ```
 
@@ -75,7 +76,7 @@ tests/                     测试与 fixture vault（不参与扫描，D38）
 
 删：`tags` / `created` / `data-date` / `date`（全部退役——状态单点在 todo 树，体裁由名字+路径承载）。
 留：`aliases`（wikilink 解析依赖）、`source`（material 的硬门）。
-Node = 纯 markdown。**工具不依赖模板；模板是可选脚手架**（`template/`，6 个模板保留原样，含 `aliases:`）。「无固定小节」只约束**笔记**：笔记不要求填满模板的小节，而不是禁止模板存在固定小节。
+Node = 纯 markdown。**工具不依赖模板；模板是可选脚手架**（`template/`，脚手架保留原样，含 `aliases:`；键 → 文件映射在 `tools/vault.toml [templates]`）。「无固定小节」只约束**笔记**：笔记不要求填满模板的小节，而不是禁止模板存在固定小节。
 
 ## 为什么这套不会重演旧死因
 

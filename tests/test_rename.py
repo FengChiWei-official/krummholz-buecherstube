@@ -182,6 +182,22 @@ def test_genre_change_is_called_out(vault):
     assert "体裁会变：node → raw" in proc.stdout
 
 
+def test_template_placeholders_are_never_rewritten(vault):
+    """`[[NAME]]` in a scaffold is a placeholder, not a link to a note."""
+    (vault / "template").mkdir()
+    scaffold = vault / "template/todo-temp.md"
+    scaffold.write_text("# t\n\n- [ ] [[NAME]] — 续写说明\n", encoding="utf-8")
+    (vault / "library/A_fold/NAME.md").write_text("# NAME\n", encoding="utf-8")
+
+    proc = run_vault(vault, "rename", "NAME", "Renamed")
+    assert "template/ 另有 1 处引用（未改）" in proc.stdout
+
+    proc = run_vault(vault, "rename", "NAME", "Renamed", "--apply")
+    assert proc.returncode == 0
+    assert scaffold.read_text(encoding="utf-8") == "# t\n\n- [ ] [[NAME]] — 续写说明\n"
+    assert (vault / "library/A_fold/Renamed.md").exists()
+
+
 def test_unwritable_zzz_output_links_are_reported_but_do_not_block(vault):
     """G3 does not scan zzz_output, so a stale link there cannot turn a gate red."""
     zzz = vault / "zzz_output"
