@@ -182,20 +182,22 @@ def test_genre_change_is_called_out(vault):
     assert "体裁会变：node → raw" in proc.stdout
 
 
-def test_unwritable_zzz_output_blocks_until_allowed(vault):
+def test_unwritable_zzz_output_links_are_reported_but_do_not_block(vault):
+    """G3 does not scan zzz_output, so a stale link there cannot turn a gate red."""
     zzz = vault / "zzz_output"
     zzz.mkdir()
     (zzz / "out.md").write_text("terminal output [[Node Zero]]\n", encoding="utf-8")
 
     proc = run_vault(vault, "rename", "Node Zero", "Zero Two")
-    assert proc.returncode == 1
+    assert proc.returncode == 0
     assert "zzz_output/ 另有 1 处引用" in proc.stdout
-    assert (vault / "library/A_fold/Node Zero.md").exists()
+    assert "扫不到它们" in proc.stdout
 
-    proc = run_vault(vault, "rename", "Node Zero", "Zero Two", "--allow-unwritable", "--apply")
+    proc = run_vault(vault, "rename", "Node Zero", "Zero Two", "--apply")
     assert proc.returncode == 0
     assert (vault / "library/A_fold/Zero Two.md").exists()
     assert (zzz / "out.md").read_text(encoding="utf-8") == "terminal output [[Node Zero]]\n"
+    assert "OK — no violations" in _g3_section(run_vault(vault, "check").stdout)
 
 
 def test_renaming_a_note_inside_zzz_output_refuses(vault):

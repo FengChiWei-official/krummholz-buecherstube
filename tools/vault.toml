@@ -6,6 +6,9 @@ raw = "Raw"
 index = "Index"
 links = "Links"
 node_suffix = "_fold"
+# Fold for a name that starts with a digit / with a CJK character (v6 convention).
+digit_fold = "0_fold"
+cjk_fold = "中_fold"
 
 [genres]
 raw_prefix = "Raw Index"
@@ -27,6 +30,18 @@ archives_work = "archives/work"
 todos = "a_sticker/todos"
 zzz = "zzz_output"
 doctrine = "doctrine"
+template = "template"
+
+# Scaffolds are OPTIONAL (D30): the tools never require one. This map only says
+# which scaffold `vault.py new` picks for a genre — key = genre/zone, value = file
+# under `paths.template`. Missing key (work, root) = plain markdown.
+[templates]
+node = "node-temp.md"
+raw = "raw-index-temp.md"
+index = "index-temp.md"
+links = "links-temp.md"
+material = "lit-temp.md"
+todos = "todo-temp.md"
 
 [scan]
 # Scan scope. `tests/` holds a complete fixture vault and `.pytest_cache/` a

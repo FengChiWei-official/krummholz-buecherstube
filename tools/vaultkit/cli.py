@@ -106,7 +106,7 @@ def emit_json(payload: dict) -> None:
 EXIT_CODES = {
     "0": "ok — every report, and any check whose hard gates are green",
     "1": "hard gate failed (check), unknown target (rawindex --around / suggest), "
-         "a docs-sync violation under docs-check --gate, or a refused rename",
+         "a refused rename or a refused new, or a docs-sync violation under docs-check --gate",
     "2": "missing or unreadable config (also a missing list file under --strict)",
 }
 
@@ -1099,7 +1099,8 @@ def _render_rename(cfg: Config, data: dict, apply: bool) -> None:
         print("  引用: 0 处——没有任何链接指向它（改名不影响别的笔记）")
     if data["unwritable"]:
         total = sum(h["count"] for h in data["unwritable"])
-        print(f"  ⚠ zzz_output/ 另有 {total} 处引用，工具不写那里（owner 手工）：")
+        print(f"  ⚠ zzz_output/ 另有 {total} 处引用：工具不写那里（owner 手工），"
+              "G3 也只扫载入的笔记，扫不到它们")
         for hit in data["unwritable"][:5]:
             print(f"    {hit['path']}: {hit['count']}")
     if data["agent_hits"]:
@@ -1112,11 +1113,9 @@ def cmd_rename(cfg: Config, g: model.Graph, args) -> int:
     """Rename one note and cascade every inbound wikilink (dry-run by default)."""
     data = collect_rename(cfg, g, args.old, args.new)
     apply = bool(getattr(args, "apply", False))
-    allow_unwritable = bool(getattr(args, "allow_unwritable", False))
-    blocked = data["error"] or (data["unwritable"] and not allow_unwritable)
-    if apply and not blocked:
+    if apply and not data["error"]:
         data["applied"] = _apply_rename(cfg, data)
-    data["exit"] = 1 if (data["error"] or (data["unwritable"] and not allow_unwritable)) else 0
+    data["exit"] = 1 if data["error"] else 0
 
     if wants_json(args):
         emit_json(data)
@@ -1124,10 +1123,6 @@ def cmd_rename(cfg: Config, g: model.Graph, args) -> int:
 
     _render_rename(cfg, data, apply)
     if data["error"]:
-        return 1
-    if data["unwritable"] and not allow_unwritable:
-        print("  拒绝：zzz_output/ 里还有指向旧名的链接，改名会让 G3 报新增悬空。"
-              "owner 先手工改，或加 --allow-unwritable 承担。")
         return 1
     if not apply:
         print("  （不改文件；确认后加 --apply 落地）")
@@ -1160,6 +1155,265 @@ def _apply_rename(cfg: Config, data: dict) -> bool:
         parse.rename_links(path.read_text(encoding="utf-8", errors="replace"),
                            data["old"], data["new"])[1]
         for path in _rename_scan(cfg)[0])
+    return True
+
+
+# ---------------------------------------------------------------- new
+
+ZONES = ("root", "library", "material", "work", "todos")
+
+
+def _fold_for(cfg: Config, name: str) -> str:
+    """Fold directory for a Node name: A–Z, digits, CJK (v6 convention)."""
+    first = name.lstrip()[:1]
+    if first and first.isascii() and first.isalpha():
+        return f"{first.upper()}{cfg.zones['node_suffix']}"
+    if first.isdigit():
+        return cfg.zones["digit_fold"]
+    return cfg.zones["cjk_fold"]
+
+
+def _zone_target(cfg: Config, zone: str, genre: str, name: str):
+    """(directory, template key) for a zone plus the name's genre."""
+    if zone == "library":
+        home = {"raw": cfg.zones["raw"], "index": cfg.zones["index"],
+                "links": cfg.zones["links"]}
+        sub = home.get(genre) or _fold_for(cfg, name)
+        return f"{cfg.paths['library']}/{sub}", (genre if genre in home else "node")
+    if zone == "material":
+        return cfg.paths["archives_material"], "material"
+    if zone == "work":
+        return cfg.paths["archives_work"], "work"
+    if zone == "todos":
+        return cfg.paths["todos"], "todos"
+    return "", "root"
+
+
+def _template_path(cfg: Config, key_or_file):
+    """A template key (`node`) or a file name under `template/`, or None.
+
+    Existence is checked in BOTH branches: a configured key whose file is absent
+    (no `template/` dir at all, say) must degrade to plain markdown, not crash.
+    """
+    if not key_or_file:
+        return None
+    candidate = cfg.root / cfg.paths["template"] / cfg.templates.get(key_or_file, key_or_file)
+    return candidate if candidate.exists() else None
+
+
+def _render_template(text: str, name: str, source) -> str:
+    """Fill the scaffold's placeholders. Everything else stays verbatim (D30)."""
+    text = text.replace("[[NAME]]", f"[[{name}]]")
+    if not source:
+        return text
+    lines, in_front, filled = text.splitlines(keepends=True), False, False
+    for i, line in enumerate(lines):
+        if i == 0 and line.strip() == "---":
+            in_front = True
+        elif in_front and line.strip() == "---":
+            in_front = False
+        elif in_front and re.match(r"^source:\s*$", line):
+            lines[i] = f"source: {source}\n"
+            filled = True
+    return "".join(lines) if filled else f"---\nsource: {source}\naliases:\n---\n\n" + text
+
+
+def _append_line(path: Path, line: str) -> None:
+    text = path.read_text(encoding="utf-8")
+    if text and not text.endswith("\n"):
+        text += "\n"
+    path.write_text(text + line + "\n", encoding="utf-8")
+
+
+def collect_new(cfg: Config, g: model.Graph, args) -> dict:
+    """Plan a note: zone from state, genre from name, scaffold from the config map.
+
+    The doctrine is enforced, not suggested: a name decides its genre (so a
+    genre name may not land outside its home), `archives/material/` needs a real
+    `source:` (G2), and a name that already exists is refused (it would make
+    `[[name]]` ambiguous). Nothing is written without `--apply`.
+    """
+    data = {"command": "new", "name": args.name, "zone": args.zone, "genre": None,
+            "dir": None, "path": None, "template": None, "content": None,
+            "todo_file": None, "todo_line": None, "register": None, "register_line": None,
+            "suggestions": [], "warnings": [], "error": None, "applied": False}
+
+    name = args.name.strip()
+    if name.endswith(".md"):
+        name = name[:-3].strip()
+        data["warnings"].append("已去掉 `.md` 后缀——这里给的是笔记名")
+    data["name"] = name
+    if not name:
+        data["error"] = "名字为空"
+        return data
+    if "/" in name or "\\" in name:
+        data["error"] = "名字不能含路径分隔符——分区由 --zone 决定"
+        return data
+    if args.template and args.no_template:
+        data["error"] = "--template 与 --no-template 只能给一个"
+        return data
+
+    zone, genre = args.zone, cfg.genre(name)
+    data["genre"] = genre
+    home = {"raw": f"{cfg.paths['library']}/{cfg.zones['raw']}",
+            "index": f"{cfg.paths['library']}/{cfg.zones['index']}",
+            "links": f"{cfg.paths['library']}/{cfg.zones['links']}"}
+    if genre in home and zone != "library":
+        data["error"] = (f"`{name}` 的体裁是 {genre}（名字决定体裁），只能落在 {home[genre]}/"
+                         "——去掉 --zone，或写 --zone library")
+        return data
+    if genre != "node" and zone in ("material", "work", "todos"):
+        data["error"] = (f"`{name}` 的体裁是 {genre}（名字决定体裁），不能放进 {zone}"
+                         "——改名字，或换 --zone")
+        return data
+
+    dir_rel, key = _zone_target(cfg, zone, genre, name)
+    target = (cfg.root / dir_rel / f"{name}.md") if dir_rel else (cfg.root / f"{name}.md")
+    data["dir"], data["path"] = dir_rel, target.relative_to(cfg.root).as_posix()
+    if target.exists():
+        data["error"] = f"已存在：{data['path']}"
+        return data
+    taken = {p.stem for p in parse.iter_notes(cfg.root, cfg.skip_dirs)}
+    taken |= {p.stem for p in (cfg.root / ".agent").rglob("*.md")}
+    if name in taken:
+        data["error"] = f"已有同名笔记 `{name}`——同名会让 [[{name}]] 二义（先改名，或换名字）"
+        return data
+
+    if zone == "material" and not args.source:
+        data["error"] = ("archives/material/ 每篇必须有真实 `source:`（G2 硬门）"
+                         "——补 --source，或换 --zone")
+        return data
+    if args.source and zone != "material":
+        data["warnings"].append("--source 只对 archives/material/ 是硬门；这里记下无害")
+
+    template = None if args.no_template else _template_path(cfg, args.template or key)
+    if args.no_template:
+        data["template"] = None
+    elif template is not None:
+        data["template"] = _rel(cfg, template)
+        data["content"] = _render_template(template.read_text(encoding="utf-8"), name, args.source)
+    else:
+        if args.template:
+            data["error"] = (f"没有模板 `{args.template}`：`{cfg.paths['template']}/` 里找不到，"
+                             f"配置里的键是 {', '.join(sorted(cfg.templates))}")
+            return data
+        if key in cfg.templates:
+            data["warnings"].append(f"脚手架 `{cfg.paths['template']}/{cfg.templates[key]}` "
+                                    "不存在——纯 markdown（工具不依赖模板，D30）")
+        else:
+            data["warnings"].append(f"`{zone}` 没有默认脚手架——纯 markdown（工具不依赖模板，D30）")
+        data["content"] = f"---\nsource: {args.source}\naliases:\n---\n\n" if args.source else ""
+
+    if args.todo:
+        if not args.into:
+            data["error"] = "挂 todo 得知道挂在哪个 todo 笔记上——补 --into \"<todo 笔记名>\""
+            return data
+        todo_note = next((p for p in sorted(cfg.todos_dir.glob("*.md"))
+                          if p.stem == args.into), None)
+        if todo_note is None:
+            data["error"] = (f"`{cfg.paths['todos']}/` 顶层没有叫 `{args.into}` 的 todo 笔记"
+                             "（archived/ 里的不算）")
+            return data
+        data["todo_file"] = _rel(cfg, todo_note)
+        data["todo_line"] = f"- [ ] [[{name}]] — {args.todo.strip()}"
+    elif zone != "todos":
+        data["warnings"].append("没挂 todo 钩子：未完成的活必须在 todo 树里写 "
+                                "`- [ ] [[NAME]] — 5–10 词续写说明`（硬规则 5）")
+
+    if zone == "todos":
+        register = cfg.todos_dir / "Index of Todos.md"
+        if register.exists():
+            data["register"] = _rel(cfg, register)
+            data["register_line"] = f"- [ ] [[{name}]]"
+        else:
+            data["warnings"].append(f"没找到 {cfg.paths['todos']}/Index of Todos.md——todo 树靠它登记")
+    if zone == "root":
+        data["warnings"].append("落在入口队列：`triage` 会把它列出来，定好分区再搬"
+                                "（搬家不破坏链接，改名才要级联）")
+    if not data["content"]:
+        data["warnings"].append("空笔记没有链接信号，`triage` 会一直列为疑似半成品——写完再走")
+    if zone == "library" and genre == "node":
+        data["warnings"].append("新 Node 还没有登记边（I1a）——`vault.py rawindex` 给归队提议")
+    return data
+
+
+def _render_new(cfg: Config, data: dict, apply: bool) -> None:
+    print(f"# vault new — {data['name']}{'' if apply else '  [dry-run]'}")
+    if data["error"]:
+        print(f"REFUSED: {data['error']}")
+        return
+    print(f"  落点: {data['path']}  (zone={data['zone']}, genre={data['genre']})")
+    print(f"  脚手架: {data['template'] or '无（纯 markdown）'}")
+    if data["content"]:
+        body = data["content"].splitlines()
+        print("  内容:")
+        for line in body[:10]:
+            print(f"    {line}")
+        if len(body) > 10:
+            print(f"    … ({len(body) - 10} more lines)")
+    if data["todo_line"]:
+        print(f"  todo 钩子 → {data['todo_file']}:")
+        print(f"    {data['todo_line']}")
+    if data["register_line"]:
+        print(f"  登记 → {data['register']}:")
+        print(f"    {data['register_line']}")
+    for warning in data["warnings"]:
+        print(f"  ⚠ {warning}")
+
+
+def cmd_new(cfg: Config, g: model.Graph, args) -> int:
+    """Create one note from a scaffold, in the zone its state belongs to."""
+    data = collect_new(cfg, g, args)
+    apply = bool(getattr(args, "apply", False))
+    if apply and not data["error"]:
+        data["applied"] = _apply_new(cfg, data)
+        if data["applied"]:
+            model.clear_cache()
+            fresh = model.build(cfg)
+            target = cfg.root / data["path"]
+            data["suggestions"] = [{"note": q.stem, "why": why}
+                                   for q, why in suggest_candidates(cfg, fresh, target, 3)]
+
+    if wants_json(args):
+        data["exit"] = 1 if data["error"] else 0
+        emit_json(data)
+        return data["exit"]
+
+    _render_new(cfg, data, apply)
+    if data["error"]:
+        return 1
+    if not apply:
+        print("  （不改文件；确认后加 --apply 落地）")
+        return 0
+    if not data["applied"]:
+        print("  未创建（见上）")
+        return 1
+    print(f"  已建 {data['path']}")
+    if data["suggestions"]:
+        print("\n  S2 — 捕获时当场链 ≥1 篇旧笔记，写一句 why。候选（你选一个，AI 不替你选）：")
+        for item in data["suggestions"]:
+            print(f"    [[{item['note']}]] — {item['why']}")
+        print(f"    选好后把链接写进 {data['path']} 的 `## Related`。")
+    else:
+        print("  S2 — 还没算出候选链接：写几句内容后再跑 "
+              f"`vault.py suggest \"{data['name']}\"`。")
+    print("  下一步：`python3 tools/vault.py check`")
+    return 0
+
+
+def _apply_new(cfg: Config, data: dict) -> bool:
+    """Write the note, then the todo hook and the todo-tree registration."""
+    path = cfg.root / data["path"]
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(data["content"] or "", encoding="utf-8")
+        if data["todo_line"]:
+            _append_line(cfg.root / data["todo_file"], data["todo_line"])
+        if data["register_line"]:
+            _append_line(cfg.root / data["register"], data["register_line"])
+    except OSError as exc:
+        print(f"ERROR: 创建失败 {exc}")
+        return False
     return True
 
 
@@ -1216,9 +1470,41 @@ moves (each with a copy-pasteable command).
 
 On a fresh clone the rhythm line reads 今天 — it takes the max of git commit
 time and mtime, and a checkout refreshes mtime. Known limitation, not a signal.""",
+    "new": """new — create a note from a scaffold, in the zone its state belongs to
+
+    python3 tools/vault.py new NAME [--zone Z] [--template KEY] [--no-template]
+                              [--source SRC] [--todo NOTE --into TODO_NOTE]
+                              [--apply] [--json]
+
+Dry-run by default (P6): nothing is written without --apply.
+
+Zone from STATE (AGENTS hard rule 2), genre from NAME (rule 4, name > path):
+  root      (default)  the entry queue — reversible, but triage will list it
+  library              Raw / Index / Links by the name's genre, else <A–Z>_fold
+                       (a leading digit → 0_fold, CJK → 中_fold)
+  material             archives/material/ — needs --source (G2 hard gate)
+  work                 archives/work/
+  todos                a_sticker/todos/ (also registers it in Index of Todos.md)
+
+The scaffold is OPTIONAL (D30) and comes from `tools/vault.toml [templates]` by
+genre; --no-template gives plain markdown. Filled in: `[[NAME]]` and an empty
+`source:` line. Everything else in the template is written verbatim.
+
+Refuses (exit 1) rather than leaving the vault in a state its gates would flag:
+  - a name that already exists (it would make `[[name]]` ambiguous);
+  - a genre name outside its home zone (the name decides the genre, so it would
+    be 体裁错位 the moment it exists);
+  - --zone material without --source;
+  - --todo without --into, or --into naming no todo note;
+  - an unknown --template key.
+
+Warns: no todo hook yet (rule 5); a new Node has no registration edge (I1a); an
+empty note carries no link signal, so triage keeps listing it; landing in the
+root queue. After --apply it rebuilds the graph and prints 3 candidate links
+(S2) — the owner picks one and writes the why-line; the tool never links for you.""",
     "rename": """rename — rename one note and cascade every inbound wikilink
 
-    python3 tools/vault.py rename OLD NEW [--apply] [--allow-unwritable] [--json]
+    python3 tools/vault.py rename OLD NEW [--apply] [--json]
 
 Wikilinks resolve by note NAME, so renaming a file breaks every `[[OLD]]` that
 pointed at it. This rewrites them all in one pass. Dry-run by default (L13):
@@ -1237,14 +1523,13 @@ Refuses (exit 1) when:
   - no note is named OLD, or several files share that stem (ambiguous);
   - a note named NEW already exists — `[[NEW]]` would resolve to the wrong one;
   - NEW contains a path separator (that is a move, not a rename);
-  - OLD lives in zzz_output/ (owner's area — the tool never writes there);
-  - zzz_output/ still links to OLD (those would become NEW dangling links and
-    turn G3 red) unless --allow-unwritable.
+  - OLD lives in zzz_output/ (owner's area — the tool never writes there).
 
 Warns, never blocks: NEW is another note's `aliases:` entry, or differs from an
 existing name only by case (this tool is case-sensitive, Obsidian is not); OLD
-is in whitelist_unresolved; OLD is in the note's own `aliases:` (clearing that
-changes resolution, so it is the owner's call).
+is in whitelist_unresolved; OLD is in the note's own `aliases:`; and
+zzz_output/ still links to OLD — the tool will not write there, and G3 does not
+scan it (G3 reads loaded notes only), so those links go stale silently.
 
 After --apply it re-scans and prints the remaining references in the writable
 scope; that number must be 0. Renames need the owner's sign-off (AGENTS hard
@@ -1358,10 +1643,10 @@ def build_parser() -> argparse.ArgumentParser:
         description="Vault operating procedures (v6)",
         epilog=("exit codes: 0 = ok (all reports, and any check with green hard gates); "
                 "1 = hard gate failed (check), unknown target (rawindex --around / suggest), "
-                "a docs-sync violation under docs-check --gate, or a refused rename; "
+                "a refused rename or new, or a docs-sync violation under docs-check --gate; "
                 "2 = missing/unreadable config (or a missing list file under --strict). "
                 "Topics: `vault.py help check|status|triage|rawindex|dag|links|random|suggest"
-                "|docs-check|rename`."),
+                "|docs-check|rename|new`."),
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--strict", action="store_true", default=argparse.SUPPRESS,
                         help="missing config / list files are fatal (exit 2), not warnings")
@@ -1396,14 +1681,30 @@ def build_parser() -> argparse.ArgumentParser:
     p_sug.add_argument("name", help="note name (stem)")
     p_sug.add_argument("--n", type=int, default=3, help="candidates to show (default 3)")
 
+    p_new = sub.add_parser("new", parents=[common],
+                           help="create a note from a scaffold, placed by zone (dry-run)")
+    p_new.add_argument("name", help="note name (stem)")
+    p_new.add_argument("--zone", choices=ZONES, default="root",
+                       help="root (entry queue, default) / library / material / work / todos")
+    p_new.add_argument("--template", metavar="KEY", default=None,
+                       help="scaffold key or file under template/ (default: by genre)")
+    p_new.add_argument("--no-template", action="store_true",
+                       help="plain markdown — scaffolds are optional (D30)")
+    p_new.add_argument("--source", metavar="SRC", default=None,
+                       help="required for --zone material (G2 hard gate)")
+    p_new.add_argument("--todo", metavar="NOTE", default=None,
+                       help="5–10 word continuation note; also appends the todo hook")
+    p_new.add_argument("--into", metavar="TODO_NOTE", default=None,
+                       help="which todo note owns the hook (required with --todo)")
+    p_new.add_argument("--apply", action="store_true",
+                       help="actually create it (default: dry-run)")
+
     p_ren = sub.add_parser("rename", parents=[common],
                            help="rename a note + cascade every inbound wikilink (dry-run)")
     p_ren.add_argument("old", help="current note name (stem)")
     p_ren.add_argument("new", help="new note name (stem; the file stays in its folder)")
     p_ren.add_argument("--apply", action="store_true",
                        help="actually rename and rewrite (default: dry-run)")
-    p_ren.add_argument("--allow-unwritable", action="store_true",
-                       help="proceed although zzz_output/ still links to the old name")
 
     p_raw = sub.add_parser("rawindex", parents=[common],
                            help="trunk operations: queue + L0 归队提议")
@@ -1448,6 +1749,8 @@ def main(argv=None) -> int:
         return cmd_suggest(cfg, g, args)
     if args.command == "rename":
         return cmd_rename(cfg, g, args)
+    if args.command == "new":
+        return cmd_new(cfg, g, args)
     return cmd_rawindex(cfg, g, args)
 
 

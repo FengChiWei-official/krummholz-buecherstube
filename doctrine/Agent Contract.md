@@ -21,7 +21,8 @@ take over correctly. Deeper why: [[Vault Design]]; operational procedures:
 | `python3 tools/vault.py rawindex [...]` | trunk operations: queue + L0 归队 / `--clusters` / `--check` / `--sync` / `--around NAME` |
 | `python3 tools/vault.py random [--scope …] [--seed N]` | 问箱 material (S9): one note + its backlinks |
 | `python3 tools/vault.py suggest NAME [--n 3]` | candidate links for a note, one why-line each (S2) |
-| `python3 tools/vault.py rename OLD NEW [--apply]` | rename a note + cascade every inbound wikilink (dry-run; refuses a name collision, a path separator, a root contract file, and `zzz_output/` links) |
+| `python3 tools/vault.py rename OLD NEW [--apply]` | rename a note + cascade every inbound wikilink (dry-run; refuses a name collision, a path separator, a root contract file, and a file inside `zzz_output/`) |
+| `python3 tools/vault.py new NAME [--zone Z] [--source S] [--apply]` | create a note from a scaffold: zone from state, genre from the name, template from `tools/vault.toml [templates]` (dry-run; refuses a name collision, a genre name outside its home, and `material` without `source:`) |
 | `python3 tools/trend_radar.py …` | daily intel flow (see `.agent/skills/trend-radar/SKILL.md`) |
 
 Every subcommand accepts `--json` (one JSON document on stdout, nothing else) and
@@ -33,7 +34,7 @@ Every subcommand accepts `--json` (one JSON document on stdout, nothing else) an
 | code | meaning |
 |---|---|
 | 0 | ok — every report, and any `check` whose hard gates are green |
-| 1 | a hard gate failed (`check`), an unknown target (`rawindex --around`, `suggest`), a refused rename (collision, ambiguity, unwritable links), or a docs-sync violation under `docs-check --gate` |
+| 1 | a hard gate failed (`check`), an unknown target (`rawindex --around`, `suggest`), a refused rename or `new`, or a docs-sync violation under `docs-check --gate` |
 | 2 | missing/unreadable config; a missing list file under `--strict`; unknown `help` topic |
 
 ## 2. Where state lives
@@ -84,6 +85,7 @@ not in a note is not in the system.
 | `python3 tools/vault.py status` | rhythm line, git state, check summary, trunk counts, numbered moves |
 | `python3 tools/vault.py rawindex --check` | the same rule registry as `check`, trunk-facing |
 | `python3 tools/vault.py rename OLD NEW` | the file pair, every inbound reference per file, and every refusal/warning — nothing is written without `--apply` |
+| `python3 tools/vault.py new NAME --zone Z` | the landing path, the scaffold, the rendered content, the todo hook, and every refusal/warning — nothing is written without `--apply` |
 | `python3 tools/vault.py docs-check --against HEAD` | triggered sync rows and the co-owner files they are missing; `--gate` makes it exit 1 |
 | `python3 tools/trend_radar.py verify` | the day's snapshot + report + index + leaderboards |
 
@@ -94,12 +96,14 @@ copies, sync-map id parity, doctrine headers).
 
 ### Facts the tools rely on (do not "fix" them)
 
-- **G3 scan scope**: every `*.md` except the `skip_dirs` in `tools/vault.toml` —
-  read them there; this file must not keep a copy (it drifts). Note *loading*
-  additionally skips `notes_extra_skip_dirs` (`zzz_output/`, `template/`), but
-  names found there still resolve links. So a dangling link in a skipped dir is
-  invisible — that is why an absent `Raw Index of Root` went unnoticed. `tests/`
-  is skipped: it holds a complete fixture vault (D38).
+- **G3 scan scope**: the *loaded* notes, i.e. every `*.md` except the
+  `skip_dirs` **and** `notes_extra_skip_dirs` in `tools/vault.toml` — read both
+  there; this file must not keep a copy (it drifts). Names found in a skipped
+  dir still resolve as link targets, so a dangling link *inside* `zzz_output/`
+  or `template/` is invisible to G3 and is not a gate failure — which is why an
+  absent `Raw Index of Root` went unnoticed, and why `rename` reports stale
+  `zzz_output/` links as a warning instead of pretending a gate will catch them.
+  `tests/` is skipped: it holds a complete fixture vault (D38).
 - **Rhythm line is a proxy, not a log**: 整理 = todos dir mtime / last commit,
   聚簇 = `library/Raw/`, 问箱 = `library/Links/`, 产出 = `zzz_output/`. On a fresh
   clone (no git history) the mtimes are checkout time, so it reads 今天.

@@ -30,11 +30,14 @@ Run `python3 tools/vault.py status` first — rhythm line, git state, check summ
 
 ## Procedures
 
-### New note in root
+### New note (capture, S2/S5)
 
-1. `python3 tools/vault.py triage` — see the standing debt.
-2. Decide the zone by state, move the file, let the name decide the genre (`check` reports 体裁错位).
-3. Unfinished → todo-hook (S5): `- [ ] [[NAME]] — 5–10 word continuation note` in the owning todo under `a_sticker/todos/`.
+1. `python3 tools/vault.py new "<Name>"` — dry-run. Zone comes from **state** (root = the entry queue and the reversible default), genre from the **name**, scaffold from `tools/vault.toml [templates]` by genre (optional — D30, `--no-template` for plain markdown).
+2. Unfinished work → hook it in the same call: `--todo "5–10 word continuation" --into "<owning todo note>"` (rule 5). A `--zone todos` note is registered in `Index of Todos.md` instead.
+3. Owner confirms → add `--apply`. It then prints 3 candidate links (S2): pick one and write it into `## Related` with a why-line. The tool never links for you — links change meaning (Agent Contract §4).
+4. `python3 tools/vault.py check`; `triage` lists whatever placement debt the new note created (root, unhooked, genre, zero-link).
+
+It refuses rather than leaving the vault in a state its gates would flag: an existing name (ambiguity), a genre name outside its home zone (体裁错位), `--zone material` without `--source` (G2), `--todo` without `--into`.
 
 ### Note has zero outbound links (I3 / capture rule)
 
@@ -68,7 +71,7 @@ Wikilinks resolve by note name, so a rename must cascade. The tool does it; the 
 3. Owner confirms → `python3 tools/vault.py rename "Old Name" "New Name" --apply`. It moves the file (`git mv` when available) and rewrites `[[Old]]`, `[[Old|alias]]`, `[[Old#Heading]]`, `![[Old]]`, `[[folder/Old]]`, `[[Old.md]]` — alias and heading untouched, fenced code and inline code spans skipped.
 4. It re-scans and prints the remaining references; that number must be 0. Then `python3 tools/vault.py check`.
 
-Refusals (exit 1): no such note, several files with that stem, a note already named NEW, a path separator in NEW, a root contract file (`README.md` / `AGENTS.md`), a file inside `zzz_output/`, or `zzz_output/` links pointing at OLD (the tool never writes there — the owner fixes those, or `--allow-unwritable` accepts the dangling links).
+Refusals (exit 1): no such note, several files with that stem, a note already named NEW, a path separator in NEW, a root contract file (`README.md` / `AGENTS.md`), or a file inside `zzz_output/`. A `zzz_output/` file that merely *links* to OLD is reported as a warning and does not block: the tool never writes there, and G3 scans loaded notes only, so those links go stale silently — the owner fixes them by hand if they care.
 Moving a file is NOT renaming: a move never breaks a link, so `git mv` alone is correct.
 
 ### Trunk workflow (rawindex) — the weekly core loop

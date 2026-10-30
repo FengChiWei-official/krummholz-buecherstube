@@ -113,6 +113,7 @@ BARE = {
     "check": (),
     "docs-check": (),
     "help": ("rawindex",),
+    "new": ("Fresh Note",),
     "random": (),
     "rawindex": (),
     "rename": ("Node Zero", "Zero Two"),

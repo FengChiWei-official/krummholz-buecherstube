@@ -86,11 +86,19 @@ def rule_g3(ctx: Context) -> list:
 
 
 def g3_scope_note(ctx: Context) -> str:
+    """G3 iterates `graph.notes`, i.e. LOADED notes — say exactly that.
+
+    It is tempting to describe the scope as "every *.md except skip_dirs", but
+    the loop is over loaded notes, so `notes_extra_skip_dirs` is invisible to G3
+    too. A stale link in `zzz_output/` or `template/` is therefore NOT a gate
+    failure, and the note must not imply otherwise.
+    """
     skip = "、".join(sorted(ctx.cfg.skip_dirs))
-    notes_skip = "、".join(sorted(ctx.cfg.notes_skip_dirs - ctx.cfg.skip_dirs))
-    return (f"扫描范围: 除 {skip} 之外的全部 *.md；笔记载入另跳过 {notes_skip}"
-            f"（其笔记名仍可作为链接目标解析）。白名单: {ctx.cfg.source.name} 配置的 "
-            f"whitelist_unresolved（当前 {len(ctx.cfg.whitelist_unresolved)} 条）")
+    extra = "、".join(sorted(ctx.cfg.notes_skip_dirs - ctx.cfg.skip_dirs))
+    return (f"扫描范围: 载入的笔记（除 {skip} 之外的全部 *.md，且不载入 {extra}）——"
+            f"{extra} 里的悬空链接看不见，但其笔记名仍可作为链接目标解析。"
+            f"白名单: {ctx.cfg.source.name} 配置的 whitelist_unresolved"
+            f"（当前 {len(ctx.cfg.whitelist_unresolved)} 条）")
 
 
 # ---------------------------------------------------------------- report level
