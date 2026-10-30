@@ -1,0 +1,31 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pytest
+        run: python -m pip install pytest
+      - name: Unit tests
+        run: python -m pytest -q
+      - name: Fixture smoke — the seeded G2 violation must fail the hard gate
+        run: |
+          set +e
+          VAULT_ROOT=tests/fixtures/mini_vault python3 tools/vault.py check > /tmp/check.out 2>&1
+          rc=$?
+          set -e
+          cat /tmp/check.out
+          test "$rc" -eq 1
+          grep -q "archives/material/No Source Lit.md: no real source:" /tmp/check.out
+      - name: Fixture smoke — triage and status run clean on the fixture
+        run: |
+          VAULT_ROOT=tests/fixtures/mini_vault python3 tools/vault.py triage
+          VAULT_ROOT=tests/fixtures/mini_vault python3 tools/vault.py status

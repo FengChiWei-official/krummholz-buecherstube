@@ -1,0 +1,90 @@
+"""CLI tests: run the real entry point against a throwaway fixture vault."""
+
+from __future__ import annotations
+
+from conftest import run_vault
+
+MATERIAL = "archives/material/No Source Lit.md"
+
+
+def test_check_fails_on_missing_source(vault):
+    proc = run_vault(vault, "check")
+    assert proc.returncode == 1
+    assert f"{MATERIAL}: no real source:" in proc.stdout
+    assert "PROBLEMS: 1 (hard gates failed)" in proc.stdout
+
+
+def test_check_clean_once_source_is_recorded(vault):
+    path = vault / MATERIAL
+    path.write_text("---\naliases: []\nsource: 某处\n---\n\n# No Source Lit\n\nbody\n",
+                    encoding="utf-8")
+    proc = run_vault(vault, "check")
+    assert proc.returncode == 0
+    assert "CLEAN — hard gates hold" in proc.stdout
+    assert "no real source" not in proc.stdout
+
+
+def test_check_flags_new_unresolved_link(vault):
+    (vault / "library" / "A_fold" / "Dangling.md").write_text(
+        "# Dangling\n\n- [[Nothing Here]]\n", encoding="utf-8")
+    proc = run_vault(vault, "check")
+    assert proc.returncode == 1
+    assert "unresolved [[Nothing Here]]" in proc.stdout
+
+
+def test_check_flags_root_file(vault):
+    (vault / "Loose.md").write_text("# Loose\n", encoding="utf-8")
+    proc = run_vault(vault, "check")
+    assert proc.returncode == 1
+    assert "Loose.md: file me (root is the entry queue)" in proc.stdout
+
+
+def test_check_reports_trunk_numbers(vault):
+    proc = run_vault(vault, "check")
+    assert "未登记: 2  (queue — see rawindex L0)" in proc.stdout
+    assert "多重登记: Node Shared -> ['Raw Index of Alpha', 'Raw Index of Beta']" in proc.stdout
+    assert "零出链: 2/5 (40%)" in proc.stdout
+    assert "绑定邻居排除 doctrine(1) 与 Raw(3)" in proc.stdout
+
+
+def test_triage_categories_and_dead_todo(vault):
+    # `Index of Todos.md` itself is exempt from the dead-reference scan, so seed
+    # the finished reference in a normal todo note.
+    (vault / "a_sticker" / "todos" / "Scratch Todo.md").write_text(
+        "# Scratch Todo (fixture)\n\n- [x] [[Gone Note]] — finished\n", encoding="utf-8")
+    proc = run_vault(vault, "triage")
+    assert proc.returncode == 0
+    assert "# root: 0" in proc.stdout
+    assert "# dead_todo: 1" in proc.stdout
+    assert "dead todo reference: Scratch Todo.md:3: [[Gone Note]]" in proc.stdout
+
+
+def test_status_renders_all_sections(vault):
+    proc = run_vault(vault, "status")
+    assert proc.returncode == 0
+    for heading in ("## 节律", "## git", "## check (two-tier summary)", "## triage (counts)",
+                    "## 主干 (trunk)", "## zzz_output", "## next moves"):
+        assert heading in proc.stdout
+    assert "nodes 5 | Raw Index 3 | Index 3 | Links 1" in proc.stdout
+    assert "queue (未登记): 2" in proc.stdout
+
+
+def test_rawindex_around_known_node(vault):
+    proc = run_vault(vault, "rawindex", "--around", "Node Shared")
+    assert proc.returncode == 0
+    assert "## Node Shared" in proc.stdout
+    assert "登记: ['Raw Index of Alpha', 'Raw Index of Beta']" in proc.stdout
+    assert "区域: ['Index of Alpha Area']" in proc.stdout
+
+
+def test_rawindex_around_unknown_exits_1(vault):
+    proc = run_vault(vault, "rawindex", "--around", "No Such Note")
+    assert proc.returncode == 1
+    assert "not found." in proc.stdout
+
+
+def test_rawindex_check_reports_registration_state(vault):
+    proc = run_vault(vault, "rawindex", "--check")
+    assert proc.returncode == 0
+    assert "未登记: 2   多重登记: 1" in proc.stdout
+    assert "零出链: 2/5  (40%)" in proc.stdout

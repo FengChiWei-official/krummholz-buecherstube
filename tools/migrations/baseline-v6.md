@@ -72,3 +72,27 @@ Enumerated by `vault.py check` → section `G2-baseline material without source`
 | `vault.py status` | 17.0 s |
 
 Target after P3: `< 2 s`.
+
+## P2 equivalence — old vs new on the real vault (2026-10-30)
+
+Captured `check`/`triage`/`status`/`rawindex`/`rawindex --check`/`rawindex --clusters`/
+`rawindex --around <name>` before the port, diffed after. Findings:
+
+| surface | result |
+|---|---|
+| `triage`, `rawindex`, `rawindex --around` | byte-identical |
+| `check`, `rawindex --check`, `status` | one line: `零出链 378 → 379` |
+| `rawindex --clusters` | deterministic order now (was hash-random) |
+
+Cause of the 378 → 379 change: the unified parser strips code fences, so the
+false edge `library/T_fold/Trial division.md → [[Trie Tree]]` (a `//` comment
+inside a ```cpp fence) is gone and that node is honestly zero-outlink. The same
+unification removed three inline-code-span edges in
+`a_sticker/other/Graph of Math - 类型化边方案.md`. Both are corrections: no hard
+gate flips (G1/G2/G3 stay green), no other trunk number moved.
+
+Also fixed while porting (recorded as a deliberate change, not equivalence):
+`rawindex` L0 tie-breaks and L2 绑定证据 ordering used `Counter.most_common`, so
+equal counts resolved in set-iteration order — i.e. differently on every process
+run. Both now sort by `(-count, stem)`.
+

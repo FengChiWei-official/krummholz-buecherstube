@@ -2,3 +2,5 @@
 .trash
 tools/__pycache__/
 archives/work/TR-leaderboards.state.json
+__pycache__/
+*.pyc
