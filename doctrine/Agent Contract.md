@@ -14,7 +14,7 @@ take over correctly. Deeper why: [[Vault Design]]; operational procedures:
 |---|---|
 | `python3 tools/vault.py status` | session entry. Rhythm line + git + check summary + triage counts + trunk + numbered next moves (every move carries a copy-pasteable command) |
 | `python3 tools/vault.py status --json` | the same as data — **this is the machine entry point**; every field below is in it |
-| `python3 tools/vault.py help <topic>` | inline help: `triage` / `rawindex` / `dag` / `links` / `random` / `suggest` / `docs-check` |
+| `python3 tools/vault.py help <topic>` | inline help: `check` / `status` / `triage` / `rawindex` / `dag` / `links` / `random` / `suggest` / `docs-check` |
 | `python3 tools/vault.py check` | two-tier invariant report; exit 1 only when a hard gate fails |
 | `python3 tools/vault.py docs-check [--against REV] [--gate]` | docs sync map vs the diff: triggered rows whose co-owners did not move (report-level; `--gate` exits 1) |
 | `python3 tools/vault.py triage` | placement debt (root, todo aging, half-done, unhooked, genre, dead todo) |

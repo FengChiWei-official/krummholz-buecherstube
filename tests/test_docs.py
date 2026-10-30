@@ -95,6 +95,98 @@ def test_docs_carry_no_threshold_value_copies(path):
 # ---------------------------------------------------------------- sync map
 
 
+def _subcommands() -> set:
+    """Subcommand names declared by build_parser (the CLI's public surface)."""
+    return set(re.findall(r'add_parser\(\s*"([^"]+)"',
+                          (REPO / "tools/vaultkit/cli.py").read_text(encoding="utf-8")))
+
+
+# ---------------------------------------------------------------- teaching surface
+
+# Subcommands allowed to have no `help <topic>`. `help` documents itself: bare
+# `vault.py help` prints the module docstring, every topic and the exit codes.
+HELP_EXEMPT = {"help"}
+
+# Bare invocation per subcommand, for the fixture-vault smoke run. A new
+# subcommand must be added here — that is the point of the equality assert.
+BARE = {
+    "check": (),
+    "docs-check": (),
+    "help": ("rawindex",),
+    "random": (),
+    "rawindex": (),
+    "status": (),
+    "suggest": ("Node A",),
+    "triage": (),
+}
+
+
+def test_every_subcommand_has_a_help_topic():
+    """A feature nobody can look up is a feature nobody learns."""
+    missing = sorted(_subcommands() - set(cli.HELP_TOPICS) - HELP_EXEMPT)
+    assert not missing, f"no `help <topic>` and not exempt: {missing}"
+
+
+def test_the_help_exemption_list_has_no_dead_entries():
+    assert HELP_EXEMPT == _subcommands() - set(cli.HELP_TOPICS)
+
+
+def test_every_subcommand_appears_in_the_skill():
+    """The skill is what an AI actually loads — a command missing there is invisible."""
+    skill = SKILL.read_text(encoding="utf-8")
+    missing = sorted(c for c in _subcommands()
+                     if not re.search(rf"vault\.py {re.escape(c)}\b", skill))
+    assert not missing, f"not mentioned in {SKILL.name}: {missing}"
+
+
+def test_every_subcommand_is_listed_in_the_bare_run_table():
+    assert set(BARE) == _subcommands(), "add the new subcommand to BARE (and run it)"
+
+
+@pytest.fixture()
+def git_vault(vault: Path) -> Path:
+    """The fixture vault as a git repo — `docs-check` needs a revision to diff."""
+    run = ["git", "-C", str(vault)]
+    subprocess.run([*run, "init", "-q"], check=True, capture_output=True)
+    subprocess.run([*run, "add", "-A"], check=True, capture_output=True)
+    subprocess.run([*run, "-c", "user.email=t@t", "-c", "user.name=t",
+                    "commit", "-qm", "seed"], check=True, capture_output=True)
+    return vault
+
+
+@pytest.mark.parametrize("command", sorted(BARE))
+def test_subcommand_runs_on_the_fixture(git_vault, command):
+    """Smoke: every subcommand must actually run, not just parse."""
+    proc = run_vault(git_vault, command, *BARE[command])
+    assert proc.returncode in (0, 1), f"{command}: rc={proc.returncode}\n{proc.stdout}"
+    assert "Traceback" not in proc.stderr, f"{command}: {proc.stderr}"
+
+
+def test_env_vars_read_by_the_tools_are_documented_in_new_machine():
+    """Per-machine setup that is not written down is setup the next machine misses."""
+    names = set()
+    for rel in ("tools/vaultkit/config.py", "tools/trend_radar.py"):
+        names |= cli._env_names((REPO / rel).read_text(encoding="utf-8"))
+    assert names, "env extractor found nothing — the probe regex rotted"
+    machine = (REPO / "doctrine/New Machine.md").read_text(encoding="utf-8")
+    assert not sorted(n for n in names if n not in machine)
+
+
+def test_env_var_change_fires_t10(sync_cfg):
+    base = 'key = os.environ.get("SEMANTIC_SCHOLAR_API_KEY")\n'
+    out = _changed(sync_cfg, changed={"tools/trend_radar.py"},
+                   texts={"tools/trend_radar.py": (base, base + 'k2 = os.environ.get("NEW_KEY")\n')})
+    assert [f["id"] for f in out["findings"]] == ["T10"]
+    assert out["findings"][0]["missing"] == ["doctrine/New Machine.md"]
+
+
+def test_env_probe_ignores_unrelated_edits(sync_cfg):
+    base = 'key = os.environ.get("SEMANTIC_SCHOLAR_API_KEY")\n'
+    out = _changed(sync_cfg, changed={"tools/trend_radar.py"},
+                   texts={"tools/trend_radar.py": (base, base + "# note\n")})
+    assert out["findings"] == []
+
+
 def test_sync_map_ids_match_the_handbook_table(sync_cfg):
     """`tools/vault.toml [docs_sync]` and the handbook table must not diverge."""
     table = prose(REPO / "doctrine/Vault Extension.md")
@@ -149,7 +241,7 @@ def test_t2_is_satisfied_once_every_co_owner_moves(sync_cfg):
     co_owners = {"tools/vaultkit/rules.py", "README.md", "AGENTS.md",
                  "doctrine/Agent Contract.md", "doctrine/Vault Design.md",
                  "tools/vaultkit/cli.py", "a_sticker/or/记忆底座-首批卡片.md",
-                 "tests/test_docs.py"}
+                 ".agent/skills/vault-ops/SKILL.md", "tests/test_docs.py"}
     out = _changed(sync_cfg, changed=co_owners,
                    texts={"tools/vaultkit/rules.py": (base, base + 'Rule("Z9", "report", "Z9", fn)\n')})
     assert out["findings"] == []
@@ -168,7 +260,7 @@ def test_editing_an_existing_doctrine_file_fires_nothing(sync_cfg):
 def test_rows_without_a_probe_are_reported_as_manual(sync_cfg):
     out = _changed(sync_cfg)
     assert out["findings"] == []
-    assert {m["id"] for m in out["manual"]} == {"T3", "T6", "T7", "T8", "T9", "T10"}
+    assert {m["id"] for m in out["manual"]} == {"T3", "T6", "T7", "T8", "T9"}
 
 
 def test_t1_never_produces_a_finding(sync_cfg):

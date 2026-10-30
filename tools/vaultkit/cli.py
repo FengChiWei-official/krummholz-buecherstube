@@ -827,10 +827,30 @@ def _subcommands_in(text: str) -> set:
     return set(re.findall(r'add_parser\(\s*"([^"]+)"', text or ""))
 
 
+_ENV_CALL = re.compile(
+    r"""(?:environ\s*(?:\.get\s*\(\s*|\[\s*)|getenv\s*\(\s*)['"]([A-Za-z_][A-Za-z0-9_]*)['"]""")
+_ENV_CONST = re.compile(
+    r"""^\s*ENV_[A-Z0-9_]+\s*=\s*['"]([A-Za-z_][A-Za-z0-9_]*)['"]""", re.M)
+
+
+def _env_names(text: str) -> set:
+    """Environment variables a module reads: direct literals + `ENV_*` constants."""
+    return set(_ENV_CALL.findall(text or "")) | set(_ENV_CONST.findall(text or ""))
+
+
 _PROBES = {
     "ids_file": _ids_in,
     "subcommands_file": _subcommands_in,
+    "env_files": _env_names,
 }
+
+
+def _probe_paths(rule: dict, field: str) -> list:
+    """A probe field is one path or a list of paths."""
+    value = rule.get(field)
+    if value is None:
+        return []
+    return [value] if isinstance(value, str) else list(value)
 
 
 def _sync_scope_match(entry: str, paths: set) -> bool:
@@ -863,12 +883,15 @@ def collect_docs_sync(cfg: Config, *, changed: set, added: set,
                              for g in rule.get("paths_added", ())):
             fired = True
         for probe, extract in _PROBES.items():
-            path = rule.get(probe)
-            if fired or not path or path not in changed:
-                continue
-            base_text, cur_text = texts.get(path, (None, None))
-            if base_text is None or extract(base_text) != extract(cur_text):
-                fired = True
+            if fired:
+                break
+            for path in _probe_paths(rule, probe):
+                if path not in changed:
+                    continue
+                base_text, cur_text = texts.get(path, (None, None))
+                if base_text is None or extract(base_text) != extract(cur_text):
+                    fired = True
+                    break
         if not fired:
             continue
         missing = [s for s in rule.get("sync", ()) if not _sync_scope_match(s, touched)]
@@ -895,12 +918,13 @@ def cmd_docs_check(cfg: Config, g: model.Graph, args) -> int:
     texts = {}
     for rule in cfg.docs_sync:
         for probe in _PROBES:
-            path = rule.get(probe)
-            if not path or path in texts or path not in changed:
-                continue
-            cur = cfg.root / path
-            base_text = _git(cfg.root, ["show", f"{base}:{path}"])
-            texts[path] = (base_text, cur.read_text(encoding="utf-8") if cur.exists() else None)
+            for path in _probe_paths(rule, probe):
+                if path in texts or path not in changed:
+                    continue
+                cur = cfg.root / path
+                base_text = _git(cfg.root, ["show", f"{base}:{path}"])
+                texts[path] = (base_text,
+                               cur.read_text(encoding="utf-8") if cur.exists() else None)
 
     data = collect_docs_sync(cfg, changed=changed, added=added, texts=texts)
     data.update({"base": base, "changed": sorted(changed),
@@ -935,6 +959,22 @@ def cmd_docs_check(cfg: Config, g: model.Graph, args) -> int:
 
 
 HELP_TOPICS = {
+    "check": """check — two-tier invariant report
+
+    python3 tools/vault.py check [--json]
+
+Renders every rule from the registry (`tools/vaultkit/rules.py`), so the same
+rules appear in `rawindex --check` and in the `status` check summary.
+
+  hard gates (G1/G2/G3) — any finding exits 1
+    G1 root drained; G2 every `archives/material/` note has a real `source:`;
+    G3 no NEW unresolved wikilink (a dangling link is a hook; only NEW blocks)
+  report-level (I1a…I9, D21) — weekly increments, never block. The vault's own
+    rule is 门常红 = 门失效, so exactly 3 gates exist and no more.
+
+Change a rule → also update the docs named by sync-map row T2 (README §工具,
+AGENTS §Invariants, Agent Contract §6, Vault Design §判据两级制, the memory-base
+card, tests/). `python3 tools/vault.py docs-check --gate` checks that for you.""",
     "docs-check": """docs-check — docs sync map vs the diff (report-level)
 
     python3 tools/vault.py docs-check [--against REV] [--gate] [--json]
@@ -954,6 +994,20 @@ Run it before committing a change to rules.py / cli.py / model.py / vault.toml,
 or when adding a doctrine file. Content checks that always gate live in
 `tests/test_docs.py` (rule ids present and non-ghost, no id ranges, no threshold
 value copies, sync-map id parity, doctrine version/sync-group headers).""",
+    "status": """status — session entry (read-only)
+
+    python3 tools/vault.py status [--json]
+
+The first command of any session. Sections: 节律 (days since 整理 / 聚簇 / 问箱 /
+产出 — git + mtime derived), git state, the check summary (the same registry as
+`check`), triage counts, trunk counts, zzz_output git-state, and numbered next
+moves (each with a copy-pasteable command).
+
+`--json` is the machine entry point: an AI with zero context can bootstrap from
+`status --json` alone (contract path, state location, exit codes included).
+
+On a fresh clone the rhythm line reads 今天 — it takes the max of git commit
+time and mtime, and a checkout refreshes mtime. Known limitation, not a signal.""",
     "triage": """triage — placement debt (read-only)
 
     python3 tools/vault.py triage [--json]
@@ -1065,7 +1119,7 @@ def build_parser() -> argparse.ArgumentParser:
                 "1 = hard gate failed (check), unknown target (rawindex --around / suggest) "
                 "or a docs-sync violation under docs-check --gate; "
                 "2 = missing/unreadable config (or a missing list file under --strict). "
-                "Topics: `vault.py help triage|rawindex|dag|links|random|suggest|docs-check`."),
+                "Topics: `vault.py help check|status|triage|rawindex|dag|links|random|suggest|docs-check`."),
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--strict", action="store_true", default=argparse.SUPPRESS,
                         help="missing config / list files are fatal (exit 2), not warnings")

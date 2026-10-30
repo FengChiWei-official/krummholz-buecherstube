@@ -10,7 +10,7 @@ Modified Zettelkasten，按**状态**组织，不按主题树。两棵树 + 原�
 2. 未完成的活挂 todo（`a_sticker/todos/`）；中断快存 = 原地不动 + 挂钩 + 续写说明（5–10 词）。
 3. 不知道干什么 = `python3 tools/vault.py status`（节律行 + 编号选项，每条都带可复制命令）。
 
-> 其余 ~84 条规则由工具与 [[Agent Contract]] 承载，不需要记忆：`vault.py help <topic>` 就地查（triage / rawindex / dag / links / random / suggest）。
+> 其余 ~84 条规则由工具与 [[Agent Contract]] 承载，不需要记忆：`vault.py help <topic>` 就地查（check / status / triage / rawindex / dag / links / random / suggest / docs-check）。
 
 ## 两棵树
 
