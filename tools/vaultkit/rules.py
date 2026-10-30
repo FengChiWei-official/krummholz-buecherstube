@@ -67,16 +67,7 @@ def _unsourced_materials(ctx: Context) -> list:
 
 def rule_g2(ctx: Context) -> list:
     """G2: every archives/material/ note carries a real `source:`."""
-    return [f"{ctx.rel(p)}: no real source:"
-            for p in _unsourced_materials(ctx)
-            if p.stem not in ctx.cfg.baseline_lit_nosource_stems]
-
-
-def rule_g2_baseline(ctx: Context) -> list:
-    """G2-baseline: material notes already un-sourced at the 2026-09 snapshot."""
-    return [f"{ctx.rel(p)}: no real source:"
-            for p in _unsourced_materials(ctx)
-            if p.stem in ctx.cfg.baseline_lit_nosource_stems]
+    return [f"{ctx.rel(p)}: no real source:" for p in _unsourced_materials(ctx)]
 
 
 def rule_g3(ctx: Context) -> list:
@@ -274,11 +265,28 @@ def rule_i8(ctx: Context) -> list:
             f"学科 Index {len(lines)} 个"] + lines
 
 
+UNRECORDED_SOURCE = "未记录"
+
+
+def rule_i9(ctx: Context) -> list:
+    """I9: material notes whose `source:` is the honest '未记录' placeholder.
+
+    Increment-only counter (D32): the 2026-10-30 backfill gave 49 notes an
+    explicit 'origin not recorded' marker instead of a fabricated source. The
+    number only falls as the owner records real origins — it never blocks.
+    """
+    count = 0
+    for p, text in ctx.graph.notes.items():
+        if not ctx.rel(p).startswith(ctx.material_prefix):
+            continue
+        if str(parse.parse_frontmatter(text).get("source", "")).startswith(UNRECORDED_SOURCE):
+            count += 1
+    return [f"未记录 source 的材料: {count}  (只报增量; 补真实出处后自然下降)"]
+
+
 RULES = [
     Rule("G1", "hard", "G1 root drained (hard gate)", rule_g1),
     Rule("G2", "hard", "G2 archives/material/ has real source (hard gate)", rule_g2),
-    Rule("G2b", "info", "G2-baseline material without source (2026-09 baseline, informational)",
-         rule_g2_baseline),
     Rule("G3", "hard", "G3 wikilink integrity — NEW unresolved only (hard gate)", rule_g3,
          note=g3_scope_note),
     Rule("I1a", "report", "I1a 未登记 Nodes (report: weekly increment)", rule_i1a,
@@ -300,5 +308,6 @@ RULES = [
          short="I7 学科 Index 的 ## 时间轴 ≥2 行"),
     Rule("I8", "report", "I8 挂点覆盖率 (report: 学习机制, 只报增量)", rule_i8,
          short="I8 挂点覆盖率"),
+    Rule("I9", "report", "I9 未记录 source 的材料 (report: 只报增量)", rule_i9),
     Rule("D21", "report", None, rule_material, short="材料 出链=已拆 (D21)"),
 ]

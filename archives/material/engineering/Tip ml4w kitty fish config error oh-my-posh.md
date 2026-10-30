@@ -1,3 +1,7 @@
+---
+source: 未记录（2026-10-30 补齐）
+---
+
 ## Text
 **标题：** 终端与Shell环境配置修复  
 **标签：** #Linux #EndeavourOS #Fish #终端

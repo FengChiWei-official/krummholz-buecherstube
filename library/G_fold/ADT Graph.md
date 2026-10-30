@@ -3,7 +3,6 @@ aliases:
   - Graph
 ---
 
-#entity/virtual #cs 
 ## Definition
 idn
 ## interest

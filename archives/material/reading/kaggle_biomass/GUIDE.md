@@ -1,3 +1,7 @@
+---
+source: 未记录（2026-10-30 补齐）
+---
+
 # Study Guide — Image2Biomass (Swin + DINOv2 + XGBoost)
 
 > **Goal:** Help a semi-intermediate practitioner understand, run, and extend the `ref.md` script that trains a Swin transformer, extracts DINOv2 embeddings, trains XGBoost models on the embeddings, and ensembles predictions for the CSIRO Image2Biomass task.

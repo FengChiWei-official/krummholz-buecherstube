@@ -1,5 +1,3 @@
-#entity/abstract #cs
-
 ## Definition
 The Network Abstraction Model is a hierarchical layering architecture that progressively abstracts physical hardware. It decomposes complex network communication into multiple relatively independent layers. Each layer interacts with its adjacent layers through standardized interfaces and protocols, ensuring that higher-level applications do not need to manage the complexities of physical signal transmission or routing.
 ## [[Term Hyponym|Hyponym]] (The [[TCP-IP]] Stack)

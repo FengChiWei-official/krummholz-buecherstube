@@ -1,6 +1,7 @@
 ---
 aliases:
   - Make Hyprland Notification Properly Work
+source: 未记录（2026-10-30 补齐）
 ---
 
 ## Symptom

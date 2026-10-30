@@ -70,3 +70,9 @@
 - [ ] [[Log-Linear Symmetry]] — 补定义:不等式与放缩
 - [ ] [[Chebyshev Polynomials]] — 补定义:结构变换模式
 - [ ] [[Instance of Move Inverse Trigonometric Functions]] — 补定义:函数结构与变形
+- [ ] [[Column Space]] — 补内容：空笔记，先写定义
+- [ ] [[Domain of Definition]] — 补内容：空笔记，先写定义
+- [ ] [[Identity]] — 补内容：空笔记，先写定义
+- [ ] [[Linear Algebra]] — 补内容：空笔记，先写定义
+- [ ] [[Null Space]] — 补内容：空笔记，先写定义
+- [ ] [[Prodact to Sum]] — 补内容：空笔记，先写定义

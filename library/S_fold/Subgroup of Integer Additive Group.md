@@ -1,5 +1,3 @@
-#concept
-
 # define
 based on [[The Cyclic Decomposition Theorem for Subgroups of the Addition Group of Integers|the theorem]], we can know that subgroup of [[Additive Group of Integers]] shares the common form $\mathbb{Z}a$.
 ## related theorem

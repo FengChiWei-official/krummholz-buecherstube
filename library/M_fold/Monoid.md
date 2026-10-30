@@ -1,5 +1,3 @@
-#concept #math/algebra/abstract 
-
 ## Definition
 -  a [[Semigroup]] having:
 	- [[Identity]]

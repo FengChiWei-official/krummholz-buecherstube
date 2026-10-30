@@ -36,3 +36,6 @@
 - [ ] [[Relocatable File]] — 补定义:ELF 三型之一,待链接
 - [ ] [[Shared Object File]] — 补定义:ELF 三型之一,动态共享
 - [ ] [[Index of Computer Organization]] — 填时间轴与地图
+- [ ] [[System Call]] — 补内容：空笔记，先写定义
+- [ ] [[segmentation]] — 补内容：空笔记，先写定义
+- [ ] [[segmentation-with-paging]] — 补内容：空笔记，先写定义

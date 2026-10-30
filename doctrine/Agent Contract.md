@@ -95,9 +95,13 @@ tool's own suite (`tests/`), including a fixture vault.
   clone (no git history) the mtimes are checkout time, so it reads 今天.
 - **Todo aging is file-level**: the mtime of each `a_sticker/todos/*.md` at the top
   level only — `a_sticker/todos/archived/` is exempt.
+- **Empty notes bypass the half-done age window**: a zero-byte note has no link
+  signal at all, so `triage` lists it regardless of creation time. A moved file has
+  no first-commit entry either (git reports the move as a rename), so a moved note
+  is never mistaken for a fresh one.
 - **`rawindex --sync` is dry-run by default** (L13 write safety). Only `--apply` writes.
 - **`tools/vault.toml` is the single home** for zones, genres, thresholds, paths and
-  the lit-no-source baseline. Never hardcode a threshold in code or docs.
+  baselines. Never hardcode a threshold in code or docs.
 - **Tasks that need a shell**: git archaeology (`git log --diff-filter=A …`),
   running the tools, `pytest`. A subagent without shell access cannot do them.
 - **`omp` config writes are session-only** unless saved explicitly; treat any

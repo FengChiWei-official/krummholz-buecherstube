@@ -48,6 +48,16 @@ def test_check_reports_trunk_numbers(vault):
     assert "多重登记" not in proc.stdout
 
 
+def test_triage_lists_empty_notes(vault):
+    """Zero-byte notes carry no link signal, so they bypass the age window."""
+    (vault / "library" / "A_fold" / "Empty Node.md").write_text("", encoding="utf-8")
+    proc = run_vault(vault, "triage")
+    assert proc.returncode == 0
+    assert "# halfdone: 1" in proc.stdout
+    assert ("library/A_fold/Empty Node.md — 空笔记（零字节）, 零出链, 无 todo 挂钩 (A1/L21)"
+            in proc.stdout)
+
+
 def test_triage_categories_and_dead_todo(vault):
     # `Index of Todos.md` itself is exempt from the dead-reference scan, so seed
     # the finished reference in a normal todo note.

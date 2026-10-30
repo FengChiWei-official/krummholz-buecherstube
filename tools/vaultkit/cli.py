@@ -649,8 +649,10 @@ def collect_triage(cfg: Config, g: model.Graph) -> dict:
     # archives are reference material, a_sticker/or is AI-raw, doctrine is system.
     # Age = git first-commit time (creation), NOT mtime — mv/migration resets mtime.
     # The cheap filters run first so the git index is only consulted for notes that
-    # already look half-done.
+    # already look half-done. Empty notes (zero bytes) skip the age gate entirely:
+    # they carry no link signal at all, so the window cannot see them (L21/L22).
     first_seen = git_first_seen_index(cfg)
+    window = cfg.thresholds["halfdone_window_days"]
     for p in notes:
         rel = _rel(cfg, p)
         zone = cfg.zone(p)
@@ -663,11 +665,15 @@ def collect_triage(cfg: Config, g: model.Graph) -> dict:
             continue
         if p.stem in todo_targets:
             continue
+        if not g.notes[p].strip():
+            findings["halfdone"].append(
+                f"疑似半成品: {rel} — 空笔记（零字节）, 零出链, 无 todo 挂钩 (A1/L21)")
+            continue
         created = first_seen.get(rel)
         if created is None:
             continue
         age_days = (now - created) / 86400
-        if age_days > cfg.thresholds["halfdone_window_days"]:
+        if age_days > window:
             continue
         findings["halfdone"].append(
             f"疑似半成品: {rel} — git 创建 {int(age_days)} 天前, 零出链, 无 todo 挂钩 (A1)")
@@ -913,7 +919,9 @@ Six categories, all mtime/edge heuristics — treat as prompt, not verdict:
               entry queue)
   todo_stale  todo notes untouched beyond todo_stale_days (file-level mtime, top
               scan only; a_sticker/todos/archived/ is exempt)
-  halfdone    created within halfdone_window_days + zero outlink + no todo hook (A1)
+  halfdone    created within halfdone_window_days + zero outlink + no todo hook (A1);
+              zero-byte notes are listed regardless of age — they carry no link
+              signal at all, so the window could never see them (L21/L22)
   unhooked    root-queue note with no todo hook (S5 anti-loss)
   genre       name says Raw Index* / Index of* / Links of* but the file is not in
               its home zone; `-MOC` also counts as index; `a_sticker/todos/Index

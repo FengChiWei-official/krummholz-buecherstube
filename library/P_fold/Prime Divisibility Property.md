@@ -3,7 +3,6 @@ aliases:
   - Euclid's Lemma
 ---
 
-#principle #math/algebra/abstract 
 ## Definition
 ### given
 - $p$ is a prime.

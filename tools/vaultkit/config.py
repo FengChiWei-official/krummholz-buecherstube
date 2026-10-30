@@ -56,7 +56,6 @@ class Config:
     root_allowed: frozenset
     trunk_root_stem: str
     trunk_model: str
-    baseline_lit_nosource_stems: frozenset
     whitelist_unresolved: frozenset
     source: Path
     warnings: tuple = ()
@@ -145,9 +144,6 @@ def load(root: str | Path | None = None, config_path: Path | None = None,
     skip_dirs = frozenset(data["scan"]["skip_dirs"])
     notes_skip_dirs = skip_dirs | frozenset(data["scan"]["notes_extra_skip_dirs"])
 
-    baseline = set(data["baseline"]["lit_nosource_stems"])
-    for entry in _load_extra_lines(vault_root / data["files"]["optional"]["baseline_lit_nosource"]):
-        baseline.add(Path(entry).stem)
     whitelist = _load_extra_lines(vault_root / data["files"]["whitelist_unresolved"],
                                   strict=strict, warnings=warnings)
 
@@ -162,7 +158,6 @@ def load(root: str | Path | None = None, config_path: Path | None = None,
         root_allowed=frozenset(data["scan"]["root_allowed"]),
         trunk_root_stem=data["trunk"]["root_stem"],
         trunk_model=data["trunk"]["model"],
-        baseline_lit_nosource_stems=frozenset(baseline),
         whitelist_unresolved=frozenset(whitelist),
         source=path,
         warnings=tuple(warnings),

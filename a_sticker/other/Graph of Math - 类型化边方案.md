@@ -2,6 +2,9 @@
 source: "本仓库实现 tools/vault.py graph(2026-09-17)+ 原文抽取:archives/Raw math idea.md、library/Index/*、mailbox/*"
 ---
 
+> [!warning] 已过时（2026-10-30）
+> **整体不采纳**：类型化边机制（`tools/vault.py graph`）在 v5 已删除，v6 D34 再次否决重新引入。现行为「约定小节」路线——`## Mapping` / `## 实例化` / `## 时间轴` / `## 地图`（v6 §4，规则 I5–I8）。原文保留，仅作历史。
+
 # Graph of Math — 图在笔记里生长 (AI 提案)
 
 > AI 提案。机制已落地(`tools/vault.py graph`),接线清单待 owner 批准;观点请消化后用自己的话写进你的卡片。

@@ -1,3 +1,7 @@
+---
+source: 未记录（2026-10-30 补齐）
+---
+
 ## Text
 
 Were they genuinely **amused at my wit**, or just **being rather patronising**.

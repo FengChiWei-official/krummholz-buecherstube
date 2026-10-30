@@ -1,3 +1,7 @@
+---
+source: 未记录（2026-10-30 补齐）
+---
+
 ## Definition (完全背包版)
 
 ## Step 1: Draw your Knapsack

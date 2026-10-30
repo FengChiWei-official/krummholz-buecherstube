@@ -1,5 +1,3 @@
-#history #cs
-
 | stages                   | pros                                                      | cons                                        | thoughts                                 |
 | ------------------------ | --------------------------------------------------------- | ------------------------------------------- | ---------------------------------------- |
 | direct allocating        | direct and easy                                           | not safe, usage rate is low,addr not static | direct                                   |

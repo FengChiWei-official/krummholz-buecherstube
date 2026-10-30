@@ -1,5 +1,3 @@
-#concept/virtual  #math/algebra/abstract 
-
 ## define
 $\mathbb{Z}d = \mathbb{Z}a \cap \mathbb{Z}b$
 

@@ -1,4 +1,3 @@
-#technique #math/proof-method 
 ## identify a candidate
 select all possible max/min object into $\mathbf{D}$.
 

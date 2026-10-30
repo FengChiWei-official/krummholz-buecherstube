@@ -38,3 +38,5 @@
 - [ ] [[State Space]] — 补定义:算法原理与复杂度
 - [ ] [[XOR Logic]] — 补定义:算法原理与复杂度
 - [ ] [[Binary Tree]] — 补定义:数据结构与遍历
+- [ ] [[Code Implement of Disjoint Set Union]] — 补内容：空笔记，先写定义
+- [ ] [[双向BFS]] — 补内容：空笔记，先写定义

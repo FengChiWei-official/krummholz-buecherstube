@@ -1,5 +1,3 @@
-#concept #math/algebra/abstract 
-
 ## definition
 -  a [[Monoid]] having:
 	- [[Inverse|Inverses]]

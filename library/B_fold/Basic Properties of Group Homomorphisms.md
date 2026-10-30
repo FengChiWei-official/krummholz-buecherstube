@@ -1,4 +1,3 @@
-#principle #math/algebra 
 ## preparation
 Let $\phi$ a [[Homomorphism]] of Group $G$ and $G^{\prime}$
 Let [[Identity]] of Group Group $G, G^{\prime}$ to be $1_G, 1_{G^{\prime}}$

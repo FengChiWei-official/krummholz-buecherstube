@@ -53,3 +53,26 @@
 ## **Related**
 
 [[Index of Algorithm]]
+
+<!-- P8 2026-10-30: 归组登记 (D22/D16) — 簇证据见 commit -->
+[[BFS Implement Principle]]
+[[Backtracking DFS]]
+[[Breadth-First Search]]
+[[Connectivity DFS]]
+[[DFS Implement Principle]]
+[[Depth First Search]]
+[[Different Types of State]]
+[[Dual Sequence DP]]
+[[Dynamic Programming]]
+[[Dynamic Programming Essential-ism Classes]]
+[[Dynamic Programming Indexing]]
+[[Linear DP]]
+[[Monotonic Queue]]
+[[Queue]]
+[[Single Sequence - Constant Transition DP]]
+[[Single Sequence - Continuous Subarray DP]]
+[[Sliding Window Algorithm]]
+[[State Machine DP]]
+[[Two Points Algorithm]]
+[[dynamic-partitioning]]
+[[standardizing-units]]

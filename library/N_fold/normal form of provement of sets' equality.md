@@ -1,5 +1,3 @@
-#math/pro-method
-
 ## ## General Strategy
 let $S$ be a subgroup of $\mathbb{Z}$ , where $a$ is the smallest positive integer.
 let $\mathbb{Z}a = \{n \in Z \mid n = ka \quad \text{for some k in }\mathbb{Z}\}$.

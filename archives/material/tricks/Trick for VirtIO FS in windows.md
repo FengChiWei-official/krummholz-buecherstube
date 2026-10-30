@@ -1,3 +1,7 @@
+---
+source: 未记录（2026-10-30 补齐）
+---
+
 ## Steps
 1. install `Virtio Driver` in `device manager`.（）
 2. install `WinFsp` ([[Trick install Win Fsp|Guidence]])

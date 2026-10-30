@@ -1,5 +1,3 @@
-#principle #math/algebra/abstract 
-
 ## background
 for **any** *(no)* binary operator $op$, we can define **power**:
 $$

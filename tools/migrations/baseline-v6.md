@@ -116,4 +116,32 @@ counted. All three are report-level; hard gates stay green.
 wording, `[gate]` → `[hard]` in `status`), and `rawindex --check` now renders
 the same rule registry instead of its own duplicate implementation.
 
+## P8 — content cleanup + registration round (2026-10-30)
+
+| item | before | after |
+|---|---|---|
+| material notes with no `source:` | 49 (47 without frontmatter) | 0 — all carry `source: 未记录（2026-10-30 补齐）`, counted by I9 |
+| retired-tag files | 20 | 0 (7 `#include` C files and 2 `#!/bin/bash` files untouched) |
+| `library/Raw/Raw Index of Root.md` | absent | exists, registered, in the trunk root member list |
+| legacy docs at `archives/work/` top level | 3 | moved to `archives/work/history/` |
+| `library/Index/Index of  Traditional CS.md` | double space | `Index of Traditional CS.md` (+ the one inbound link) |
+| queue (未登记) | 500 | 392 |
+| Raw Indexes | 31 | 34 |
+
+Registration round (owner-confirmed, D16/D22): the 5 L2 clusters whose evidence
+cleared ≥4 votes and ≥50 % of the cluster's neighbour votes went into existing
+Raw Indexes (Abstract Algebra +19, Differential Geometry +19, Algorithm +21);
+the 27-node Latin/affix L1 component went into `Raw Index of Roots and Affixes`;
+two new coarse Raw Indexes were created — `Raw Index of German` (11) and
+`Raw Index of Electromagnetism` (11). Total 108 Nodes registered. Nothing was
+registered on the ≥90 % L0 bar: the strongest single-node proposal in the vault
+is 50 % (1/2), so the loop's auto-apply path produced nothing and the grouping
+was the owner's call.
+
+Also: `triage`'s half-done signal now lists zero-byte notes regardless of age
+(19 listed; they carry no link signal, so the age window could never see them),
+and each was hooked into its topic todo. `archives/work/projects/` micro-stubs
+were left as archives (owner call).
+
+
 

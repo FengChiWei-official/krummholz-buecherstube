@@ -1,4 +1,3 @@
-#principle #math/algebra/abstract 
 ## preparation
 Let:
 - $a , b \in \mathbb{Z}^+, \text{ and } a, b \ne 0$
