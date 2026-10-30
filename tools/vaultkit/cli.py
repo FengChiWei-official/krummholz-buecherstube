@@ -376,34 +376,35 @@ def _raw_names(g, path) -> set:
     return {r.stem for r in g.reg.get(path, ())}
 
 
-def _links_evidence(g, nbr, path, seed, topic) -> tuple:
+def _links_evidence(cfg: Config, g, nbr, path, seed, topic) -> tuple:
     """(score, why) — how strongly `path` belongs on a Links card seeded by `seed`.
 
-    Evidence is graded, because a bare shared Index area is nearly meaningless in
-    a large area: name/alias hit 3, a link to or from the seed 2, a shared Raw
-    Index registration 2, a shared binding neighbour 1, a bare shared area 0
-    (reported but never a membership reason).
+    The grades live in `tools/vault.toml [thresholds]` (P3) — retune them there,
+    not here. A bare shared Index area scores nothing on purpose: in a large area
+    it would qualify almost every note and say nothing.
     """
+    grade = cfg.thresholds
     low = topic.strip().lower()
     if low and (low in path.stem.lower()
                 or any(low in a.lower() for a in _aliases_of(g, path))):
-        return 3, f"名字含 `{topic}`"
+        hit = grade["links_alias"] if low not in path.stem.lower() else grade["links_name"]
+        return hit, (f"名字含 `{topic}`" if hit == grade["links_name"] else f"别名含 `{topic}`")
     if seed is not None:
         if seed in g.out.get(path, ()):
-            return 2, f"链到种子 [[{seed.stem}]]"
+            return grade["links_structural"], f"链到种子 [[{seed.stem}]]"
         if path in g.out.get(seed, ()):
-            return 2, f"被种子 [[{seed.stem}]] 链"
+            return grade["links_structural"], f"被种子 [[{seed.stem}]] 链"
         shared_raw = _raw_names(g, path) & _raw_names(g, seed)
         if shared_raw:
-            return 2, f"同登记: {sorted(shared_raw)[0]}"
+            return grade["links_structural"], f"同登记: {sorted(shared_raw)[0]}"
         shared = nbr.get(path, set()) & nbr.get(seed, set())
         if shared:
             names = " / ".join(p.stem for p in sorted(shared, key=lambda p: p.stem)[:3])
-            return 1, f"共同邻居 {len(shared)}: {names}"
+            return grade["links_neighbour"], f"共同邻居 {len(shared)}: {names}"
         shared_area = _area_names(g, path) & _area_names(g, seed)
         if shared_area:
             return 0, f"仅同区域: {sorted(shared_area)[0]}"
-    return -1, ""
+    return 0, ""
 
 
 def _aliases_of(g, path) -> list:
@@ -442,16 +443,19 @@ def collect_links_candidates(cfg: Config, g: model.Graph, topic: str, n: int = 1
     nbr = g.binding_neighbors()
     seed_paths = set(seeds)
     scored: dict = {}
+
+    def record(path, seed):
+        """Keep the strongest evidence seen for `path`, across every seed."""
+        hit = _links_evidence(cfg, g, nbr, path, seed, topic)
+        if hit[0] > scored.get(path, (-1, ""))[0]:
+            scored[path] = hit
+
     for seed in seeds:
-        scored[seed] = _links_evidence(g, nbr, seed, None, topic)
+        record(seed, None)
         for q in (g.out.get(seed, set()) | {p for p, qs in g.out.items() if seed in qs}):
-            scored[q] = max(scored.get(q, (-1, "")), _links_evidence(g, nbr, q, seed, topic))
+            record(q, seed)
         for q in g.notes:
-            if q in scored:
-                continue
-            hit = _links_evidence(g, nbr, q, seed, topic)
-            if hit[0] > 0:
-                scored[q] = hit
+            record(q, seed)
 
     members, weak, structural = [], 0, 0
     for path, (score, why) in scored.items():
@@ -2112,13 +2116,17 @@ the evidence for each member named:
 
   种子               notes whose name or alias contains TOPIC (the seed set)
   覆盖区域 / 成员     members grouped by Index area, each with a why-line:
-                     name hit · 链到/被种子链 · 同登记 (shared Raw Index) ·
-                     同区域 (shared Index area) · 共同邻居 (shared neighbours,
-                     named) · ★种子
+                     name/alias hit · 链到/被种子链 · 同登记 (shared Raw Index) ·
+                     共同邻居 (shared neighbours, named) · ★种子
   卡片名候选          `Links of X and Y` (D16: the name and the commonality
                      sentence are yours — the sentence must rest on the evidence
                      printed above)
   ⚠                  fewer than 2 areas covered → not a Links card yet
+
+How strong each kind of evidence is, and which kinds count at all, are grades in
+`tools/vault.toml [thresholds]` (`links_name`, `links_alias`, `links_structural`,
+`links_text`, `links_neighbour`) — retune them there, not here. A bare shared
+Index area is deliberately not a grade: it is not evidence.
 
 Read-only. No seed found → exit 1, with the pointer to `retrieve` for a
 whole-vault search instead of a name match.""",

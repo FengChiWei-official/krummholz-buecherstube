@@ -22,6 +22,15 @@ halfdone_window_days = 7
 cluster_theta_percentile = 0.97
 l0_confidence = 0.9
 rawindex_top = 10
+# `links-candidates` evidence grades: how strong a reason each kind of evidence is
+# for putting a note on a Links card. Higher = stronger. A bare shared Index area
+# is deliberately NOT graded here: it is not evidence at all (a large area would
+# otherwise contribute nearly every note), so it stays out of the config.
+links_name = 3
+links_alias = 3
+links_structural = 2
+links_text = 2
+links_neighbour = 1
 
 [paths]
 library = "library"

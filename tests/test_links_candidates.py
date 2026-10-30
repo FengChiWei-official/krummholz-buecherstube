@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 
 from conftest import run_vault
+from vaultkit import config
 
 
 def test_members_are_grouped_by_area_with_evidence(vault):
@@ -73,6 +74,16 @@ def test_coverage_is_computed_before_the_cap(vault):
     assert capped["member_total"] == full["member_total"]
     assert len(capped["members"]) == 2
     assert sum(g["member_count"] for g in capped["groups"]) > len(capped["members"])
+
+
+def test_evidence_grades_come_from_the_config(vault):
+    """Retuning is a `tools/vault.toml` edit (P3), never a code edit."""
+    cfg = config.load(root=vault)
+    data = json.loads(run_vault(vault, "links-candidates", "Node", "--json").stdout)
+    by_note = {m["note"]: m for m in data["members"]}
+    assert by_note["Node A"]["score"] == cfg.thresholds["links_name"]
+    assert by_note["Node Shared"]["score"] == cfg.thresholds["links_name"]
+    assert data["members"][0]["score"] >= data["members"][-1]["score"]
 
 
 def test_read_only(vault):
