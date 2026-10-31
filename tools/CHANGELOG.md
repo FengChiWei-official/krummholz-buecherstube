@@ -1,5 +1,43 @@
 # Changelog
 
+## v6.2.0 (2026-10-31)
+
+Additive: a shell-free retrieval entry point (MCP) and the sync-map row that keeps
+new entry points documented. Versioning itself is now pinned in
+`doctrine/Vault Extension.md` §发版 (ledger **D39**): SemVer shape, what counts as
+MAJOR / MINOR / PATCH for this repo's public API, and how the tool version, the
+doctrine-set version, the changelog and the tag stay in step.
+
+**MCP entry point — retrieval for an agent whose tool set has no shell**
+
+- `tools/vault_mcp.py` — the `retrieve` / `place` verbs over MCP stdio, reusing the
+  CLI's config, `Graph` and renderers, so a tool result is byte-identical to what
+  `vault.py` prints. Declared in the repo's `.mcp.json` (so a clone carries it);
+  every call re-reads the vault, and a search with no hits is an answer
+  (`isError: false`). This closes the measured failure where an agent without
+  bash/exec could not run `retrieve` and silently fell back to grep.
+- Docs: `AGENTS.md` rule 9, `README.md` §工具, `Agent Contract` §1 and the skill now
+  name the MCP path and forbid the silent fallback; `New Machine` §步骤 7 covers
+  assembly.
+
+**Docs sync map**
+
+- New row **T12** (`paths_added = ["tools/*.py"]`): a new entry point must be
+  reflected in `README.md`, `Agent Contract` §1, the skill and `tests/`.
+- New probe **`help_topics_file`** on T5: adding or removing a `help <topic>` now
+  drags the docs that enumerate them, and `tests/test_docs.py` asserts those
+  enumerations equal `cli.HELP_TOPICS` in both directions (the docs had drifted
+  nine topics behind the CLI, which is how `retrieve` stayed invisible).
+
+**Fixes**
+
+- A downstream pipe closed early (`vault.py … | head`) now ends the process by
+  SIGPIPE instead of printing a `BrokenPipeError` traceback; the MCP server
+  follows the same rule. Documented beside the exit codes.
+- Every mention of `retrieve` now states that the vault is bilingual and the match
+  is literal — try both languages and both word forms before concluding "no note".
+- Tests: 231 → 253.
+
 ## v6.1.0 (2026-10-30)
 
 Additive release: four read-only retrieval subcommands, the doc sync map with its

@@ -4,4 +4,4 @@ Public version of the toolkit. See `tools/vault.toml` for zones, genres,
 thresholds and baselines; `doctrine/` for the why.
 """
 
-__version__ = "6.1.0"
+__version__ = "6.2.0"
