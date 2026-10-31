@@ -54,7 +54,7 @@
 
 1. `cli.py build_parser()` 用 `parents=[common]`（继承 `--strict` / `--json`）。
 2. 实现拆 `collect_*`（返回 dict，供 `--json`）与 `cmd_*`（渲染文本）；`wants_json(args)` 分支里 `emit_json(payload)`。
-3. `HELP_TOPICS` 加一个 topic——**有门**：没有 topic 的子命令（`help` 除外）测试会红；命令名还必须在 `.agent/skills/vault-ops/SKILL.md` 里露面，并在 fixture 上真跑一次（`tests/test_docs.py` 的 `BARE` 表）。
+3. `HELP_TOPICS` 加一个 topic——**有门**：没有 topic 的子命令（`help` 除外）测试会红；命令名还必须在 `.agent/skills/vault-ops/SKILL.md` 里露面，并在 fixture 上真跑一次（`tests/test_docs.py` 的 `BARE` 表）。加/删 topic 还会触发 T5 的 `help_topics_file` 探针——文档里的枚举（`README.md`、`doctrine/Agent Contract.md`、SKILL 各一处）必须同步，`tests/test_docs.py` 再断言枚举与 `HELP_TOPICS` 双向相等。
 4. 按 §同步面 T5 同步入口表、README 与 `tests/`；跑 `python3 tools/vault.py docs-check --gate` 确认没漏。
 
 ### 4. 改主干模型 / 登记语义
@@ -76,11 +76,35 @@
 
 ### 7. 发版
 
-1. `tools/vaultkit/__init__.py` 的 `__version__` 升到新版本（`status --json` / `check --json` 直接读它）。
-2. `tools/CHANGELOG.md`：把 `Unreleased` 段转成 `## v<版本>（日期）`，写清这一版是**加性**还是**破坏性**。
-3. `doctrine/` 的 `版本：v6` 头**不动**——那是 doctrine 集的版本，与工具版本独立；只有 doctrine 语义变化才动它（走 T9 + 新 D 号）。
-4. `python3 -m pytest -q` + `check` + `docs-check --gate` 全绿后提交，再打标签 `v<版本>`（仓库约定：每个版本一个标签）。
-5. 本仓库**不 push**，除非 owner 明确要求。
+**版本号规范（固定，D39）**——照 SemVer 2.0.0 的骨架，先把"公开 API"钉死，再定义谁升哪一位。
+
+**两个独立版本，各自一个信源：**
+
+| 版本 | 信源 | 含义 |
+|---|---|---|
+| 工具版本 | `tools/vaultkit/__init__.py` 的 `__version__`（`status --json` / `check --json` 直接读它） | 形如 `X.Y.Z`，无前导零（SemVer §2）；本仓库的公开 API 的版本 |
+| doctrine 集版本 | 每份 `doctrine/*.md` 头部的 `> 版本：vN（日期）。` | 五份头**必须一致**；只在 doctrine 语义变化时动（走 T9 + 新 D 号）；与工具版本号**不必相等** |
+
+**公开 API**（升位判据的对象，SemVer §1 要求先声明）：`vault.py` 的子命令名与旗标、退出码（P5）、`--json` 载荷的字段、`tools/vault.toml` 的键名（P3）。**输出措辞**不在其中——它由测试钉住（P8），对 owner 不构成破坏。
+
+| 升哪一位 | 触发（公开 API 的视角） | 例 |
+|---|---|---|
+| **MAJOR** | 破坏性：子命令改名/删除、退出码语义变化、`vault.toml` 键改名、判据语义或硬门增删（T3）、主干模型（T4）、笔记需要迁移 | v5 → v6 大修 |
+| **MINOR** | 加性、旧用法不变：新子命令/旗标、新 report 级判据、新工具入口（T12）、新探针、新同步面行 | v6.0.0 → v6.1.0；MCP 入口 + T12 |
+| **PATCH** | 向后兼容的修复：bug、文案、测试、文档、输出措辞 | `fix(cli): …` 那几条 |
+
+不用 pre-release / build 元数据（SemVer §9/§10）：单 owner、单机，发版即发布。
+
+**一次发版四个动作**（顺序固定）：
+
+1. `__version__` 升到新版本。
+2. `tools/CHANGELOG.md`：把顶部 `## Unreleased` 段转成 `## v<版本>（日期）`（日期 `YYYY-MM-DD`，段首一句写明这一版是**加性**还是**破坏性**）。
+3. `doctrine/` 的 `版本：` 头**不动**——它不是工具版本；只有 doctrine 语义变化才动它（走 T9 + 新 D 号）。
+4. `python3 -m pytest -q` + `python3 tools/vault.py check` + `python3 tools/vault.py docs-check --gate` 全绿 → 提交 `release: v<版本>` → 打标签 `v<版本>`。**每个版本恰一个标签**；非版本标记（如 `v6-start`）用别的形制，别与版本号混。本仓库**不 push**，除非 owner 明确要求。
+
+**未发版期间**：所有未发版的改动记在 `tools/CHANGELOG.md` 顶部的 `## Unreleased` 段（没有就新建），`__version__` 保持**上一个已发版**的号。这样 `__version__` 永远等于"最后已发版"，CHANGELOG 首个 `## v*` 段就是它。
+
+**机器门**（`tests/test_docs.py`，与上面每条一一对应）：`__version__` 的 SemVer 形状；CHANGELOG 首个 `## v*` 段的版本 == `__version__`；段头 `## vX.Y.Z (YYYY-MM-DD)` 的形制；各段版本递减；五份 doctrine 头版本一致。标签与 `git` 状态不进测试（CI checkout 可能没有标签）。
 
 ## 同步面
 
@@ -96,7 +120,7 @@
 探针**覆盖不到**的地方，写在这里免得被误信：
 
 - **T2 只比对判据 id 集合**：`*_note` 说明文字改了不触发。G3 范围行就这么漏过一次——靠 `tests/test_cli.py` 把渲染文字钉到配置上兜住，其余靠纪律。
-- **T5 只比对子命令名集合**：加旗标、改 `--help` 文案不触发。新增命令本身会被拦住（那是这套门的起点）。
+- **T5 比对子命令名集合 + `help` 主题集合**（两个探针）：加旗标、改 `--help` 文案不触发。新增命令、新增或删除 `help` 主题会被拦住——文档里的枚举是手抄副本，靠这两个探针 + `tests/test_docs.py` 的双向断言钉住。
 
 | # | 触发改动 | 必须同步 | 探针 |
 |---|---|---|---|
@@ -104,13 +128,14 @@
 | T2 | `tools/vaultkit/rules.py` 判据增删改名 | `README.md` §工具；`AGENTS.md` §Invariants；`doctrine/Agent Contract.md` §6；`doctrine/Vault Design.md` §判据两级制；`tools/vaultkit/cli.py`（`cmd_check` 头行、`help rawindex` 文案）；`a_sticker/or/记忆底座-首批卡片.md` 规则卡；`tests/` | 判据 id 集合 |
 | T3 | 硬门增删 | 先要 owner 裁决 + `doctrine/Vault Design.md` §决策台账 新 D 号；再 T2 全部 + `tests/` + `.github/workflows/ci.yml` | manual（要人裁决） |
 | T4 | `tools/vaultkit/model.py` 登记语义 / 主干模型 | `doctrine/Vault Design.md` §两棵树 + §关键 doctrine；`README.md` §两棵树；`AGENTS.md` 硬规则 3；`cli.py help dag` | 路径 |
-| T5 | `cli.py` 子命令 / 旗标 / 退出码 | `README.md` §工具；`doctrine/Agent Contract.md` §1 + §Exit codes；`.agent/skills/vault-ops/SKILL.md`（流程节 + inline help 列表）；`cli.py` 顶层 epilog；`tests/` | 子命令名集合 |
+| T5 | `cli.py` 子命令 / help 主题 / 旗标 / 退出码 | `README.md` §工具；`doctrine/Agent Contract.md` §1 + §Exit codes；`.agent/skills/vault-ops/SKILL.md`（流程节 + inline help 列表）；`cli.py` 顶层 epilog；`tests/` | 子命令名集合 + help 主题集合 |
 | T6 | 体裁 / 分区规则 | `AGENTS.md` 硬规则 2、4；`doctrine/Vault Design.md` §区域；`README.md` §区域；记忆底座卡「体裁由什么决定」 | manual |
 | T7 | 字段政策 | `AGENTS.md` 硬规则 4；`doctrine/Vault Design.md` §字段；`README.md` §最小记忆集；记忆底座卡「保留哪些 frontmatter 字段」 | manual |
 | T8 | 模板政策 | `AGENTS.md` 硬规则 4；`doctrine/Vault Design.md` §字段；`README.md` §最小记忆集第 1 条 | manual |
 | T9 | doctrine 任何语义变化 | `doctrine/Vault Design.md` §决策台账（新 D 号）；`a_sticker/or/记忆底座-首批卡片.md` 重新生成（该文件头部自带漂移规则） | manual |
 | T10 | 本机 / Obsidian / 插件设置 | `doctrine/New Machine.md` §仓库里有的 vs 每机各异的 | 环境变量集合（`.obsidian/` 部分 manual） |
 | T11 | 新增 doctrine 文件 | `AGENTS.md` §Source of truth；`README.md` §协作 + §Related Files；`doctrine/Vault Design.md` §区域；`.agent/skills/vault-ops/SKILL.md` §Load order；若新文件有自己的同步组，本表加一行 | 新增文件 |
+| T12 | 新增工具入口（`tools/` 的直接子文件） | `README.md` §工具；`doctrine/Agent Contract.md` §1；`.agent/skills/vault-ops/SKILL.md`（流程节）；`tests/`；若该入口需要每机装配（如 MCP 客户端注册），同时同步 `doctrine/New Machine.md` | 新增文件 |
 
 ## 自检
 
@@ -128,6 +153,7 @@
 | 子命令有用法 | 每个子命令要么有 `help <topic>`，要么在显式豁免表里（现在只有 `help` 自己） |
 | 子命令被跑过 | 每个子命令在 fixture vault 上真跑一次——新子命令必须登记进 `BARE` 表才会被跑 |
 | 子命令进技能 | 每个子命令名都出现在 `.agent/skills/vault-ops/SKILL.md` 里 |
+| help 主题清单一致 | 文档里的 `help <topic>` 枚举 == `cli.HELP_TOPICS`（双向相等） |
 | 环境变量被登记 | 代码读的环境变量集合一旦变化，`docs-check` 触发 T10，要求同步 `New Machine.md` |
 
 「改了一处有没有连带改」由 `docs-check` 管（提交前跑，见 §同步面）：

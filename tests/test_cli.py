@@ -2,7 +2,14 @@
 
 from __future__ import annotations
 
-from conftest import run_vault
+import os
+import signal
+import subprocess
+import sys
+
+import pytest
+
+from conftest import REPO, TOOLS, run_vault
 from vaultkit import config
 
 MATERIAL = "archives/material/No Source Lit.md"
@@ -285,3 +292,20 @@ def test_help_topics(vault):
         assert topic in proc.stdout
     assert run_vault(vault, "help").returncode == 0
     assert run_vault(vault, "help", "nonsense").returncode == 2
+
+
+def test_a_closed_downstream_pipe_does_not_print_a_traceback(vault):
+    """`vault.py retrieve X | head` must end like `cat`, not raise BrokenPipeError."""
+    if not hasattr(signal, "SIGPIPE"):
+        pytest.skip("SIGPIPE is POSIX-only")
+    read_fd, write_fd = os.pipe()
+    proc = subprocess.Popen(
+        [sys.executable, str(TOOLS / "vault.py"), "retrieve", "Node"],
+        stdout=write_fd, stderr=subprocess.PIPE, text=True,
+        env=dict(os.environ, VAULT_ROOT=str(vault)), cwd=str(REPO))
+    os.close(write_fd)  # the child owns the only write end
+    os.close(read_fd)   # ... and nothing is left to read it
+    _, err = proc.communicate()
+    assert proc.returncode == -signal.SIGPIPE, err
+    assert "Traceback" not in err
+    assert "BrokenPipeError" not in err

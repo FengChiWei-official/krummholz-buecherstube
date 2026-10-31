@@ -81,6 +81,7 @@ whitelist_unresolved = "tools/whitelist_unresolved.txt"
 #   paths_added       a NEW file matches one of these globs
 #   ids_file          the set of rule ids in this file changed (rules.py)
 #   subcommands_file  the set of subcommand names in this file changed (cli.py)
+#   help_topics_file  the set of `help <topic>` names in this file changed (cli.py)
 #   env_files         the set of environment variables read by these files changed
 # A row with no probe is manual: the handbook names its trigger, no path can see
 # it. `sync` entries ending in "/" mean "any file under this directory".
@@ -116,8 +117,9 @@ sync = ["doctrine/Vault Design.md", "README.md", "AGENTS.md",
 
 [[docs_sync.rules]]
 id = "T5"
-note = "子命令增删（子命令名集合变化即触发）"
+note = "子命令 / help 主题增删（集合变化即触发）"
 subcommands_file = "tools/vaultkit/cli.py"
+help_topics_file = "tools/vaultkit/cli.py"
 sync = ["README.md", "doctrine/Agent Contract.md", ".agent/skills/vault-ops/SKILL.md",
         "tests/"]
 
@@ -155,5 +157,12 @@ note = "新增 doctrine 文件"
 paths_added = ["doctrine/*.md"]
 sync = ["AGENTS.md", "README.md", "doctrine/Vault Design.md",
         ".agent/skills/vault-ops/SKILL.md"]
+
+[[docs_sync.rules]]
+id = "T12"
+note = "新增工具入口（tools/ 的直接子文件）"
+paths_added = ["tools/*.py"]
+sync = ["README.md", "doctrine/Agent Contract.md", ".agent/skills/vault-ops/SKILL.md",
+        "tests/"]
 
 

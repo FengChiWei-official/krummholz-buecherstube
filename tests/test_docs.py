@@ -101,6 +101,47 @@ def test_docs_cite_fold_names_by_key_not_by_value(path, sync_cfg):
     assert not hits, f"{path.name} copies a zone name: {hits}"
 
 
+# ---------------------------------------------------------------- release versioning
+
+# `doctrine/Vault Extension.md` §发版 pins the norm (ledger D39); these are the
+# parts a machine can check. SemVer 2.0.0 §2: X.Y.Z, no leading zeroes.
+SEMVER = re.compile(r"^\d+\.\d+\.\d+$")
+CHANGELOG = REPO / "tools/CHANGELOG.md"
+RELEASED = re.compile(r"^## v(\d+\.\d+\.\d+) \((\d{4}-\d{2}-\d{2})\)$", re.M)
+DOCTRINE_VERSION = re.compile(r"^> 版本：(v\d+)（(\d{4}-\d{2}-\d{2})）。", re.M)
+
+
+def _released_sections() -> list:
+    return RELEASED.findall(CHANGELOG.read_text(encoding="utf-8"))
+
+
+def test_the_tool_version_is_semver():
+    assert SEMVER.match(cli.__version__), cli.__version__
+
+
+def test_the_first_changelog_release_is_the_tool_version():
+    """`__version__` is the *last released* version; unreleased work stays above it."""
+    sections = _released_sections()
+    assert sections, "tools/CHANGELOG.md has no `## vX.Y.Z (date)` section"
+    assert sections[0][0] == cli.__version__
+
+
+def test_the_changelog_lists_versions_newest_first():
+    versions = [tuple(int(part) for part in version.split("."))
+                for version, _ in _released_sections()]
+    assert versions == sorted(versions, reverse=True), versions
+
+
+def test_every_doctrine_file_shares_one_version():
+    """A partial doctrine bump (four files at one version, one behind) is the drift."""
+    versions = set()
+    for path in DOCTRINE:
+        header = DOCTRINE_VERSION.search(path.read_text(encoding="utf-8"))
+        assert header, f"{path.name} has no `> 版本：vN（date）。` header"
+        versions.add(header.group(1))
+    assert len(versions) == 1, f"doctrine files disagree: {sorted(versions)}"
+
+
 # ---------------------------------------------------------------- sync map
 
 
@@ -156,6 +197,41 @@ def test_every_subcommand_appears_in_the_skill():
 
 def test_every_subcommand_is_listed_in_the_bare_run_table():
     assert set(BARE) == _subcommands(), "add the new subcommand to BARE (and run it)"
+
+
+# ---------------------------------------------------------------- help topics
+
+# The docs enumerate the `help <topic>` list. That enumeration is a copy of
+# `cli.HELP_TOPICS` — the single source — so it is checked instead of trusted:
+# a stale copy is how `retrieve` stayed invisible to a cold-start AI (the docs
+# listed 9 topics while the CLI had 15), and a topic nobody lists is a feature
+# nobody looks up.
+HELP_LIST_DOCS = (
+    REPO / "README.md",
+    REPO / "doctrine/Agent Contract.md",
+    SKILL,
+)
+# Words that belong to the documenting sentence, not to the topic list.
+HELP_LIST_NOISE = {"for", "inline", "help"}
+HELP_WORD = re.compile(r"[a-z][a-z0-9-]*")
+
+
+def _listed_help_topics(path: Path) -> set:
+    """Topics enumerated by the line(s) that document the `help <topic>` list."""
+    listed = set()
+    for line in prose(path).splitlines():
+        if "help <topic>" in line and " / " in line:
+            listed |= set(HELP_WORD.findall(line.rsplit("help <topic>", 1)[1]))
+    return listed - HELP_LIST_NOISE
+
+
+@pytest.mark.parametrize("path", HELP_LIST_DOCS, ids=_named)
+def test_help_topic_lists_match_the_cli(path):
+    """The doc's enumeration must equal `cli.HELP_TOPICS` — in both directions."""
+    listed = _listed_help_topics(path)
+    assert listed == set(cli.HELP_TOPICS), (
+        f"{path.name} lists {sorted(listed)}; "
+        f"cli.HELP_TOPICS is {sorted(cli.HELP_TOPICS)}")
 
 
 @pytest.fixture()
@@ -251,6 +327,35 @@ def test_comment_only_rule_edit_fires_nothing(sync_cfg):
     assert out["findings"] == []
 
 
+def test_help_topic_change_fires_t5(sync_cfg):
+    """A new `help <topic>` must drag the docs that enumerate them along."""
+    base = 'HELP_TOPICS = {\n    "check": "check — two-tier",\n}\n'
+    cur = 'HELP_TOPICS = {\n    "check": "check — two-tier",\n    "zzz": "zzz",\n}\n'
+    out = _changed(sync_cfg, changed={"tools/vaultkit/cli.py"},
+                   texts={"tools/vaultkit/cli.py": (base, cur)})
+    assert [f["id"] for f in out["findings"]] == ["T5"]
+    assert "README.md" in out["findings"][0]["missing"]
+
+
+def test_help_topic_text_edit_fires_nothing(sync_cfg):
+    """Rewording a topic's help text is not a topic-set change."""
+    base = 'HELP_TOPICS = {\n    "check": "check — two-tier",\n}\n'
+    cur = 'HELP_TOPICS = {\n    "check": "check — reworded",\n}\n'
+    out = _changed(sync_cfg, changed={"tools/vaultkit/cli.py"},
+                   texts={"tools/vaultkit/cli.py": (base, cur)})
+    assert out["findings"] == []
+
+
+def test_help_topics_probe_reads_the_real_cli():
+    """The extractor must keep seeing cli.py's `HELP_TOPICS`: it is the source.
+
+    A reformat of the dict that stops the probe from matching would silently
+    disarm the T5 row, so the extractor is pinned to the live file.
+    """
+    text = (REPO / "tools/vaultkit/cli.py").read_text(encoding="utf-8")
+    assert cli._help_topics_in(text) == set(cli.HELP_TOPICS)
+
+
 def test_t2_is_satisfied_once_every_co_owner_moves(sync_cfg):
     base = 'Rule("G1", "hard", "G1 root", fn)\n'
     co_owners = {"tools/vaultkit/rules.py", "README.md", "AGENTS.md",
@@ -265,6 +370,19 @@ def test_t2_is_satisfied_once_every_co_owner_moves(sync_cfg):
 def test_new_doctrine_file_fires_t11(sync_cfg):
     out = _changed(sync_cfg, added={"doctrine/Whatever.md"})
     assert [f["id"] for f in out["findings"]] == ["T11"]
+
+
+def test_new_tool_entry_point_fires_t12(sync_cfg):
+    """A new entry point is a surface a cold-start reader must be told about."""
+    out = _changed(sync_cfg, added={"tools/vault_mcp.py"})
+    assert [f["id"] for f in out["findings"]] == ["T12"]
+    assert "README.md" in out["findings"][0]["missing"]
+
+
+def test_a_new_module_or_note_is_not_an_entry_point(sync_cfg):
+    """Only a direct `tools/*.py` file counts; internal modules and notes do not."""
+    assert _changed(sync_cfg, added={"tools/vaultkit/helper.py"})["findings"] == []
+    assert _changed(sync_cfg, added={"library/A_fold/Fresh Note.md"})["findings"] == []
 
 
 def test_editing_an_existing_doctrine_file_fires_nothing(sync_cfg):

@@ -12,6 +12,7 @@ import json
 import math
 import random as random_module
 import re
+import signal
 import subprocess
 import sys
 import time
@@ -110,6 +111,11 @@ EXIT_CODES = {
          "under docs-check --gate",
     "2": "missing or unreadable config (also a missing list file under --strict)",
 }
+
+# Not a verdict of this program: a downstream pipe closed early (`vault.py … | head`)
+# ends the process by SIGPIPE — the shell's 128+13 — the way `cat`/`grep` do.
+SIGPIPE_NOTE = ("a downstream pipe closed early (`vault.py … | head`) ends the process by "
+                "SIGPIPE (the shell's 128+13), not by one of the codes above")
 
 
 # ---------------------------------------------------------------- check
@@ -1416,9 +1422,22 @@ def _env_names(text: str) -> set:
     return set(_ENV_CALL.findall(text or "")) | set(_ENV_CONST.findall(text or ""))
 
 
+def _help_topics_in(text: str) -> set:
+    """`help <topic>` names declared by `HELP_TOPICS` — the list the docs copy.
+
+    Only the *keys* of the block count: rewording a topic's help text is not a
+    topic-set change (same precision as `subcommands_file`).
+    """
+    block = re.search(r"^HELP_TOPICS\s*=\s*\{(.*?)^\}", text or "", re.M | re.S)
+    if not block:
+        return set()
+    return set(re.findall(r'^\s+"([a-z][a-z0-9-]*)":', block.group(1), re.M))
+
+
 _PROBES = {
     "ids_file": _ids_in,
     "subcommands_file": _subcommands_in,
+    "help_topics_file": _help_topics_in,
     "env_files": _env_names,
 }
 
@@ -2044,8 +2063,9 @@ triggered row whose co-owners were not touched.
 
 Two-tier, like `check`: report-level by default (exit 0, prints); a gate under
 --gate (exit 1). Probes are precise — a row fires only when its own probe fires:
-a path changed, a NEW file appeared, the rule-id set in rules.py changed, or the
-subcommand set in cli.py changed. A comment-only edit to rules.py fires nothing.
+a path changed, a NEW file appeared, the rule-id set in rules.py changed, the
+subcommand set in cli.py changed, or the `help <topic>` set in cli.py changed.
+A comment-only edit to rules.py fires nothing.
 Rows with no probe are listed as `manual` (read the handbook for those).
 
 Run it before committing a change to rules.py / cli.py / model.py / vault.toml,
@@ -2085,7 +2105,12 @@ broken by occurrence count, then by name.
 
 Scope: the loaded notes — `zzz_output/` and `template/` are not searched, the
 same scope G3 uses. Exit 0 when something is found, 1 when nothing is (a search
-with no hits is an answer, not a failure).""",
+with no hits is an answer, not a failure).
+
+**This vault is bilingual (中文 / English) and the match is literal — nothing is
+translated or stemmed.** A Chinese query does not find an English-named note and
+vice versa, so try both forms (`可导性`, `可导`, `differentiability`) before
+concluding "no such note": the first word you try is often the wrong language.""",
     "index-candidates": """index-candidates — a candidate card table for an Index
 
     python3 tools/vault.py index-candidates RAW_INDEX_NAME [--n 8] [--json]
@@ -2316,6 +2341,7 @@ def print_help(topic: str | None) -> int:
     print("help topics: " + " / ".join(sorted(HELP_TOPICS)))
     print("use `vault.py help <topic>`; exit codes: " + "; ".join(
         f"{k} {v}" for k, v in EXIT_CODES.items()))
+    print(SIGPIPE_NOTE)
     return 0
 
 
@@ -2428,6 +2454,12 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv=None) -> int:
+    # A downstream pipe closed early (`vault.py retrieve X | head`) is not an
+    # error: restore the default SIGPIPE disposition so the process ends quietly
+    # like `cat`/`grep` instead of printing a BrokenPipeError traceback. Python
+    # ignores SIGPIPE by default, which is why the write raises instead.
+    if hasattr(signal, "SIGPIPE"):
+        signal.signal(signal.SIGPIPE, signal.SIG_DFL)
     args = build_parser().parse_args(argv)
     if args.command == "help":
         return print_help(args.topic)

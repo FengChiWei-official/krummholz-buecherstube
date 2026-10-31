@@ -103,6 +103,7 @@ Node = 纯 markdown。**工具不依赖模板；模板是可选脚手架**（`te
 | D36 | 原始清单 `TR-raw-D-*.md` | **不再保存** | 候选池只活在当日 `/tmp` 快照；滚动 raw 合并删除；索引不再挂 raw 链 |
 | D37 | 主干模型 | **树 → DAG** | 登记是边不是父：≥1 条登记边，同一 `(Raw Index, Node)` 对不得重复，多重登记合法，`Raw Index → Raw Index` 必须无环（I1a/I1b/I1c） |
 | D38 | 扫描范围 | **排除 `tests/` 与 `.pytest_cache/`** | 两者都在进图：`tests/fixtures/mini_vault/` 是一整套假 vault（17 篇），`.pytest_cache/README.md` 由跑测试生成。实测危害：`[[README]]` 解析到 `.pytest_cache/README.md`；`[[Fence Node]]`、`[[No Source Lit]]` 这类 fixture 专有名字**能解析** → G3 漏报；5 个 stem 重名让 `rename` 误判二义。落地：进 `tools/vault.toml [scan] skip_dirs`；stems 1312 → 1300、aliases 171 → 169、`resolvable()` 1482 → 1468；**Nodes / Raw / Links / doctrine 计数不变**（fixture 不在 `library/` 下，本来就不算 Node）；G3 范围行本就从配置渲染（`rules.g3_scope_note`）；`Agent Contract` §6 不再抄字面量 |
+| D39 | 版本号规范 | **固定为 SemVer 骨架 + 两个独立版本** | 工具版本 = `tools/vaultkit/__init__.py` 的 `__version__`（唯一信源，`status --json` 读它），形如 `X.Y.Z` 无前导零；**公开 API**（升位判据的对象，SemVer §1 要求先声明）= 子命令名与旗标 / 退出码（P5）/ `--json` 字段 / `vault.toml` 键名（P3），输出措辞不在其中（它由测试钉住，P8）。MAJOR = 破坏（改名、退出码语义、判据语义、硬门、主干模型、笔记需迁移）；MINOR = 加性（新命令/旗标/判据/入口/探针/同步行）；PATCH = 修复与文案；不用 pre-release/build 元数据。doctrine 集**只有一个**版本（五份头必须一致），只在 doctrine 语义变化时动（T9 + 新 D 号），与工具版本号不必相等。未发版改动记在 `tools/CHANGELOG.md` 顶部 `## Unreleased`，`__version__` 保持上一个已发版 → 首个 `## v*` 段永远等于它。发版 = 升号 + CHANGELOG 段 + 三条命令全绿 + `release: v<版本>` 提交 + 标签 `v<版本>`（每版恰一标签；非版本标记另用形制）。机器门在 `tests/test_docs.py`：SemVer 形状、首个 `## v*` 段 == `__version__`、段头日期形制、段版本递减、doctrine 头一致。记忆底座卡不涉及版本号，无需重新生成 |
 
 ## Related
 
