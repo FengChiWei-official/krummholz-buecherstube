@@ -12,7 +12,7 @@
 
 | | 内容 | 迁移方式 |
 |---|---|---|
-| **在 git 里** | 全部笔记（`library/` `archives/` `a_sticker/` `zzz_output/`）、`doctrine/`、`tools/`（含测试与 CI）、`template/`、`README.md` / `AGENTS.md` | `git clone` 即得。含记忆底座卡片的复习调度注释（插件 `dataStore = NOTES`，调度写回笔记本身） |
+| **在 git 里** | 全部笔记（`library/` `archives/` `a_sticker/` `zzz_output/`）、`doctrine/`、`tools/`（含测试与 CI）、`template/`、`README.md` / `AGENTS.md` / `.mcp.json` | `git clone` 即得。含记忆底座卡片的复习调度注释（插件 `dataStore = NOTES`，调度写回笔记本身） |
 | **每机各异（不在 git）** | `.obsidian/`：主题、快捷键、社区插件与其设置、插件的调度索引 `data.json` | 按 §步骤 3–4 手工装 |
 | **每机各异** | `archives/work/TR-leaderboards.state.json`（榜单 Δ 的上一次快照，已 gitignore） | 新机器首日无 Δ；跑一次 `python3 tools/trend_radar.py fetch` 即恢复 |
 | **每机各异（临时）** | `/tmp/trend-radar/<date>/` 当日候选池快照 | 无需迁移，`fetch` 当场重建 |
@@ -33,6 +33,7 @@
    - `dataStore = NOTES`——复习调度写回笔记本身，因此调度状态随 git 走。
 5. 可选：`python3 -m venv .venv && .venv/bin/pip install pytest`，然后 `.venv/bin/python -m pytest -q`（CI 也这么跑）。
 6. `zzz_output/Root.md` 补一行 `[[Raw Index of Root]]`（owner 动作；AI 不碰 `zzz_output/` 内容）。
+7. 可选——AI 客户端的检索入口：仓库自带项目级 MCP 注册 `.mcp.json`（声明 `vault` = `python3 tools/vault_mcp.py`，暴露 `retrieve` / `place`）。前提是客户端会读项目级 MCP 配置（omp 的 `mcp.enableProjectConfig` 默认开）；配置在会话启动后才出现时，`/mcp reload` 或重开会话才挂载。它服务**工具集里没有 bash/exec** 的 AI——那类 AI 否则只能退到 grep，正是 `doctrine/Agent Contract.md` 明令禁止的第一步。
 
 ## 验收
 
@@ -40,7 +41,7 @@
 |---|---|
 | `python3 tools/vault.py check` | exit 0，硬门 G1/G2/G3 全绿 |
 | `python3 tools/vault.py status` | 节律行 + 主干计数 + 编号 next moves（节律行显示「今天」属正常） |
-| `python3 -m pytest -q` | 全绿（v6 为 55 条） |
+| `python3 -m pytest -q` | 全绿（条数不写进文档——它是会变的副本） |
 | `git status` | 干净——`.obsidian/` 被 gitignore，不产生噪声 |
 | Obsidian 打开 `a_sticker/or/记忆底座-首批卡片.md` | 间隔重复面板出现**按文件夹划分**的 deck（名含 `or`），卡片可复习 |
 

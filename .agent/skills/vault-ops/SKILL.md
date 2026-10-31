@@ -18,12 +18,15 @@ Read in this order before acting:
 5. `doctrine/Vault Workflow.md` — the 3 verbs + 1 loop, S1–S10, 心法
 6. `doctrine/Vault Extension.md` — 改系统 / 改文档前读 §同步面（`doctrine/New Machine.md` 面向 owner 装配，不在 AI 载入序）
 
-Inline help: `python3 tools/vault.py help <topic>` for `check` / `status` / `triage` / `rawindex` / `dag` / `links` / `random` / `suggest` / `docs-check` / `rename` / `new` / `place` / `links-candidates` / `index-candidates` / `retrieve`.
+Inline help: `python3 tools/vault.py help <topic>` for `retrieve` / `place` / `check` / `status` / `triage` / `rawindex` / `dag` / `links` / `links-candidates` / `index-candidates` / `random` / `suggest` / `rename` / `new` / `docs-check`.
+
+**Search first — `retrieve`, then `place`, before any `grep`/`glob`/`ls`.** "Does a note about X exist?" is a tool call: `retrieve X` searches the whole vault, ranked by the vault's own evidence, one why-line per hit. "Where does this note sit?" is `place NAME`. The vault is bilingual and the match is literal: query both the 中文 and the English form. Shell search is the fallback for what the tools do not load (`zzz_output/`, `template/`) — never the opening move: it returns volume without ranking and cannot report "no such note" in a way you can act on.
 
 ## Session entry
 
 Run `python3 tools/vault.py status` first — rhythm line, git state, check summary, triage counts, trunk counts, numbered next moves (each with a copy-pasteable command). Owner decides, you execute. Repo state, not memory, decides what is possible.
 
+- **First search is a tool call**: before any `grep`/`glob`/`ls`, ask the vault — `retrieve TERM` (does X exist? where?), `place NAME` (where does this note sit?). Shell search is only for what the tools do not load. The vault is bilingual: the match is literal, so query both the 中文 and the English form.
 - **Cold start**: a fresh clone is fully operational — procedures here, tools in `tools/`, doctrine in `doctrine/`, no state outside git. `.obsidian/` is gitignored (per-machine only).
 - **Resuming**: a dirty tree means likely mid-work. Cross-check the todo tree (`grep -rn -- '- \[ \] \[\[NAME' a_sticker/todos/`). Found → resume from the continuation note. Not found → ask the owner; a note with zero signals cannot be attributed by doctrine, never guess.
 - **Signals vs content**: every finding is a signal, not a verdict. Content wins; report contradictions instead of forcing actions.
@@ -75,9 +78,12 @@ An Index grows out of the trunk's *clusters*; the coarse Raw Index stays coarse 
 
 ### Finding things (whole-vault retrieval)
 
-1. `python3 tools/vault.py retrieve "<term>"` — ranked by the vault's own evidence: name hit, alias hit, registered by / inside a matching Raw Index or Index, text hit (with the line), shared neighbour. Each hit prints why, its registrations, its areas and its role. Scope = loaded notes; exit 1 when nothing matches.
+`retrieve` is the first resort, not a step before the real search: it is the only verb that ranks by the vault's own evidence and reports "no such note" honestly. `grep` appears below only because the tools do not load `zzz_output/`/`template/`.
+
+1. `python3 tools/vault.py retrieve "<term>"` — ranked by the vault's own evidence: name hit, alias hit, registered by / inside a matching Raw Index or Index, text hit (with the line), shared neighbour. Each hit prints why, its registrations, its areas and its role. Scope = loaded notes; exit 1 when nothing matches. **The vault is bilingual (中文 / English) and the match is literal — nothing is translated or stemmed.** A Chinese query does not find an English-named note: try both forms (`可导性` / `可导` / `differentiability`) before concluding "no such note".
 2. For a term that only lives in `zzz_output/` or `template/` (not loaded, so not searched), fall back to `grep -rn -- '<term>' .`.
 3. Found a note and want its position? `place NAME`. Want raw material instead of a verdict? `random --scope library` (问箱, S9).
+4. **No bash/exec in your tool set?** You cannot run `vault.py` — and silently answering from `grep` is the one thing this section forbids. Use the MCP server instead: the repo's `.mcp.json` declares `vault` = `python3 tools/vault_mcp.py`, exposing `retrieve` and `place` with the same config, the same graph and byte-identical output (assembly: `doctrine/New Machine.md` §步骤 7). If you have neither, say so and hand the owner the copy-pasteable command instead of answering from a fallback search.
 
 ### Note feels lost / can't find related
 

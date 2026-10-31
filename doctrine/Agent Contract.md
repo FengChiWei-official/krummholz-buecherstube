@@ -14,7 +14,7 @@ take over correctly. Deeper why: [[Vault Design]]; operational procedures:
 |---|---|
 | `python3 tools/vault.py status` | session entry. Rhythm line + git + check summary + triage counts + trunk + numbered next moves (every move carries a copy-pasteable command) |
 | `python3 tools/vault.py status --json` | the same as data — **this is the machine entry point**; every field below is in it |
-| `python3 tools/vault.py help <topic>` | inline help: `check` / `status` / `triage` / `rawindex` / `dag` / `links` / `random` / `suggest` / `docs-check` |
+| `python3 tools/vault.py help <topic>` | inline help: `retrieve` / `place` / `check` / `status` / `triage` / `rawindex` / `dag` / `links` / `links-candidates` / `index-candidates` / `random` / `suggest` / `rename` / `new` / `docs-check` |
 | `python3 tools/vault.py check` | two-tier invariant report; exit 1 only when a hard gate fails |
 | `python3 tools/vault.py docs-check [--against REV] [--gate]` | docs sync map vs the diff: triggered rows whose co-owners did not move (report-level; `--gate` exits 1) |
 | `python3 tools/vault.py triage` | placement debt (root, todo aging, half-done, unhooked, genre, dead todo) |
@@ -22,7 +22,8 @@ take over correctly. Deeper why: [[Vault Design]]; operational procedures:
 | `python3 tools/vault.py place NAME` | one note's position in the relation graph: registration edges, 归队提议 with the voting evidence, areas, links, link candidates (read-only) |
 | `python3 tools/vault.py links-candidates TOPIC` | member candidates for a Links card: seeds by name/alias, members grouped by Index area with the evidence each, and whether it crosses ≥2 areas (read-only) |
 | `python3 tools/vault.py index-candidates RAW_INDEX` | candidate card table for an Index: the Raw Index's members clustered by shared neighbours, with the evidence, a draft commonality sentence and draft Index names (read-only) |
-| `python3 tools/vault.py retrieve TERM` | whole-vault retrieval ranked by evidence (name / alias / registration / area / text / shared neighbour), each hit with its reason, registrations, areas and role; exit 1 when nothing matches (read-only) |
+| `python3 tools/vault.py retrieve TERM` | whole-vault retrieval ranked by evidence (name / alias / registration / area / text / shared neighbour), each hit with its reason, registrations, areas and role; exit 1 when nothing matches. The vault is bilingual and the match is literal — try the 中文 and the English form before concluding there is no note (read-only) |
+| `python3 tools/vault_mcp.py` | the same two verbs (`retrieve`, `place`) over MCP stdio, for a client whose tool set has no bash/exec: same config, same graph, byte-identical output (declared in the repo's `.mcp.json`) |
 | `python3 tools/vault.py random [--scope …] [--seed N]` | 问箱 material (S9): one note + its backlinks |
 | `python3 tools/vault.py suggest NAME [--n 3]` | candidate links for a note, one why-line each (S2) |
 | `python3 tools/vault.py rename OLD NEW [--apply]` | rename a note + cascade every inbound wikilink (dry-run; refuses a name collision, a path separator, a root contract file, and a file inside `zzz_output/`) |
@@ -33,6 +34,13 @@ Every subcommand accepts `--json` (one JSON document on stdout, nothing else) an
 `--strict` (a missing config/list file becomes a fatal error instead of a warning).
 `--vault` is not a flag: set `VAULT_ROOT` to point the tools at another vault.
 
+**Search first — the tool, not a shell pipeline.** "Does the vault already have X?"
+is answered by `retrieve TERM` (whole vault, ranked by evidence, one why-line per
+hit) and "where does this note sit?" by `place NAME`. `grep`/`glob`/`ls` are the
+fallback for what the tools do not load (`zzz_output/`, `template/`), never the
+first move: they return volume without ranking, and they cannot say "no such note
+exists" in a way you can act on.
+
 ### Exit codes
 
 | code | meaning |
@@ -40,6 +48,8 @@ Every subcommand accepts `--json` (one JSON document on stdout, nothing else) an
 | 0 | ok — every report, and any `check` whose hard gates are green |
 | 1 | a hard gate failed (`check`), an unknown target (`place`, `suggest`), a search with no hits (`retrieve`), a refused rename or `new`, or a docs-sync violation under `docs-check --gate` |
 | 2 | missing/unreadable config; a missing list file under `--strict`; unknown `help` topic |
+
+A downstream pipe closed early (`python3 tools/vault.py … | head`) ends the process by SIGPIPE — the shell reports 128+13 — instead of printing a traceback. That is not a verdict of the tool: the three codes above stay the only ones it returns.
 
 ## 2. Where state lives
 

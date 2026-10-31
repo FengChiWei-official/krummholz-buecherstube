@@ -23,7 +23,7 @@ Read this first, then the source-of-truth files it points to. Do not improvise d
 6. **Don't touch** `zzz_output/` contents (owner's terminal output — human-only; links and git-state may be checked/diagnosed) or `.obsidian/`. `zzz_output/Root.md` is the main-tree entry (主树): `Root.md` → `Raw Index of Root` → topic indexes.
 7. One note, one idea. Prefer short definitions; link instead of inlining. AI never writes own-voice body prose; AI-generated prose belongs in `a_sticker/or/`.
 8. No commits or pushes unless the owner asks. Deletions and renames need the owner's sign-off.
-9. Run `python3 tools/vault.py check` before committing structural changes; before any rename/move, `grep -rn -- '\[\[Old Name'` first. Procedures: `.agent/skills/vault-ops/SKILL.md`; handover contract: `doctrine/Agent Contract.md`; inline help: `python3 tools/vault.py help <topic>`.
+9. **找东西先走工具**：整库检索 = `python3 tools/vault.py retrieve TERM`（按证据强度排序，每条带理由），一篇的位置 = `python3 tools/vault.py place NAME`；`grep`/`glob`/`ls` 只在这两个工具报无命中之后用（它们只覆盖工具不载入的 `zzz_output/`、`template/`）。**本库中英双语，匹配是字面的、不翻译**：中文词落空就换英文词/词根再查（反之亦然），别把一次落空当成"没有这篇"。若你的工具集没有 bash/exec：用 MCP 版（`python3 tools/vault_mcp.py` 的 `retrieve` / `place`，同一配置与同一渲染），不要静默退到 grep。然后：`python3 tools/vault.py check` 在提交结构改动前跑；任何 rename/move 之前先 `grep -rn -- '\[\[Old Name'`。Procedures: `.agent/skills/vault-ops/SKILL.md`; handover contract: `doctrine/Agent Contract.md`; inline help: `python3 tools/vault.py help <topic>`.
 10. **改文档或工具文案前**，先读 `doctrine/Vault Extension.md` §同步面——它列了「改一处要同步哪几处」；文档与 `check` 的报告级输出互相矛盾就是漂移。机器门：`python3 tools/vault.py docs-check --gate`（默认报告级；`tests/test_docs.py` 在 CI 里强制内容一致性）。
 
 ## Invariants (two-tier)

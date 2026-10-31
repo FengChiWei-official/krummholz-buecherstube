@@ -1,0 +1,11 @@
+{
+  "$schema": "https://raw.githubusercontent.com/can1357/oh-my-pi/main/packages/coding-agent/src/config/mcp-schema.json",
+  "mcpServers": {
+    "vault": {
+      "type": "stdio",
+      "command": "python3",
+      "args": ["tools/vault_mcp.py"],
+      "cwd": "."
+    }
+  }
+}
