@@ -1,12 +1,16 @@
 # Changelog
 
-## Unreleased
+## v6.3.0 (2026-11-01)
 
-Additive docs change: the content boundary now forbids **adding** prose but allows
-**in-place revision** of existing prose (grammar, spelling, punctuation, LaTeX
-formatting, layout, sentence wording, within-section order) in the note zones;
-math, claims, names, `aliases:`/`source:` values and links stay off-limits
-(ledger **D40**). A math correction is a proposal in `a_sticker/or/`.
+Additive: one new docs-sync row (**T13**), a doctrine-set bump to **v8**, and the
+content-boundary rewrite. Nothing in the CLI's public surface changes.
+
+The content boundary now allows **in-place revision** of existing prose (grammar,
+spelling, punctuation, LaTeX formatting, layout, sentence wording, within-section
+order) in the note zones, and — under one written plan the owner approves —
+**completion, rewording and restructuring**; math, claims, names,
+`aliases:`/`source:` values and links stay off-limits (ledger **D40**, then
+**D41**). A math correction is a proposal in `a_sticker/or/`.
 
 - Docs: `AGENTS.md` rule 7, `Vault Workflow` §AI 边界 (new subsection) + §产出,
   `Agent Contract` §3/§4/§5, `Vault Design` §关键 doctrine + §决策台账 (D40),
