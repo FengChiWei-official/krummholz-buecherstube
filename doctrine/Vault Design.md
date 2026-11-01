@@ -1,6 +1,6 @@
 # Vault Design
 
-> 版本：v6（2026-10-30）。本轮裁决 D30–D37 见本文件 §决策台账。
+> 版本：v8（2026-11-01）。本轮裁决 D30–D41 见本文件 §决策台账。
 > 同步组：改本文件语义按 [[Vault Extension]] §同步面 T9（新 D 号 + 重新生成记忆底座卡）；本文件是 T2 / T4 / T6 / T7 / T8 / T11 的连带文件。
 
 ## Definition
@@ -13,7 +13,7 @@
 
 - **人 = 内容**。自己的话，自己的思想。没有任何东西可以替代它。终端产出在 `zzz_output/`。
 - **Obsidian = 媒介**。backlink、未解析链接面板、搜索——联想引擎。
-- **omp (AI) = 结构与纪律**。检查、聚簇、登记、供材。永远不是声音。
+- **omp (AI) = 结构与纪律**。检查、聚簇、登记、供材；可就地修订已有文字的语言与排版，并在**获批计划**下补全未讲清处、按本意重组语言、重构整篇（D41）。永远不是新声音——除非你批准它说话。
 
 ## 两棵树
 
@@ -38,6 +38,7 @@ Node       点     默认体裁（<A–Z>_fold）
 - **环不变量**：`Raw Index → Raw Index` 子图必须无环（I1c）。主干允许一个 Raw Index 指向另一个（粗主干挂细主干），但不允许互相指回去。
 - **登记边规则**（D22）：Raw Index → Node 的登记边是结构动作，AI 可直接追加；`Node ↔ Node` 与 `Index → Node` 改变笔记意义，须 owner 批准。
 - **出链 = 已拆**（D21）：材料被拆过的标记 = 它有指向所拆 Node 的出链；零出链材料 = 未拆。零新增状态字段。
+- **内容边界**（D41）：默认不新增正文；**一次性计划审核**之下可补全未讲清处、按本意重组语言、重构整篇。仍然不许（计划未逐条列出的）：数学的符号/常量/方向/量词/前提、笔记名、`aliases:`/`source:` 的值、链接的目标与方向、文件级动作。范围与报告义务见 [[Vault Workflow]] §AI 边界。
 - **结构涌现，不预设**：Index 是聚簇的输出，不是脚手架。先有簇（带共性），再有 Index。
 - **人维护的会变之物才删；变化由 AI 承载的可以留**：状态字段人改 → 删；主干成员集虽每轮变但 AI 承载 → 留。
 
@@ -104,6 +105,8 @@ Node = 纯 markdown。**工具不依赖模板；模板是可选脚手架**（`te
 | D37 | 主干模型 | **树 → DAG** | 登记是边不是父：≥1 条登记边，同一 `(Raw Index, Node)` 对不得重复，多重登记合法，`Raw Index → Raw Index` 必须无环（I1a/I1b/I1c） |
 | D38 | 扫描范围 | **排除 `tests/` 与 `.pytest_cache/`** | 两者都在进图：`tests/fixtures/mini_vault/` 是一整套假 vault（17 篇），`.pytest_cache/README.md` 由跑测试生成。实测危害：`[[README]]` 解析到 `.pytest_cache/README.md`；`[[Fence Node]]`、`[[No Source Lit]]` 这类 fixture 专有名字**能解析** → G3 漏报；5 个 stem 重名让 `rename` 误判二义。落地：进 `tools/vault.toml [scan] skip_dirs`；stems 1312 → 1300、aliases 171 → 169、`resolvable()` 1482 → 1468；**Nodes / Raw / Links / doctrine 计数不变**（fixture 不在 `library/` 下，本来就不算 Node）；G3 范围行本就从配置渲染（`rules.g3_scope_note`）；`Agent Contract` §6 不再抄字面量 |
 | D39 | 版本号规范 | **固定为 SemVer 骨架 + 两个独立版本** | 工具版本 = `tools/vaultkit/__init__.py` 的 `__version__`（唯一信源，`status --json` 读它），形如 `X.Y.Z` 无前导零；**公开 API**（升位判据的对象，SemVer §1 要求先声明）= 子命令名与旗标 / 退出码（P5）/ `--json` 字段 / `vault.toml` 键名（P3），输出措辞不在其中（它由测试钉住，P8）。MAJOR = 破坏（改名、退出码语义、判据语义、硬门、主干模型、笔记需迁移）；MINOR = 加性（新命令/旗标/判据/入口/探针/同步行）；PATCH = 修复与文案；不用 pre-release/build 元数据。doctrine 集**只有一个**版本（五份头必须一致），只在 doctrine 语义变化时动（T9 + 新 D 号），与工具版本号不必相等。未发版改动记在 `tools/CHANGELOG.md` 顶部 `## Unreleased`，`__version__` 保持上一个已发版 → 首个 `## v*` 段永远等于它。发版 = 升号 + CHANGELOG 段 + 三条命令全绿 + `release: v<版本>` 提交 + 标签 `v<版本>`（每版恰一标签；非版本标记另用形制）。机器门在 `tests/test_docs.py`：SemVer 形状、首个 `## v*` 段 == `__version__`、段头日期形制、段版本递减、doctrine 头一致。记忆底座卡不涉及版本号，无需重新生成 |
+| D40 | 内容边界 | **禁新增、允就地修订** | AI 可就地修订既有正文的语言与排版（语法/拼写/标点/大小写/LaTeX 排版/版面/句内表达/小节内顺序）；范围=笔记区（`library/`、root 队列、`archives/work/`、`a_sticker/`）。不得增删知识内容；不得动数学与主张（数学修正进 `a_sticker/or/` 提案）；不得动笔记名/`aliases:`/`source:`/链接。每次修订逐条报 before→after，不提交；批量扫荡须 owner 要求。`aliases:` 增改升为 owner 批准项（Agent Contract §4）。新增正文仍只进 `a_sticker/or/`。落地：Workflow §AI 边界 新子节 + Agent Contract §3/§4/§5 + AGENTS 硬规则 7 + P9 + 新同步行 T13。 |
+| D41 | 内容边界（升级） | **计划审核下可补全、可重组、可重构** | AI 在 owner 批准的一份计划之下可补全未讲清处（省略的推导步骤、中间理由、电报体、指代、空 `## Definition`）、按本意重组语言（重写句子、调段落顺序、统一术语与 why 格式）、重构整篇（重排小节、改标题层级、拆合小节、行内式提为显示式）。闸门 = 一次性计划审核（批准计划 = 批准它逐条列出的每一项）。仍然不许（除非计划逐条列出）：数学符号/常量/方向/量词/前提、笔记名、`aliases:`/`source:` 值、链接目标与方向、新增或删除链接、文件级动作（新建/删除/改名/搬家）。无获批计划时旧边界生效：新散文只进 `a_sticker/or/`。落地：Workflow §AI 边界 子节重写 + Agent Contract §3/§4/§5 + AGENTS 硬规则 7 + P9 + Vault Design §三层分工/§关键 doctrine + SKILL + 记忆底座卡；同步行仍用 T13（co-owner 集合不变）。 |
 
 ## Related
 

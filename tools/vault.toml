@@ -165,4 +165,11 @@ paths_added = ["tools/*.py"]
 sync = ["README.md", "doctrine/Agent Contract.md", ".agent/skills/vault-ops/SKILL.md",
         "tests/"]
 
+[[docs_sync.rules]]
+id = "T13"
+note = "manual — 内容边界 / 就地修订权限（P9 + AI 边界）"
+sync = ["AGENTS.md", "doctrine/Vault Workflow.md", "doctrine/Agent Contract.md",
+        "doctrine/Vault Design.md", ".agent/skills/vault-ops/SKILL.md",
+        "a_sticker/or/记忆底座-首批卡片.md"]
+
 

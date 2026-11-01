@@ -114,9 +114,39 @@ Moving a file is NOT renaming: a move never breaks a link, so `git mv` alone is 
 5. `python3 tools/vault.py rawindex --check` — the report-level rules again, trunk-facing.
 6. `python3 tools/vault.py rawindex --sync` — dry-run; `--apply` writes the trunk root member list.
 
+### Revision under an approved plan (D41)
+
+The default is that you do not add body prose. Under **one written plan the owner
+approves**, you may go further — that plan is the only channel through which you
+touch content.
+
+1. Read the notes first; never rewrite text you have not read this session.
+2. Write the plan first: which files, what changes in each, and why that reading
+   matches the owner's intent. Then stop. Approving the plan approves every item
+   it lists; without an approved plan only the language/layout pass is allowed.
+3. With an approved plan you may: *complete what a note left unsaid* (omitted
+   derivation steps, the missing middle reason, telegraphic prose, an ambiguous
+   `it`, an empty `## Definition`); *reword to the intent* (sentences, paragraph
+   order, terms, the Related why format); *restructure the note* (sections,
+   heading levels, splitting or merging sections, inline math to display).
+4. Still never, unless the plan lists them item by item: math symbols, constants,
+   direction, quantifiers or hypotheses (a math correction is a proposal in
+   `a_sticker/or/`); the note name, an `aliases:` value, a `source:` value, or a
+   wikilink's target/direction; adding or removing links; creating, deleting,
+   renaming or moving files.
+5. Scope = notes: `library/`, root queue, `archives/work/`, `a_sticker/`.
+   `archives/material/`, `doctrine/`, `zzz_output/`, `template/`, `tools/`,
+   `tests/` are out.
+6. Report every edit as before → after in your reply; `git diff` is the owner's
+   review surface. Never commit.
+7. Sweeps: only notes the owner named or the plan covers; a whole-vault sweep
+   needs an explicit owner request.
+8. A note the owner edits while you work wins: re-read before editing, never
+   overwrite newer text with your own draft.
+
 ### Changing the system itself (rules, config, commands, doctrine)
 
-1. Read `doctrine/Vault Extension.md` §同步面 — the trigger → co-owner table (ids `T1`–`T11`). Pick your row *before* editing.
+1. Read `doctrine/Vault Extension.md` §同步面 — the trigger → co-owner table. Pick your row *before* editing.
 2. Edit the code or doc.
 3. `python3 tools/vault.py docs-check --against HEAD` — report-level; lists every triggered row whose co-owners did not move. `--gate` exits 1 (use it before committing).
 4. `python3 tools/vault.py check` and `python3 -m pytest -q` — `tests/test_docs.py` holds the content checks that always gate (rule ids present and non-ghost, no id ranges, no threshold value copies, sync-map id parity, doctrine headers).

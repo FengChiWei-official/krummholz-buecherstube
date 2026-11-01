@@ -1,7 +1,7 @@
 # Agent Contract
 
-> 版本：v6（2026-10-30）。
-> 同步组：本文件是 [[Vault Extension]] §同步面 T2（判据清单）/ T3（硬门）/ T5（命令与退出码）的连带文件；语义变化按 T9。
+> 版本：v8（2026-11-01）。
+> 同步组：本文件是 [[Vault Extension]] §同步面 T2（判据清单）/ T3（硬门）/ T5（命令与退出码）/ T13（内容边界）的连带文件；语义变化按 T9。
 
 Self-contained handover contract for an AI (or a new human) with **zero history**.
 If you read only this file plus run `python3 tools/vault.py status --json`, you can
@@ -69,7 +69,19 @@ not in a note is not in the system.
   confidence at or above `l0_confidence` (`tools/vault.toml`), `triage` categories,
   `rawindex --clusters` grouping proposals.
 - **Scaffolds**: create a note's headings/empty tables, and `a_sticker/or/` drafts.
-  Never the body prose of a `library/` note.
+- **Revision under an approved plan** (D41): the default is no new body prose, but
+  once the owner approves a written plan — which files, what changes, why that
+  matches the intent — you may *complete what a note left unsaid*, *reword to the
+  intent*, and *restructure the whole note*. Without an approved plan the old rule
+  holds: AI prose belongs in `a_sticker/or/`.
+- **Still off-limits under a plan** unless the plan lists them item by item: math
+  symbols, constants, direction, quantifiers, hypotheses (a math *correction* is a
+  proposal in `a_sticker/or/`); the note name, an `aliases:` value, a `source:`
+  value, a wikilink's target or direction; adding or removing links; creating,
+  deleting, renaming or moving files.
+- **Scope** = notes (`library/`, root queue, `archives/work/`, `a_sticker/`);
+  `archives/material/`, `doctrine/`, `zzz_output/`, `template/`, `tools/`,
+  `tests/` are out. Report every edit before → after; never commit.
 
 ## 4. What needs owner approval
 
@@ -80,12 +92,18 @@ not in a note is not in the system.
 - **Cluster commonality sentences and new Raw Index names** (D16): the AI proposes
   the grouping, the owner writes the sentence and picks the name.
 - **Any change to `.obsidian/`** — per-machine settings are the owner's.
+- **Adding or changing an `aliases:` value** — it changes wikilink resolution
+  (and can make a name ambiguous).
+- **The plan itself** (D41): the written plan that grants content-level revision
+  of a named set of notes. Approving it approves every item it lists.
 
 ## 5. What you must never do
 
 - Write or edit anything in `zzz_output/` (owner's terminal output; git state and
   links may be *read*).
-- Write own-voice body prose in `library/`. AI prose belongs in `a_sticker/or/`.
+- Write *new* own-voice body prose in `library/` **without an approved plan**. AI
+  prose belongs in `a_sticker/or/`. (Completion, rewording and restructuring under
+  an approved plan are §3, D41.)
 - Touch `.obsidian/`, add big binaries to the repo (T22: no large assets; the vault
   is text), or commit.
 - Reintroduce retired tags or status fields.

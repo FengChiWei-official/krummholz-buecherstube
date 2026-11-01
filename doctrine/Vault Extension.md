@@ -1,6 +1,6 @@
 # Vault Extension
 
-> 版本：v6（2026-10-30）。
+> 版本：v8（2026-11-01）。
 > 同步组：本文件是同步面本身；新增 doctrine 文件按 T11。
 
 ## Definition
@@ -21,7 +21,7 @@
 | P6 | **写操作默认 dry-run** | `rawindex --sync` 不带 `--apply` 不落盘；新增写命令沿用同一默认 |
 | P7 | **性能预算** | `vault.py status` < 2 s；git 考古一次性批量（`cli.git_first_seen_index`），不得回到每笔记一个子进程 |
 | P8 | **输出格式即契约** | `tests/` 断言输出字符串；改措辞 = 改测试 |
-| P9 | **内容边界** | 状态只在 todo 树；AI 不写 own-voice 正文；`zzz_output/` 内容 AI 不碰 |
+| P9 | **内容边界** | 状态只在 todo 树；AI 的**就地修订 / 补全 / 重构**须**一次性计划审核**（[[Vault Workflow]] §AI 边界，D41）；无获批计划时不得新增 own-voice 正文；`zzz_output/` 内容 AI 不碰 |
 
 ## 代码放哪里（分层）
 
@@ -64,7 +64,7 @@
 
 ### 5. 新增一份 doctrine 文件
 
-1. 文件放 `doctrine/`，头部两行：`> 版本：v6（YYYY-MM-DD）。` 与 `> 同步组：…`（同步组里引用 T 号）。
+1. 文件放 `doctrine/`，头部两行：`> 版本：v8（YYYY-MM-DD）。` 与 `> 同步组：…`（同步组里引用 T 号）。
 2. 按 §同步面 T11 同步那四处注册点。
 3. `python3 tools/vault.py docs-check --gate` 会替你盯着 T11——新增 doctrine 文件本身是探针。
 
@@ -136,6 +136,7 @@
 | T10 | 本机 / Obsidian / 插件设置 | `doctrine/New Machine.md` §仓库里有的 vs 每机各异的 | 环境变量集合（`.obsidian/` 部分 manual） |
 | T11 | 新增 doctrine 文件 | `AGENTS.md` §Source of truth；`README.md` §协作 + §Related Files；`doctrine/Vault Design.md` §区域；`.agent/skills/vault-ops/SKILL.md` §Load order；若新文件有自己的同步组，本表加一行 | 新增文件 |
 | T12 | 新增工具入口（`tools/` 的直接子文件） | `README.md` §工具；`doctrine/Agent Contract.md` §1；`.agent/skills/vault-ops/SKILL.md`（流程节）；`tests/`；若该入口需要每机装配（如 MCP 客户端注册），同时同步 `doctrine/New Machine.md` | 新增文件 |
+| T13 | 内容边界（P9 + AI 边界 + 就地修订 / 补全 / 重构权限） | `AGENTS.md` 硬规则 7；`doctrine/Vault Workflow.md` §AI 边界；`doctrine/Agent Contract.md` §3 + §4 + §5；`doctrine/Vault Design.md` §关键 doctrine + §决策台账；`.agent/skills/vault-ops/SKILL.md`；`a_sticker/or/记忆底座-首批卡片.md` | manual |
 
 ## 自检
 

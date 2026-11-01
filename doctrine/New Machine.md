@@ -1,6 +1,6 @@
 # New Machine
 
-> 版本：v6（2026-10-30）。
+> 版本：v8（2026-11-01）。
 > 同步组：本机状态变化时同步 `doctrine/Vault Extension.md` §同步面 T10。
 
 ## Definition

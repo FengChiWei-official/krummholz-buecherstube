@@ -295,7 +295,7 @@ def test_sync_map_paths_exist(sync_cfg):
 @pytest.mark.parametrize("path", DOCTRINE, ids=_named)
 def test_doctrine_files_declare_version_and_sync_group(path, sync_cfg):
     text = path.read_text(encoding="utf-8")
-    assert "> 版本：v6（" in text, f"{path.name} has no version header"
+    assert "> 版本：v8（" in text, f"{path.name} has no version header"
     match = re.search(r"^> 同步组：(.+)$", text, re.M)
     assert match, f"{path.name} has no 同步组 header line"
     known = {r["id"] for r in sync_cfg.docs_sync}
@@ -393,7 +393,7 @@ def test_editing_an_existing_doctrine_file_fires_nothing(sync_cfg):
 def test_rows_without_a_probe_are_reported_as_manual(sync_cfg):
     out = _changed(sync_cfg)
     assert out["findings"] == []
-    assert {m["id"] for m in out["manual"]} == {"T3", "T6", "T7", "T8", "T9"}
+    assert {m["id"] for m in out["manual"]} == {"T3", "T6", "T7", "T8", "T9", "T13"}
 
 
 def test_t1_never_produces_a_finding(sync_cfg):

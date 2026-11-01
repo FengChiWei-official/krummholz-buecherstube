@@ -1,5 +1,33 @@
 # Changelog
 
+## Unreleased
+
+Additive docs change: the content boundary now forbids **adding** prose but allows
+**in-place revision** of existing prose (grammar, spelling, punctuation, LaTeX
+formatting, layout, sentence wording, within-section order) in the note zones;
+math, claims, names, `aliases:`/`source:` values and links stay off-limits
+(ledger **D40**). A math correction is a proposal in `a_sticker/or/`.
+
+- Docs: `AGENTS.md` rule 7, `Vault Workflow` §AI 边界 (new subsection) + §产出,
+  `Agent Contract` §3/§4/§5, `Vault Design` §关键 doctrine + §决策台账 (D40),
+  `Vault Extension` P9, the skill (new procedure) and the memory-base card.
+- New sync row **T13** (`tools/vault.toml [docs_sync]`, manual): the content
+  boundary drags its co-owners along.
+
+Content boundary, second step (ledger **D41**): the line is no longer "AI never
+adds content" but "AI adds content **only under one written plan the owner
+approves**". Under an approved plan the AI may complete what a note left unsaid,
+reword to the intent, and restructure the whole note; approving the plan approves
+every item it lists. Math, names, `aliases:`/`source:` values, link targets and
+file-level moves stay off-limits unless the plan lists them item by item.
+
+- Docs: `AGENTS.md` rule 7, `Vault Workflow` §AI 边界 (subsection rewritten) +
+  §产出, `Agent Contract` §3 + §4 (the plan itself) + §5, `Vault Design`
+  §三层分工 + §关键 doctrine + §决策台账 (D41), `Vault Extension` P9 and the T13
+  row description, the skill (procedure rewritten) and the memory-base cards.
+- The sync row stays **T13**: same co-owner set, so `tools/vault.toml` does not
+  move.
+
 ## v6.2.0 (2026-10-31)
 
 Additive: a shell-free retrieval entry point (MCP) and the sync-map row that keeps
