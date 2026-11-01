@@ -10,11 +10,11 @@
 [[Absolute Function]]
 
 [[Mean Value theorem]]
-切割线放缩
-凹凸性， 泰勒
+切割线放缩 [[Secant Integral Inequality by Midpoint Expansion]]
+凹凸性，泰勒
 
 单调性
-有界性， 局部有界加导数
+有界性，局部有界加导数
 夹逼准则 压缩准则
 比较审敛法
 放缩
@@ -40,4 +40,4 @@
 ---
 ## **Related**
 
-[[Raw Index of Tricks in Math]] Belongs to.
+[[Raw Index of Tricks in Math]]: belongs to.

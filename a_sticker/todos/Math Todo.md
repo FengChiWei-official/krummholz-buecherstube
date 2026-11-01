@@ -76,3 +76,4 @@
 - [ ] [[Linear Algebra]] — 补内容：空笔记，先写定义
 - [ ] [[Null Space]] — 补内容：空笔记，先写定义
 - [ ] [[Prodact to Sum]] — 补内容：空笔记，先写定义
+- [ ] [[Secant Integral Inequality by Midpoint Expansion]] — 补中点展开证割线型积分不等式的思路

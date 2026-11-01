@@ -83,7 +83,7 @@
 [[MAC Learning & Filtering]]
 [[Multiplexing]]
 [[NIC]]
-[[Polynomial]]
+[[Polynomials]]
 [[VLAN]]
 
 <!-- L0 2026-10-26: 归队登记 (D22) -->
