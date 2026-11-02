@@ -1,10 +1,11 @@
 
 ## Aim
 
-Trend Radar 每日情报流的索引：精选报告落 `archives/work/`（`TR-*`），本笔记只挂载当前仍在的件。报告按 ISO 周 → 自然月 → 自然年滚动合并（7/4/12），被合并件删除。原始清单自 2026-10-30 起不再落库（只走 `/tmp` 快照，供当日校验）。
+Trend Radar 每日情报流的索引：精选报告落 `archives/work/`（`TR-*`），原始候选池只活在当日 `/tmp` 快照（不落库、不长期保留）。本笔记只挂载当前仍在的件。报告按 ISO 周 → 自然月 → 自然年滚动合并（7/4/12），被合并件删除。
 
 ## Items
 
+- [ ] [[TR-D-2026-11-02]]（日报，24 条）
 - [ ] [[TR-D-2026-10-28]]（日报，23 条）
 - [ ] [[TR-D-2026-10-26]]（日报，23 条）
 - [ ] [[TR-D-2026-10-16]]（日报，22 条）
@@ -21,7 +22,7 @@ Trend Radar 每日情报流的索引：精选报告落 `archives/work/`（`TR-*`
 ## Key Methods
 
 - 调用：让 AI 跑 skill `trend-radar`（`.agent/skills/trend-radar/SKILL.md`）
-- 抓取层：HuggingFace（模型/数据集/Space/日报论文）/ arXiv（AI 桶 cs.AI·LG·CL + ML 算法桶 stat.ML·math.OC·cs.NA + 工程桶 cs.SE·PL·AR·OS + 算法桶 cs.DS·CG·CC）/ Semantic Scholar / OpenAlex（期刊会议）/ Hacker News / Lobsters / GitHub，原始清单零 AI 改写、逐条可回溯到 API 快照
+- 抓取层：HuggingFace（模型/数据集/Space/日报论文）/ arXiv（AI 桶 cs.AI·LG·CL + ML 算法桶 stat.ML·math.OC·cs.NA + 工程桶 cs.SE·PL·AR·OS + 算法桶 cs.DS·CG·CC）/ Semantic Scholar / OpenAlex（期刊会议）/ Hacker News / Lobsters / GitHub，候选池零 AI 改写、当日可回溯到 /tmp 快照
 - 精选层：分「精选 + 学术」两节，条数随当日信号浮动（不设固定配额）；学术节以 ML 算法/优化为主（≥2 条），工程桶与算法桶各 ≤2；每条一句为什么值得看，空白处用 web_search 补漏
 
 ## Applications
