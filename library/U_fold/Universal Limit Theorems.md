@@ -120,8 +120,8 @@ Normal is what happens when counts become large and you standardize. Poisson is 
 ## **Related**
 
 [[Index of Probability]]
-[[Probability System and Random Variables]]
-[[Probability Spaces and the Universal Source]]
+[[Random Variables]]
+[[Probability Spaces]]
 [[The Scenes and Processes of Probability]]
 [[Poisson Process and the Count-Waiting Duality]]
 [[Memorylessness, Time and Aging]]

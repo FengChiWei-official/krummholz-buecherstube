@@ -10,7 +10,7 @@ Identity Transform focuses on exact rewrites that preserve equality and create c
 ## Core Patterns
 
 ### Conjugate
-[[Conjugate]]
+[[Conjugate in doing math]]
 [[Conjugate Radicals]]
 [[Trig Disguise Conjugate Radical]]
 [[Hyperbolic Conjugate Radical]]

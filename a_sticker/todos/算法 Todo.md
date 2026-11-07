@@ -40,3 +40,7 @@
 - [ ] [[Binary Tree]] — 补定义:数据结构与遍历
 - [ ] [[Code Implement of Disjoint Set Union]] — 补内容：空笔记，先写定义
 - [ ] [[双向BFS]] — 补内容：空笔记，先写定义
+- [ ] [[Storage of Sparse and Special Matrices]] — 补定义:数据结构与存储,稀疏/特殊矩阵压缩
+- [ ] [[index 运算规范化-参考资料卡]] — 裁决七条规范,修 704/DP Indexing 病灶
+- [ ] [[Links 写作参考-index 与距离]] — 选一张写 Links 卡(Bound 主题最稳)
+- [ ] [[Distance]] — 补定义:与 Index 对偶的距离类型

@@ -160,8 +160,8 @@ A probabilist who only knows formulas but cannot match them to scenarios is **me
 ## **Related**
 
 [[Index of Probability]]
-[[Probability System and Random Variables]]
-[[Probability Spaces and the Universal Source]]
+[[Random Variables]]
+[[Probability Spaces]]
 [[The Scenes and Processes of Probability]]
 [[Universal Limit Theorems]]
 [[Poisson Process and the Count-Waiting Duality]]

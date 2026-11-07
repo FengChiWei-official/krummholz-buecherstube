@@ -234,7 +234,7 @@ Modeling: compose all of the above
 ## **Related**
 
 [[Index of Probability]]
-[[Probability Spaces and the Universal Source]]
+[[Probability Spaces]]
 [[The Scenes and Processes of Probability]]
 [[Universal Limit Theorems]]
 [[Poisson Process and the Count-Waiting Duality]]

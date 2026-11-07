@@ -25,7 +25,7 @@ This map is organized by solving method instead of object type.
 
 ## Core Concepts
 
-[[Conjugate]]
+[[Conjugate in doing math]]
 [[Denominator Normalization]]
 [[The Ratio Substitution]]
 [[Reciprocal Substitution]]

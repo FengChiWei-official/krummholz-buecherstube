@@ -11,5 +11,7 @@ It is read as `The index of H in G`.
 
 Intuitively, the index `[G:H]` is the total number of left (or right) [[Coset]]s of $H$ in $G$.
 
+if H is a [[Normal Subgroup]], $|G/H| =  [G:H]$
+
 ---
 ## **Related**

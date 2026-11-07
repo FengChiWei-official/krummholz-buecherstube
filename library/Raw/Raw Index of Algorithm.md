@@ -49,6 +49,13 @@
 [[Template of BFS with Cycles]]
 [[Types of BFS & DFS]]
 
+<!-- L2 2026-11-06: 簇登记 (D22) — index 概念簇（0/1-based 与「下标是函数」） -->
+[[Index]]
+[[Index Frame]]
+[[0-index]]
+[[1-index]]
+[[Distance]]
+
 ---
 ## **Related**
 

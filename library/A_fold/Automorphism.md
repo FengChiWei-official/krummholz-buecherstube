@@ -2,7 +2,7 @@
 
 ## Instances
 - [[Identity]]
-- [[Conjugate]]
+- [[Conjugate in doing math]]
 
 ---
 ## **Related**

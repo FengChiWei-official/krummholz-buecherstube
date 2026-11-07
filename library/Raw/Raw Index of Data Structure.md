@@ -40,3 +40,6 @@
 
 <!-- L0 2026-10-26: 归队登记 (D22) -->
 [[Sequential List]]
+
+<!-- L0 2026-11-06: 归队登记 (D22, 75% via Linear/Sequential/Linked List) -->
+[[Storage of Sparse and Special Matrices]]

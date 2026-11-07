@@ -46,8 +46,8 @@
 - [ ] [[Object -- Investigate the microscopic behavior of the function as x tends to some point]] — 补正文:局部性态
 - [ ] [[Memorylessness, Time and Aging]] — 内容已近成卡,评估 promote
 - [ ] [[Poisson Process and the Count-Waiting Duality]] — 内容已近成卡,评估 promote
-- [ ] [[Probability Spaces and the Universal Source]] — 内容已近成卡,评估 promote
-- [ ] [[Probability System and Random Variables]] — 内容已近成卡,评估 promote
+- [ ] [[Probability Spaces]] — 内容已近成卡,评估 promote
+- [ ] [[Random Variables]] — 内容已近成卡,评估 promote
 - [ ] [[The Scenes and Processes of Probability]] — 内容已近成卡,评估 promote
 - [ ] [[Universal Limit Theorems]] — 内容已近成卡,评估 promote
 - [ ] [[Standard Limits]] — 补正文:除 Definition-of-E 外的标准极限
@@ -77,3 +77,5 @@
 - [ ] [[Null Space]] — 补内容：空笔记，先写定义
 - [ ] [[Prodact to Sum]] — 补内容：空笔记，先写定义
 - [ ] [[Secant Integral Inequality by Midpoint Expansion]] — 补中点展开证割线型积分不等式的思路
+- [ ] [[概率论变换技术-参考资料卡]] — 从 A 组与骨架题写出自己的卡
+- [ ] [[Raw Index of Probability]] — 补 Related why 并建概率技术层笔记
