@@ -196,7 +196,7 @@ This is the deepest relationship between Poisson and Exponential — they are no
 ## **Related**
 
 [[Index of Probability]]
-[[Random Variables]]
+[[Random Variable]]
 [[Probability Spaces]]
 [[The Scenes and Processes of Probability]]
 [[Universal Limit Theorems]]

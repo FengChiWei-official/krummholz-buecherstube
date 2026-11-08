@@ -60,7 +60,7 @@ Probability theory as a discipline — the developing map of its concepts. Read 
 
 Where each canonical note sits in this development:
 
-[[Random Variables]] — Station 6: the measure-theoretic system — random variables as functions, operations on them, distributions as generative stories
+[[Random Variable]] — Station 6: the measure-theoretic system — random variables as functions, operations on them, distributions as generative stories
 [[Probability Spaces]] — Stations 1 & 6: the sample space, expanded from finite equally-likely outcomes to measurable spaces and their universal source
 [[The Scenes and Processes of Probability]] — Station 7: the modern synthesis — concrete processes vs. universal laws; where each distribution lives
 [[Universal Limit Theorems]] — Stations 2, 3 & 5: LLN, CLT, Law of Small Numbers, EVT; Normal as a homeless CLT attractor

@@ -268,7 +268,7 @@ Scene × Time ──→ Stochastic process ──→ Temporal dependence
 ## **Related**
 
 [[Index of Probability]]
-[[Random Variables]]
+[[Random Variable]]
 [[Probability Spaces]]
 [[Universal Limit Theorems]]
 [[Poisson Process and the Count-Waiting Duality]]

@@ -47,7 +47,7 @@
 - [ ] [[Memorylessness, Time and Aging]] — 内容已近成卡,评估 promote
 - [ ] [[Poisson Process and the Count-Waiting Duality]] — 内容已近成卡,评估 promote
 - [ ] [[Probability Spaces]] — 内容已近成卡,评估 promote
-- [ ] [[Random Variables]] — 内容已近成卡,评估 promote
+- [ ] [[Random Variable]] — 内容已近成卡,评估 promote
 - [ ] [[The Scenes and Processes of Probability]] — 内容已近成卡,评估 promote
 - [ ] [[Universal Limit Theorems]] — 内容已近成卡,评估 promote
 - [ ] [[Standard Limits]] — 补正文:除 Definition-of-E 外的标准极限

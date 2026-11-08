@@ -120,7 +120,7 @@ Normal is what happens when counts become large and you standardize. Poisson is 
 ## **Related**
 
 [[Index of Probability]]
-[[Random Variables]]
+[[Random Variable]]
 [[Probability Spaces]]
 [[The Scenes and Processes of Probability]]
 [[Poisson Process and the Count-Waiting Duality]]
