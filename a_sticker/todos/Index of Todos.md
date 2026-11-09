@@ -2,10 +2,11 @@
 
 ## Core Concepts
 
+
+
 - [ ] [[Deutsch Todo]]
 - [ ] [[Latin Todo]]
 - [ ] [[Math Todo]]
-- [ ] [[translate todo]]
 - [ ] [[Hobby todo]]
 - [ ] [[Life todo]]
 - [ ] [[考研 Todo]]
@@ -40,5 +41,6 @@
 
 ---
 ## **Related**
+
 - [ ] [[抽代枢纽卡 Todo]]
 - [ ] [[Praat 声学分析 Todo]]

@@ -7,6 +7,8 @@
 [[Index of Algorithm]]
 [[Index of Math]]
 
+[[Index of Learning General]]
+
 ---
 
 [[Index of 汉语言学]]

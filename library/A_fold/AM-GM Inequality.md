@@ -15,6 +15,11 @@ $$
 1. [[Hook Function]]
 2. [[Product to Sum]]
 3. [[The Square Squeeze]]
+4. [[Absolute Function Plus AM-GM]]
 4.[[Log-Linear Symmetry]] (The "General Case")
+
+
 ---
 ## **Related**
+
+[[Order relation]]: Depends on it.

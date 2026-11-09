@@ -35,7 +35,7 @@ pattern based: [[Index of Math Expressions Pattern]]
 
 [[Logarithmic Function Toolkit]]
 [[Function Patterns Reduction Toolkits]]
-[[Absolute Function Toolkits]]
+[[Links of Absolute Function Toolkits]]
 [[Index of Identity Transform]]
 [[Raw Index Structural Transformation Toolkit]]
 
@@ -46,3 +46,5 @@ pattern based: [[Index of Math Expressions Pattern]]
 ## Entries
 
 [[Raw Index of Math Entries]]
+[[Index of Useful Functions]]
+[[Index of common structures]]

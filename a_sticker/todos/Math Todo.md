@@ -30,8 +30,17 @@
 - [ ] [[Focus on the Dominant]] — 补定义与主部提取例子
 - [ ] [[L'Hospital Rule]] — 补定义与使用条件
 - [ ] [[Mean Value theorem]] — 补三类中值定理与用法
-- [ ] [[Absolute Function Toolkits]] — 补定义与不等式工具
+- [ ] [[Links of Absolute Function Toolkits]] — 补定义与不等式工具
 - [ ] [[Absolute Inequality]] — 补定义与常见形式
+- [ ] [[Absolute Function Plus AM-GM]] — 补推导与用法
+- [ ] [[Links of Inequality and Order Relation]] — 补 Perspectives 与例子
+- [ ] [[Order relation]] — 补序关系定义与例子
+- [ ] [[Extremum]] — 补定义与判定
+- [ ] [[Recurrence Formula]] — 补定义与闭式联系
+- [ ] [[Explicit Formula]] — 补定义与例子
+- [ ] [[Well Define]] — 补定义与例子
+- [ ] [[Index of common structures]] — 补成员并由 owner 写共性句
+- [ ] [[Index of Learning General]] — 补成员并请 owner 写共性句
 - [ ] [[Comparison Test]] — 补定义与适用场景
 - [ ] [[Graphs of  Functions]] — 补各函数图像要点
 - [ ] [[Inequality]] — 补定义与分类,挂 [[Inequality Sheet]]

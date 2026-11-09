@@ -16,3 +16,5 @@ $e^{\frac{1}{x}}$
 
 ---
 ## **Related**
+
+[[Index of common structures]]

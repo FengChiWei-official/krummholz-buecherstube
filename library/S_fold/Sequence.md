@@ -9,3 +9,5 @@ A map in $\mathbb{N} \to \mathbb{R}$.
 
 ---
 ## **Related**
+
+[[Limit]]
