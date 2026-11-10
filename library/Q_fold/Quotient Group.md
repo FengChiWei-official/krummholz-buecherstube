@@ -62,6 +62,6 @@ Z/4 = {0(4Z+), 1(4Z+), 2(4Z+), 3(4Z+)}
 ---
 ## **Related**
 
-[[Lagrange's Theorem]] Size counter.
-
-[^1]: 
+[[Lagrange's Theorem]]: Size counter.
+[[Fundamental Homomorphism Theorem|First Isomorphism Theorem]]: Tells you how to find a operatable representation.
+[[Correspondence Theorem|The Fourth Isomorphism Theorem]]: Tell you what is the structure of a quotient group.
