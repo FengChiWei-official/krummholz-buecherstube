@@ -71,4 +71,4 @@ If $f(x)$ is differentiable, its monotonicity is defined by its derivative:
 ---
 ## **Related**
 
-[[Links of Composition of a Function with a Monotonic Function]]
+[[Links of Monotonicity as Order Isomorphism]]

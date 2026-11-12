@@ -1,24 +1,30 @@
 ## Definition
 Given [[Function]] $f(x)$, do you know what is the properties of $g(f(x))$?
 
+By operator family: [[Links of Function Properties under Operators]]
+
 
 ## Cases
 ### [[Monotonicity]]
 
 [[Links of Monotonicity in Transformations]]
 
-## [[Boundedness]]
 ### [[Parity]]
 
 [[Links of Parity in Transformations]]
 [[Links of Parity Identity]]
 
-## [[Periodicity]]
+### [[Boundedness]]
+
+### [[Periodicity]]
+
 [[Links of Periodicity in Transformations]]
 
-## [[Continuity]]
+### [[Continuity]]
 
-## [[Intermediate Value Property]]
+[[Links of Continuity]]
+
+### [[Intermediate Value Property]]
 
 > [!todo]
 > 可积， 可导， 可微

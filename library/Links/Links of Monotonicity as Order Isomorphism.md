@@ -50,6 +50,8 @@ Monotonicity is the fundamental requirement for the Change of Variables Formula 
 
 ## Related
 
+- [[Links of Properties of Functions in Compositions]] — the operation side: what each property becomes under $f \circ g$.
+- [[Links of Monotonicity in Transformations]] — the rule side: the direction of each unary rewrite.
 - [[Bijective Functions]]
 - [[Homeomorphisms in Topology]]
 - [[Calculus: The Substitution Rule]]

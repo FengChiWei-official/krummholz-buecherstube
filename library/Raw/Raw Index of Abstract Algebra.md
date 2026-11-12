@@ -42,3 +42,6 @@
 [[Subgroup Generation Theorem for the Integer Additive Group]]
 [[The Cyclic Decomposition Theorem for Subgroups of the Addition Group of Integers]]
 [[Theorem on kernel of Homomorphism]]
+
+<!-- L0 2026-11-11: 归队登记 (D22) — quotient group chain -->
+[[Fundamental Homomorphism Theorem]]

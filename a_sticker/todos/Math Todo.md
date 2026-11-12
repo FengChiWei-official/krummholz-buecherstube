@@ -88,3 +88,4 @@
 - [ ] [[Secant Integral Inequality by Midpoint Expansion]] — 补中点展开证割线型积分不等式的思路
 - [ ] [[概率论变换技术-参考资料卡]] — 从 A 组与骨架题写出自己的卡
 - [ ] [[Raw Index of Probability]] — 补 Related why 并建概率技术层笔记
+- [ ] [[Links of Weights and Intervals in Inequalities]] — recognize weights and intervals from Jensen's two-point form

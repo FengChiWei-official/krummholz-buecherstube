@@ -5,7 +5,7 @@
 
 ## For [[Composition]]
 
-[[Links of All Important Function in Composition]]
+[[Links of Properties of Functions in Compositions]]
 
 ## Representation
 

@@ -80,5 +80,11 @@
 [[One-side Derivative]]
 [[Points of Discontinuity]]
 
+<!-- L0 2026-11-12: Links 卡登记 (D22) -->
+[[Links of Function Properties under Operators]]
+[[Links of Function Properties under Differentiation and Integration]]
+[[Links of Properties of Functions in Compositions]]
+[[Links of Properties of Specific Transform]]
+
 ---
 ## **Related**

@@ -24,3 +24,5 @@ Given $f(x)$,
 
 ---
 ## **Related**
+
+[[Links of Monotonicity as Order Isomorphism]]
