@@ -9,7 +9,7 @@ it is a enssential part of [[Process]](one of 3).
 
 ## context
 [[Register|CPU Registers]] 
-[[Program Counter|PC]]
+[[library/P_fold/Program Counter|PC]]
 [[Stack Pointer]]
 [[Process State]]
 [[Memory Info]]: including [[Page Table| Page Tables]] and 段表指针

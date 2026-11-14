@@ -38,7 +38,7 @@
 [[Processes' Concurrency]]
 [[Processes' Dynamicity]]
 [[Processes' Independency]]
-[[Program Counter]]
+[[library/P_fold/Program Counter]]
 [[Program Segment]]
 [[Register]]
 [[Stack Pointer]]
@@ -77,3 +77,42 @@
 [[透明性即维护假象]]
 [[表示先于电路]]
 [[时空互换]]
+
+<!-- L0 2026-11-13: 寄存器集群登记 (D22) — 寄存器卡与它的节点 -->
+[[General-Purpose Register]]
+[[Instruction Register]]
+[[Memory Address Register]]
+[[Memory Data Register]]
+[[Program Status Word]]
+[[Floating-Point Register]]
+[[Control Register]]
+[[Segment Register]]
+[[Links of Registers]]
+
+<!-- 2026-11-14: CU 实现与微程序集群登记 (D22) — 由 Links of CU 级联出来的概念卡 -->
+[[RISC]]
+[[CISC]]
+[[Operation Code]]
+[[Expanding Opcode]]
+[[Microinstruction]]
+[[Microprogram]]
+[[Control Store]]
+[[Microcommand]]
+[[Microoperation]]
+[[Horizontal Microinstruction]]
+[[Vertical Microinstruction]]
+[[Direct Encoding]]
+[[Field-direct Encoding]]
+[[Field-indirect Encoding]]
+
+<!-- 2026-11-14: 流水线 -->
+[[Pipeline]]
+
+<!-- 2026-11-14: 流水线冒险与调度 -->
+[[Structural Hazard]]
+[[Data Hazard]]
+[[Control Hazard]]
+[[Forwarding]]
+[[Branch Prediction]]
+[[Superscalar]]
+[[Out-of-order Execution]]

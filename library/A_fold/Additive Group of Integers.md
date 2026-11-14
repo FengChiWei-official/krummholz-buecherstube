@@ -5,6 +5,7 @@ it is a instance is [[Group]] that defined on $\mathbb{Z}$ with operator $+$
 - [[Subgroup of Integer Additive Group]]
 ## theorem
 1. it and its [[Subgroup of Integer Additive Group|Subgroup]] are [[Links of Cyclic Subgroup or Group|Cyclic Group]]s.
+
 ---
 
 ## View

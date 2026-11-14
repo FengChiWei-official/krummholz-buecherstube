@@ -18,10 +18,10 @@
 - [ ] [[Processes' Concurrency]] — 补定义:操作系统与计算机组成
 - [ ] [[Processes' Dynamicity]] — 补定义:操作系统与计算机组成
 - [ ] [[Processes' Independency]] — 补定义:操作系统与计算机组成
-- [ ] [[Program Counter]] — 补定义:操作系统与计算机组成
+- [x] [[library/P_fold/Program Counter]] — 补定义:操作系统与计算机组成
 - [ ] [[Program Segment]] — 补定义:操作系统与计算机组成
-- [ ] [[Register]] — 补定义:操作系统与计算机组成
-- [ ] [[Stack Pointer]] — 补定义:操作系统与计算机组成
+- [x] [[Register]] — 补定义:操作系统与计算机组成
+- [x] [[Stack Pointer]] — 补定义:操作系统与计算机组成
 - [ ] [[Thread]] — 补定义:操作系统与计算机组成
 - [ ] [[Threads' Registers]] — 补定义:操作系统与计算机组成
 - [ ] [[User Mode]] — 补定义:操作系统与计算机组成
@@ -35,7 +35,7 @@
 - [ ] [[Executable File]] — 补定义:ELF 三型之一,程序入口
 - [ ] [[Relocatable File]] — 补定义:ELF 三型之一,待链接
 - [ ] [[Shared Object File]] — 补定义:ELF 三型之一,动态共享
-- [ ] [[Index of Computer Organization]] — 填时间轴与地图
+- [x] [[Index of Computer Organization]] — 填时间轴与地图
 - [ ] [[System Call]] — 补内容：空笔记，先写定义
 - [ ] [[segmentation]] — 补内容：空笔记，先写定义
 - [ ] [[segmentation-with-paging]] — 补内容：空笔记，先写定义
