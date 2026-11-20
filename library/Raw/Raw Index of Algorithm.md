@@ -14,7 +14,7 @@
 [[Clear Lowest Bit]]
 [[Convex Hull Trick for DP]]
 [[Difference list]]
-[[Direced Graphs]]
+[[Directed Graphs]]
 [[Greedy todo]]
 [[Grid BFS and DFS]]
 [[Hamming Weight & Distance]]
@@ -55,6 +55,9 @@
 [[0-index]]
 [[1-index]]
 [[Distance]]
+
+<!-- L0 2026-11-17: 归队登记 (D22) — 树 DFS 两段状态流（owner 给定角度） -->
+[[State Flow in Tree DFS]]
 
 ---
 ## **Related**

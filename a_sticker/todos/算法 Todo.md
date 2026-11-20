@@ -11,7 +11,7 @@
 - [ ] [[Clear Lowest Bit]] — 补定义:算法原理与复杂度
 - [ ] [[Convex Hull Trick for DP]] — 补定义:算法原理与复杂度
 - [ ] [[Difference list]] — 补定义:算法原理与复杂度
-- [ ] [[Direced Graphs]] — 补定义:算法原理与复杂度
+- [ ] [[Directed Graphs]] — 补定义:算法原理与复杂度
 - [ ] [[Greedy todo]] — 补定义:算法原理与复杂度
 - [ ] [[Grid BFS and DFS]] — 补定义:算法原理与复杂度
 - [ ] [[Hamming Weight & Distance]] — 补定义:算法原理与复杂度
