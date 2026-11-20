@@ -23,7 +23,7 @@
 - [ ] [[Todo Interval]] — 补定义:算法原理与复杂度
 - [ ] [[Tree DP]] — 补定义:算法原理与复杂度
 - [ ] [[Unbounded Knapsack DP]] — 补定义:算法原理与复杂度
-- [ ] [[Undireced Graphs]] — 补定义:算法原理与复杂度
+- [ ] [[Undirected Graphs]] — 补定义:算法原理与复杂度
 - [ ] [[Two Points]] — 补定义:算法原理与复杂度
 - [ ] [[Single Number Problem]] — 补定义:算法原理与复杂度
 - [ ] [[Recursive]] — 补定义:算法原理与复杂度

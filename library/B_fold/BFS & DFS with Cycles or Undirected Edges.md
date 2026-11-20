@@ -1,6 +1,6 @@
 ## Definition
 
-We usually consider [[Undireced Graphs]] as a special kind of [[Directed Graphs]].Therefore, Undirected Edges are equivalent with cycles.
+We usually consider [[Undirected Graphs]] as a special kind of [[Directed Graphs]].Therefore, Undirected Edges are equivalent with cycles.
 
 [[Template of BFS with Cycles]]
 

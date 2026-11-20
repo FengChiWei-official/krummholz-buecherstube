@@ -26,7 +26,7 @@
 [[Todo Interval]]
 [[Tree DP]]
 [[Unbounded Knapsack DP]]
-[[Undireced Graphs]]
+[[Undirected Graphs]]
 [[Two Points]]
 [[Single Number Problem]]
 [[Recursive]]
