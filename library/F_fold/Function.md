@@ -13,3 +13,5 @@
 
 ---
 ## **Related**
+
+[[Mapping]]: an instance.

@@ -89,3 +89,4 @@
 - [ ] [[概率论变换技术-参考资料卡]] — 从 A 组与骨架题写出自己的卡
 - [ ] [[Raw Index of Probability]] — 补 Related why 并建概率技术层笔记
 - [ ] [[Links of Weights and Intervals in Inequalities]] — recognize weights and intervals from Jensen's two-point form
+- [ ] [[抽样分布与假设检验-参考资料卡]] — 按 §8 骨架写出自己的卡

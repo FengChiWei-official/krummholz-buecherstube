@@ -10,7 +10,7 @@
 ## Other
 
 $(1+x)^{\frac{1}{x}}$
-$e^{\frac{1}{x}}$
+$e^{\frac{1}{x}}$, $(x+2)e^{\frac{1}{x}}$
 
 [[Common Elementary Transcendental Functions]]
 

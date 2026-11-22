@@ -43,3 +43,6 @@
 
 <!-- L0 2026-11-06: 归队登记 (D22, 75% via Linear/Sequential/Linked List) -->
 [[Storage of Sparse and Special Matrices]]
+
+<!-- L0 2026-11-22: 考纲登记 (D22) -->
+[[数据结构考纲]]

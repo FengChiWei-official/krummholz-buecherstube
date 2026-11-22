@@ -42,6 +42,5 @@
 ---
 ## **Related**
 
-- [ ] [[抽代枢纽卡 Todo]]
 - [ ] [[Praat 声学分析 Todo]]
 - [ ] [[408 Links 转化 Todo]]
