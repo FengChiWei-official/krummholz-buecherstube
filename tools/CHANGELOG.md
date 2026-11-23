@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+Additive: binaries get an explicit home — a content boundary for assets (ledger
+**D42**, doctrine set **v9**), a new docs-sync row **T14** for repo-level skills,
+and the T10 env probe extended to the image skill's script.
+
+- `AGENTS.md` rule 11: the repo is text; images/PDF/EPUB upload to the public R2
+  bucket from `.agent/skills/vault-images/`, notes keep the URL only.
+- Sync map: **T14** (`paths_added` on `.agent/skills/*/SKILL.md`) — a new
+  repo-level skill must be registered in `README.md` and the vault-ops skill.
+- Probe: `_env_names` now reads `ENV_*` / `*_KEYS` tuple constants, so
+  `r2put.py`'s `R2_*` keys are gated; `tests/test_docs.py` takes its file list
+  from T10 instead of hardcoding it, and the doctrine-version test no longer
+  pins the number.
+- `doctrine/New Machine.md` enumerates every `R2_*` key.
+
 ## v6.3.0 (2026-11-01)
 
 Additive: one new docs-sync row (**T13**), a doctrine-set bump to **v8**, and the

@@ -51,6 +51,7 @@ Root = 入口队列（Obsidian 默认落点）：新捕获落在那里，triage 
 - `python3 tools/vault.py random [--scope …] [--seed N]` / `suggest NAME [--n 3]` — 问箱材料（S9）与候选链接（S2），只给信号不写笔记。
 - `python3 tools/vault_mcp.py` — **MCP stdio 服务器**：把 `retrieve` / `place` 暴露成 MCP 工具（同一配置、同一图、同一渲染——输出与 CLI 逐字节相同）。给**工具集里没有 bash/exec** 的客户端用，免得它退到 grep。仓库自带项目级注册 `.mcp.json`（说明见 `doctrine/New Machine.md` §步骤 7）。
 - `python3 tools/trend_radar.py` — 每日情报（详见 `.agent/skills/trend-radar/`）。
+- `.agent/skills/vault-images/r2put.py` — 插图与资产上传到公开 R2 桶（`check` / `put` / `presign` / `selftest`）：内容寻址 key、按哈希去重、输出公开 URL 与现成的 markdown 嵌入行。笔记只存 URL，仓库保持纯文本；装配见 `.agent/skills/vault-images/SKILL.md` 与 [[New Machine]]。
 
 阈值与路径的唯一定义处是 `tools/vault.toml`（改一处即全局生效）。
 

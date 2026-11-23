@@ -1,6 +1,6 @@
 # Agent Contract
 
-> 版本：v8（2026-11-01）。
+> 版本：v9（2026-11-23）。
 > 同步组：本文件是 [[Vault Extension]] §同步面 T2（判据清单）/ T3（硬门）/ T5（命令与退出码）/ T13（内容边界）的连带文件；语义变化按 T9。
 
 Self-contained handover contract for an AI (or a new human) with **zero history**.
@@ -69,6 +69,10 @@ not in a note is not in the system.
   confidence at or above `l0_confidence` (`tools/vault.toml`), `triage` categories,
   `rawindex --clusters` grouping proposals.
 - **Scaffolds**: create a note's headings/empty tables, and `a_sticker/or/` drafts.
+- **Assets**: upload a note's image or file to the public bucket with
+  `.agent/skills/vault-images/r2put.py` and embed the URL it prints (image
+  `![](...)`, other files `[name](...)`). The repo stays text (AGENTS rule 11,
+  D42); the bucket is public, so upload only what the note needs.
 - **Revision under an approved plan** (D41): the default is no new body prose, but
   once the owner approves a written plan — which files, what changes, why that
   matches the intent — you may *complete what a note left unsaid*, *reword to the
@@ -104,8 +108,8 @@ not in a note is not in the system.
 - Write *new* own-voice body prose in `library/` **without an approved plan**. AI
   prose belongs in `a_sticker/or/`. (Completion, rewording and restructuring under
   an approved plan are §3, D41.)
-- Touch `.obsidian/`, add big binaries to the repo (T22: no large assets; the vault
-  is text), or commit.
+- Touch `.obsidian/`, add binaries to the repo (AGENTS rule 11 / D42: the vault
+  is text; images and files live in the public bucket), or commit.
 - Reintroduce retired tags or status fields.
 
 ## 6. How to verify yourself

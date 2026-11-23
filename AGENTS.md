@@ -26,6 +26,8 @@ Read this first, then the source-of-truth files it points to. Do not improvise d
 9. **找东西先走工具**：整库检索 = `python3 tools/vault.py retrieve TERM`（按证据强度排序，每条带理由），一篇的位置 = `python3 tools/vault.py place NAME`；`grep`/`glob`/`ls` 只在这两个工具报无命中之后用（它们只覆盖工具不载入的 `zzz_output/`、`template/`）。**本库中英双语，匹配是字面的、不翻译**：中文词落空就换英文词/词根再查（反之亦然），别把一次落空当成"没有这篇"。若你的工具集没有 bash/exec：用 MCP 版（`python3 tools/vault_mcp.py` 的 `retrieve` / `place`，同一配置与同一渲染），不要静默退到 grep。然后：`python3 tools/vault.py check` 在提交结构改动前跑；任何 rename/move 之前先 `grep -rn -- '\[\[Old Name'`。Procedures: `.agent/skills/vault-ops/SKILL.md`; handover contract: `doctrine/Agent Contract.md`; inline help: `python3 tools/vault.py help <topic>`.
 10. **改文档或工具文案前**，先读 `doctrine/Vault Extension.md` §同步面——它列了「改一处要同步哪几处」；文档与 `check` 的报告级输出互相矛盾就是漂移。机器门：`python3 tools/vault.py docs-check --gate`（默认报告级；`tests/test_docs.py` 在 CI 里强制内容一致性）。
 
+11. **仓库是纯文本，资产走 URL**：图片、PDF、EPUB 等二进制**不进 git**。它们上传到公开 R2 桶（`.agent/skills/vault-images/r2put.py`，装配与用法见同目录 `SKILL.md`），笔记只存公开 URL——图用 `![](url)`，其它用 `[文件名](url)`。桶是公开的：只传笔记要用的内容，不传私人材料。凭据在仓库外 `~/.config/krummholz/r2.env`（mode 600），不进库、不进同步盘。
+
 ## Invariants (two-tier)
 
 - **Hard gates** (exit 1, block commit): G1 root drained; G2 every `archives/material/` note has real `source:`; G3 no NEW unresolved wikilinks (baseline whitelist in `tools/whitelist_unresolved.txt`, currently 0 entries).

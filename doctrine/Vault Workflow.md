@@ -1,6 +1,6 @@
 # Vault Workflow
 
-> 版本：v8（2026-11-01）。
+> 版本：v9（2026-11-23）。
 > 同步组：改本文件语义按 [[Vault Extension]] §同步面 T9（新 D 号 + 重新生成记忆底座卡）；§AI 边界 的改动另按 T13。
 
 ## Definition
@@ -62,6 +62,8 @@
 **AI 是磨刀石，不是代笔——但在获批的计划下，它可以动内容。** 默认情况下问题、结构、链接、检查归 AI、正文归人：AI 生成的新散文属于 `a_sticker/or/`，作为原材料等待消化，绝不直接进 `library/`。`zzz_output/` 内容 AI 永不代笔、永不编辑（git 状态可查、链接可验）。
 
 链接的批准权（S2 继承）：**Node↔Node 与 Index→Node 的新链接须 owner 批准**（链接改变笔记意义）；登记边（Raw Index → Node）是结构动作，AI 直接做；结构修复（改名、归位、悬空修复）AI 直接做；`aliases:` 的增改也须 owner 批准（它改变 wikilink 解析）。
+
+**资产不是正文**：图、PDF/EPUB 等二进制不进库（硬规则 11，D42）。上传用 `.agent/skills/vault-images/r2put.py`，笔记只放它打印的 URL（图 `![](url)`，其它 `[文件名](url)`）；上传与嵌入属结构动作（Agent Contract §3），不算新增正文。桶是公开的——只传笔记要用的内容。
 
 ### 就地修订与补全（语言 / 排版 / 内容，D41）
 

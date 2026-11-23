@@ -148,7 +148,8 @@ sync = ["doctrine/Vault Design.md", "a_sticker/or/记忆底座-首批卡片.md"]
 [[docs_sync.rules]]
 id = "T10"
 note = "环境变量集合（探针）+ 本机 / Obsidian / 插件设置（manual，.obsidian 不在 git）"
-env_files = ["tools/vaultkit/config.py", "tools/trend_radar.py"]
+env_files = ["tools/vaultkit/config.py", "tools/trend_radar.py",
+             ".agent/skills/vault-images/r2put.py"]
 sync = ["doctrine/New Machine.md"]
 
 [[docs_sync.rules]]
@@ -171,5 +172,11 @@ note = "manual — 内容边界 / 就地修订权限（P9 + AI 边界）"
 sync = ["AGENTS.md", "doctrine/Vault Workflow.md", "doctrine/Agent Contract.md",
         "doctrine/Vault Design.md", ".agent/skills/vault-ops/SKILL.md",
         "a_sticker/or/记忆底座-首批卡片.md"]
+
+[[docs_sync.rules]]
+id = "T14"
+note = "新增仓库级 skill（.agent/skills/<name>/SKILL.md 新增即触发）"
+paths_added = [".agent/skills/*/SKILL.md"]
+sync = ["README.md", ".agent/skills/vault-ops/SKILL.md"]
 
 

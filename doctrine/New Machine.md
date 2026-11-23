@@ -1,6 +1,6 @@
 # New Machine
 
-> 版本：v8（2026-11-01）。
+> 版本：v9（2026-11-23）。
 > 同步组：本机状态变化时同步 `doctrine/Vault Extension.md` §同步面 T10。
 
 ## Definition
@@ -15,8 +15,9 @@
 | **在 git 里** | 全部笔记（`library/` `archives/` `a_sticker/` `zzz_output/`）、`doctrine/`、`tools/`（含测试与 CI）、`template/`、`README.md` / `AGENTS.md` / `.mcp.json` | `git clone` 即得。含记忆底座卡片的复习调度注释（插件 `dataStore = NOTES`，调度写回笔记本身） |
 | **每机各异（不在 git）** | `.obsidian/`：主题、快捷键、社区插件与其设置、插件的调度索引 `data.json` | 按 §步骤 3–4 手工装 |
 | **每机各异** | `archives/work/TR-leaderboards.state.json`（榜单 Δ 的上一次快照，已 gitignore） | 新机器首日无 Δ；跑一次 `python3 tools/trend_radar.py fetch` 即恢复 |
+| **每机各异（凭据）** | `~/.config/krummholz/r2.env`：R2 API token 的 5 个键（账户 id / Access Key ID / Secret / 桶 / 公开地址）+ 可选前缀。文件在仓库外，mode 600 | 在 R2 控制台建 user token（Object Read & Write，限定 `my-books-asset`），按 `.agent/skills/vault-images/SKILL.md` §装配 填；`r2put.py check` 验收。缺它只影响插图/资产上传，不影响其它工具 |
 | **每机各异（临时）** | `/tmp/trend-radar/<date>/` 当日候选池快照 | 无需迁移，`fetch` 当场重建 |
-| **环境变量** | `SEMANTIC_SCHOLAR_API_KEY` / `OPENALEX_API_KEY` / `ARTIFICIAL_ANALYSIS_API_KEY`（趋势雷达可选；缺则该源降级或标未启用）；`TR_SNAPSHOT_DIR`（快照根目录，可选）；`VAULT_ROOT`（把工具指向别的 vault，可选） | 按需 export；key 只从环境读，绝不写进笔记 |
+| **环境变量** | `SEMANTIC_SCHOLAR_API_KEY` / `OPENALEX_API_KEY` / `ARTIFICIAL_ANALYSIS_API_KEY`（趋势雷达可选；缺则该源降级或标未启用）；`TR_SNAPSHOT_DIR`（快照根目录，可选）；`VAULT_ROOT`（把工具指向别的 vault，可选）；插图/资产上传：`R2_ACCOUNT_ID` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` / `R2_BUCKET` / `R2_PUBLIC_BASE` 与可选 `R2_PREFIX` / `R2_ENDPOINT` / `R2_SESSION_TOKEN`（读环境或 `~/.config/krummholz/r2.env`，见 `.agent/skills/vault-images/SKILL.md`） | 按需 export；key 只从环境读，绝不写进笔记；R2_* 写进仓库外的 `r2.env`（mode 600）即可 |
 
 ## 步骤
 
@@ -34,6 +35,7 @@
 5. 可选：`python3 -m venv .venv && .venv/bin/pip install pytest`，然后 `.venv/bin/python -m pytest -q`（CI 也这么跑）。
 6. `zzz_output/Root.md` 补一行 `[[Raw Index of Root]]`（owner 动作；AI 不碰 `zzz_output/` 内容）。
 7. 可选——AI 客户端的检索入口：仓库自带项目级 MCP 注册 `.mcp.json`（声明 `vault` = `python3 tools/vault_mcp.py`，暴露 `retrieve` / `place`）。前提是客户端会读项目级 MCP 配置（omp 的 `mcp.enableProjectConfig` 默认开）；配置在会话启动后才出现时，`/mcp reload` 或重开会话才挂载。它服务**工具集里没有 bash/exec** 的 AI——那类 AI 否则只能退到 grep，正是 `doctrine/Agent Contract.md` 明令禁止的第一步。
+8. 可选——插图/资产上传：按 `.agent/skills/vault-images/SKILL.md` §装配 建 `~/.config/krummholz/r2.env`，然后 `python3 .agent/skills/vault-images/r2put.py check` 见 `ok`。不做这一步时，笔记里已有的外链图片照常显示。
 
 ## 验收
 
@@ -44,6 +46,7 @@
 | `python3 -m pytest -q` | 全绿（条数不写进文档——它是会变的副本） |
 | `git status` | 干净——`.obsidian/` 被 gitignore，不产生噪声 |
 | Obsidian 打开 `a_sticker/or/记忆底座-首批卡片.md` | 间隔重复面板出现**按文件夹划分**的 deck（名含 `or`），卡片可复习 |
+| `python3 .agent/skills/vault-images/r2put.py check` | 配了 token 时 `ok  bucket my-books-asset reachable, credentials accepted`；未配时 `exit 2` + 缺失键名（不阻断其它验收项） |
 
 ## Related
 

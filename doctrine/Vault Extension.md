@@ -1,6 +1,6 @@
 # Vault Extension
 
-> 版本：v8（2026-11-01）。
+> 版本：v9（2026-11-23）。
 > 同步组：本文件是同步面本身；新增 doctrine 文件按 T11。
 
 ## Definition
@@ -74,7 +74,16 @@
 2. `tools/vault.toml [templates]` 加一个键（键 = 体裁/分区：`node` / `raw` / `index` / `links` / `material` / `todos`）。
 3. 无需改文档：文档只引用键名与 `[templates]`，不写文件数量（§自检 拦数值副本）。
 
-### 7. 发版
+### 7. 加一个仓库级 skill
+
+`.agent/skills/<name>/` 下、提交进 git 的 skill 是**仓库级**（区别于每机装配的状态）：
+
+1. 目录里放 `SKILL.md`（frontmatter 只两键：`name` / `description`，description 写清「何时用」）+ 需要的脚本；二进制与凭据不进库（硬规则 11）。
+2. 登记入口：`README.md` §工具 一条（做什么、一条命令起手）；`.agent/skills/vault-ops/SKILL.md` 的 §Load order 或 §Procedures 给指针。
+3. 需要每机装配 → `doctrine/New Machine.md` 写步骤与验收；脚本读环境变量 → 把脚本加进 T10 的 `env_files`，键名必须出现在 New Machine（`tests/test_docs.py` 从这份配置读文件清单，不再手抄）。
+4. `python3 tools/vault.py docs-check --gate`：新增 `SKILL.md` 触发 T14，提示上面两处登记。
+
+### 8. 发版
 
 **版本号规范（固定，D39）**——照 SemVer 2.0.0 的骨架，先把"公开 API"钉死，再定义谁升哪一位。
 
@@ -137,6 +146,7 @@
 | T11 | 新增 doctrine 文件 | `AGENTS.md` §Source of truth；`README.md` §协作 + §Related Files；`doctrine/Vault Design.md` §区域；`.agent/skills/vault-ops/SKILL.md` §Load order；若新文件有自己的同步组，本表加一行 | 新增文件 |
 | T12 | 新增工具入口（`tools/` 的直接子文件） | `README.md` §工具；`doctrine/Agent Contract.md` §1；`.agent/skills/vault-ops/SKILL.md`（流程节）；`tests/`；若该入口需要每机装配（如 MCP 客户端注册），同时同步 `doctrine/New Machine.md` | 新增文件 |
 | T13 | 内容边界（P9 + AI 边界 + 就地修订 / 补全 / 重构权限） | `AGENTS.md` 硬规则 7；`doctrine/Vault Workflow.md` §AI 边界；`doctrine/Agent Contract.md` §3 + §4 + §5；`doctrine/Vault Design.md` §关键 doctrine + §决策台账；`.agent/skills/vault-ops/SKILL.md`；`a_sticker/or/记忆底座-首批卡片.md` | manual |
+| T14 | 新增仓库级 skill（`.agent/skills/<name>/SKILL.md`） | `README.md` §工具 一条入口；`.agent/skills/vault-ops/SKILL.md`（Load order 或流程节的指针）；需要每机装配 → `doctrine/New Machine.md`；脚本读环境变量 → 加进 T10 的 `env_files`（探针会盯键名是否出现在 New Machine） | 新增文件 |
 
 ## 自检
 

@@ -1415,11 +1415,18 @@ _ENV_CALL = re.compile(
     r"""(?:environ\s*(?:\.get\s*\(\s*|\[\s*)|getenv\s*\(\s*)['"]([A-Za-z_][A-Za-z0-9_]*)['"]""")
 _ENV_CONST = re.compile(
     r"""^\s*ENV_[A-Z0-9_]+\s*=\s*['"]([A-Za-z_][A-Za-z0-9_]*)['"]""", re.M)
+_ENV_TUPLE = re.compile(r"^\s*([A-Z][A-Z0-9_]*)\s*=\s*\(([^)]*)\)", re.M | re.S)
+_ENV_TUPLE_ITEM = re.compile(r"""['"]([A-Za-z_][A-Za-z0-9_]*)['"]""")
 
 
 def _env_names(text: str) -> set:
-    """Environment variables a module reads: direct literals + `ENV_*` constants."""
-    return set(_ENV_CALL.findall(text or "")) | set(_ENV_CONST.findall(text or ""))
+    """Environment variables a module reads: literals, `ENV_*` constants, key tuples."""
+    text = text or ""
+    names = set(_ENV_CALL.findall(text)) | set(_ENV_CONST.findall(text))
+    for constant, block in _ENV_TUPLE.findall(text):
+        if "ENV" in constant or constant.endswith("_KEYS"):
+            names |= set(_ENV_TUPLE_ITEM.findall(block))
+    return names
 
 
 def _help_topics_in(text: str) -> set:

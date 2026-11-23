@@ -17,6 +17,7 @@ Read in this order before acting:
 4. `doctrine/Vault Design.md` — why the system works
 5. `doctrine/Vault Workflow.md` — the 3 verbs + 1 loop, S1–S10, 心法
 6. `doctrine/Vault Extension.md` — 改系统 / 改文档前读 §同步面（`doctrine/New Machine.md` 面向 owner 装配，不在 AI 载入序）
+7. `.agent/skills/vault-images/SKILL.md` — only when a note needs a figure or a hosted file (assembly, upload, embed line)
 
 Inline help: `python3 tools/vault.py help <topic>` for `retrieve` / `place` / `check` / `status` / `triage` / `rawindex` / `dag` / `links` / `links-candidates` / `index-candidates` / `random` / `suggest` / `rename` / `new` / `docs-check`.
 
@@ -42,6 +43,13 @@ Run `python3 tools/vault.py status` first — rhythm line, git state, check summ
 5. Once it has at least one link, `python3 tools/vault.py place "<Name>"` says where it sits in the relation graph: registration edges, which Raw Index the neighbourhood votes for (with the voters named), and the notes worth linking next. Use it again whenever a note feels misplaced.
 
 It refuses rather than leaving the vault in a state its gates would flag: an existing name (ambiguity), a genre name outside its home zone (体裁错位), `--zone material` without `--source` (G2), `--todo` without `--into`.
+
+### Note needs an image or a hosted file (D42)
+
+1. `python3 .agent/skills/vault-images/r2put.py check` — once per machine; `ok` means the credentials in `~/.config/krummholz/r2.env` are accepted.
+2. `python3 .agent/skills/vault-images/r2put.py put PATH` — prints `uploaded|exists  <key>  (size)`, the public URL, and a ready embed line: `![](url)` for images, `[name](url)` for PDF/EPUB/`--any` files. Same bytes again → `exists`, no second PUT.
+3. Paste that line into the note. The binary stays out of the repo (rule 11); the bucket is public, so upload only what the note needs.
+4. Handing a large upload to a client without credentials: `... presign KEY --method PUT --expires 3600`, then `curl -X PUT --upload-file PATH "<url>"`.
 
 ### Note has zero outbound links (I3 / capture rule)
 
@@ -151,6 +159,10 @@ touch content.
 3. `python3 tools/vault.py docs-check --against HEAD` — report-level; lists every triggered row whose co-owners did not move. `--gate` exits 1 (use it before committing).
 4. `python3 tools/vault.py check` and `python3 -m pytest -q` — `tests/test_docs.py` holds the content checks that always gate (rule ids present and non-ghost, no id ranges, no threshold value copies, sync-map id parity, doctrine headers).
 5. New doctrine file → also register it in the four places named by row T11.
+
+### Registering a repo-level skill (T14)
+
+A skill committed under `.agent/skills/<name>/` is **repo-level**: a new `SKILL.md` fires T14. Register it in `README.md` §工具 and here (Load order or a procedure pointer). Needs per-machine setup → `doctrine/New Machine.md`; its script reads environment variables → add the script to T10's `env_files` (the docs test then demands every key name in New Machine). Keep credentials and binaries out of the repo: `~/.config/krummholz/r2.env` (mode 600) is the model.
 
 ### Health audit
 

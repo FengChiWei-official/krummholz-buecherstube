@@ -253,14 +253,29 @@ def test_subcommand_runs_on_the_fixture(git_vault, command):
     assert "Traceback" not in proc.stderr, f"{command}: {proc.stderr}"
 
 
-def test_env_vars_read_by_the_tools_are_documented_in_new_machine():
-    """Per-machine setup that is not written down is setup the next machine misses."""
+def test_env_vars_read_by_the_tools_are_documented_in_new_machine(sync_cfg):
+    """Per-machine setup that is not written down is setup the next machine misses.
+
+    The file list comes from T10 (`env_files`) — the same list `docs-check`
+    watches — so adding a script there gates its keys without a second copy.
+    """
+    rule = next(r for r in sync_cfg.docs_sync if r["id"] == "T10")
+    files = rule["env_files"]
+    files = [files] if isinstance(files, str) else list(files)
     names = set()
-    for rel in ("tools/vaultkit/config.py", "tools/trend_radar.py"):
+    for rel in files:
         names |= cli._env_names((REPO / rel).read_text(encoding="utf-8"))
     assert names, "env extractor found nothing — the probe regex rotted"
     machine = (REPO / "doctrine/New Machine.md").read_text(encoding="utf-8")
     assert not sorted(n for n in names if n not in machine)
+
+
+def test_env_probe_reads_key_tuples():
+    """`ENV_KEYS` / `*_KEYS` tuples are env names; other tuples are not."""
+    text = ('ENV_KEYS = ("A_ONE", "B_TWO")\n'
+            'OPTIONAL_KEYS = ("C_THREE",)\n'
+            'ROOT_ALLOWED = ("README.md",)\n')
+    assert cli._env_names(text) == {"A_ONE", "B_TWO", "C_THREE"}
 
 
 def test_env_var_change_fires_t10(sync_cfg):
@@ -295,7 +310,7 @@ def test_sync_map_paths_exist(sync_cfg):
 @pytest.mark.parametrize("path", DOCTRINE, ids=_named)
 def test_doctrine_files_declare_version_and_sync_group(path, sync_cfg):
     text = path.read_text(encoding="utf-8")
-    assert "> 版本：v8（" in text, f"{path.name} has no version header"
+    assert DOCTRINE_VERSION.search(text), f"{path.name} has no version header"
     match = re.search(r"^> 同步组：(.+)$", text, re.M)
     assert match, f"{path.name} has no 同步组 header line"
     known = {r["id"] for r in sync_cfg.docs_sync}
@@ -377,6 +392,19 @@ def test_new_tool_entry_point_fires_t12(sync_cfg):
     out = _changed(sync_cfg, added={"tools/vault_mcp.py"})
     assert [f["id"] for f in out["findings"]] == ["T12"]
     assert "README.md" in out["findings"][0]["missing"]
+
+
+def test_new_repo_level_skill_fires_t14(sync_cfg):
+    """A committed skill is a surface too: register it in README and the ops skill."""
+    out = _changed(sync_cfg, added={".agent/skills/new-skill/SKILL.md"})
+    assert [f["id"] for f in out["findings"]] == ["T14"]
+    assert out["findings"][0]["missing"] == ["README.md",
+                                             ".agent/skills/vault-ops/SKILL.md"]
+
+
+def test_a_skill_script_is_not_a_new_skill(sync_cfg):
+    """Only `SKILL.md` marks a skill; helper scripts inside one do not."""
+    assert _changed(sync_cfg, added={".agent/skills/vault-images/helper.py"})["findings"] == []
 
 
 def test_a_new_module_or_note_is_not_an_entry_point(sync_cfg):

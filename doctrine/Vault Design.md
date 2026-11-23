@@ -1,6 +1,6 @@
 # Vault Design
 
-> 版本：v8（2026-11-01）。本轮裁决 D30–D41 见本文件 §决策台账。
+> 版本：v9（2026-11-23）。本轮裁决 D30–D42 见本文件 §决策台账。
 > 同步组：改本文件语义按 [[Vault Extension]] §同步面 T9（新 D 号 + 重新生成记忆底座卡）；本文件是 T2 / T4 / T6 / T7 / T8 / T11 的连带文件。
 
 ## Definition
@@ -39,6 +39,7 @@ Node       点     默认体裁（<A–Z>_fold）
 - **登记边规则**（D22）：Raw Index → Node 的登记边是结构动作，AI 可直接追加；`Node ↔ Node` 与 `Index → Node` 改变笔记意义，须 owner 批准。
 - **出链 = 已拆**（D21）：材料被拆过的标记 = 它有指向所拆 Node 的出链；零出链材料 = 未拆。零新增状态字段。
 - **内容边界**（D41）：默认不新增正文；**一次性计划审核**之下可补全未讲清处、按本意重组语言、重构整篇。仍然不许（计划未逐条列出的）：数学的符号/常量/方向/量词/前提、笔记名、`aliases:`/`source:` 的值、链接的目标与方向、文件级动作。范围与报告义务见 [[Vault Workflow]] §AI 边界。
+- **资产边界**（D42）：仓库 = 纯文本，二进制不进 git；图与文件上传到公开 R2 桶（`.agent/skills/vault-images/`），笔记只存公开 URL——图 `![](url)`，其它 `[文件名](url)`。桶公开可读，只传笔记要用的内容；凭据在仓库外 `~/.config/krummholz/r2.env`（mode 600）。
 - **结构涌现，不预设**：Index 是聚簇的输出，不是脚手架。先有簇（带共性），再有 Index。
 - **人维护的会变之物才删；变化由 AI 承载的可以留**：状态字段人改 → 删；主干成员集虽每轮变但 AI 承载 → 留。
 
@@ -107,6 +108,7 @@ Node = 纯 markdown。**工具不依赖模板；模板是可选脚手架**（`te
 | D39 | 版本号规范 | **固定为 SemVer 骨架 + 两个独立版本** | 工具版本 = `tools/vaultkit/__init__.py` 的 `__version__`（唯一信源，`status --json` 读它），形如 `X.Y.Z` 无前导零；**公开 API**（升位判据的对象，SemVer §1 要求先声明）= 子命令名与旗标 / 退出码（P5）/ `--json` 字段 / `vault.toml` 键名（P3），输出措辞不在其中（它由测试钉住，P8）。MAJOR = 破坏（改名、退出码语义、判据语义、硬门、主干模型、笔记需迁移）；MINOR = 加性（新命令/旗标/判据/入口/探针/同步行）；PATCH = 修复与文案；不用 pre-release/build 元数据。doctrine 集**只有一个**版本（五份头必须一致），只在 doctrine 语义变化时动（T9 + 新 D 号），与工具版本号不必相等。未发版改动记在 `tools/CHANGELOG.md` 顶部 `## Unreleased`，`__version__` 保持上一个已发版 → 首个 `## v*` 段永远等于它。发版 = 升号 + CHANGELOG 段 + 三条命令全绿 + `release: v<版本>` 提交 + 标签 `v<版本>`（每版恰一标签；非版本标记另用形制）。机器门在 `tests/test_docs.py`：SemVer 形状、首个 `## v*` 段 == `__version__`、段头日期形制、段版本递减、doctrine 头一致。记忆底座卡不涉及版本号，无需重新生成 |
 | D40 | 内容边界 | **禁新增、允就地修订** | AI 可就地修订既有正文的语言与排版（语法/拼写/标点/大小写/LaTeX 排版/版面/句内表达/小节内顺序）；范围=笔记区（`library/`、root 队列、`archives/work/`、`a_sticker/`）。不得增删知识内容；不得动数学与主张（数学修正进 `a_sticker/or/` 提案）；不得动笔记名/`aliases:`/`source:`/链接。每次修订逐条报 before→after，不提交；批量扫荡须 owner 要求。`aliases:` 增改升为 owner 批准项（Agent Contract §4）。新增正文仍只进 `a_sticker/or/`。落地：Workflow §AI 边界 新子节 + Agent Contract §3/§4/§5 + AGENTS 硬规则 7 + P9 + 新同步行 T13。 |
 | D41 | 内容边界（升级） | **计划审核下可补全、可重组、可重构** | AI 在 owner 批准的一份计划之下可补全未讲清处（省略的推导步骤、中间理由、电报体、指代、空 `## Definition`）、按本意重组语言（重写句子、调段落顺序、统一术语与 why 格式）、重构整篇（重排小节、改标题层级、拆合小节、行内式提为显示式）。闸门 = 一次性计划审核（批准计划 = 批准它逐条列出的每一项）。仍然不许（除非计划逐条列出）：数学符号/常量/方向/量词/前提、笔记名、`aliases:`/`source:` 值、链接目标与方向、新增或删除链接、文件级动作（新建/删除/改名/搬家）。无获批计划时旧边界生效：新散文只进 `a_sticker/or/`。落地：Workflow §AI 边界 子节重写 + Agent Contract §3/§4/§5 + AGENTS 硬规则 7 + P9 + Vault Design §三层分工/§关键 doctrine + SKILL + 记忆底座卡；同步行仍用 T13（co-owner 集合不变）。 |
+| D42 | 资产边界 | **二进制不进库，图/文件走公开 R2** | 图片、PDF/EPUB 上传到公开桶，笔记只存 URL；上传器 `.agent/skills/vault-images/r2put.py`（内容寻址 key、按 hash 去重、`presign` 让无凭据客户端直传）；桶公开可读，凭据在仓库外 `~/.config/krummholz/r2.env`（mode 600）。落地：AGENTS 硬规则 11 + Agent Contract §3/§5 + Workflow §AI 边界 + vault-ops 资产流程 + 记忆底座卡 + 新同步行 T14（仓库级 skill 登记）+ T10 探针纳入 skill 脚本的环境变量。 |
 
 ## Related
 
