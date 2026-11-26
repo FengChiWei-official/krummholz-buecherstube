@@ -40,6 +40,7 @@
 ## Topic Areas
 
 - [[Index of Computer Organization]]
+- [[Index of Computer Network]]
 
 ## Key Methods
 
