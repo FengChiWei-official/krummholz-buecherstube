@@ -44,3 +44,5 @@
 
 - [ ] [[Praat 声学分析 Todo]]
 - [ ] [[408 Links 转化 Todo]]
+- [ ] [[习思想 Todo]]
+- [ ] [[马原 Todo]]

@@ -30,6 +30,6 @@ Read this first, then the source-of-truth files it points to. Do not improvise d
 
 ## Invariants (two-tier)
 
-- **Hard gates** (exit 1, block commit): G1 root drained; G2 every `archives/material/` note has real `source:`; G3 no NEW unresolved wikilinks (baseline whitelist in `tools/whitelist_unresolved.txt`, currently 0 entries).
+- **Hard gates** (exit 1, block commit): G1 root drained; G2 every `archives/material/` note has real `source:`; G3 no NEW unresolved wikilinks (baseline whitelist in `tools/whitelist_unresolved.txt`).
 - **Report-level** (weekly increments, never block): I1a 未登记 / I1b 重复登记边 / I1c Raw Index 环 / I2 Links cross-area (same-area = violation, no-area = hint) / I3 Node ≥1 outbound link / I4 doctrine & Raw excluded from binding neighbors / I5 Mapping / I6 实例化 / I7 时间轴 / I8 挂点覆盖率 / I9 un-recorded material source / D21 未拆材料.
 - Every rule is one entry in `tools/vaultkit/rules.py`; every threshold lives once in `tools/vault.toml`. Never hardcode either in a doc.

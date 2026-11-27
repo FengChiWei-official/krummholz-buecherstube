@@ -2,3 +2,12 @@
 # Doctrine: dangling links are allowed as new-note hooks; check flags only NEW
 # unresolved links. Add a name here when the hook is intentional and the note
 # does not exist yet. Remove the line once the note is created. `#` = comment.
+
+# 概率 Links 卡的概念卡钩子（存量，check 在 HEAD 已红）
+confidence interval
+hypothesis test
+joint distribution of the sample
+pivotal quantity
+standard deviation
+standard error
+statistic
