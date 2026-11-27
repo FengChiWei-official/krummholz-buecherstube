@@ -56,3 +56,16 @@
 
 <!-- L0 2026-11-27: 钩子建卡登记 (D22) — 树的存储（见 or/树的存储-顺序与链式-分析） -->
 [[Storage of Tree]]
+
+<!-- L0 2026-11-27: 钩子建卡登记 (D22) — 查找/排序/图存储（见 or/408-算法默认实现与成分算法-分析） -->
+[[Binary Search Tree]]
+[[Adjacency Matrix]]
+[[Adjacency List]]
+[[Critical Path]]
+[[Hash Table]]
+[[Open Addressing]]
+[[ASL]]
+[[Merge Sort]]
+[[Counting Sort]]
+[[B Tree]]
+[[Replacement Selection]]
