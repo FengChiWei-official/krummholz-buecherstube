@@ -15,4 +15,4 @@
 
 ## 相关
 
-[[Binary Tree]] · [[ADT Tree]]
+[[Binary Tree]] · [[ADT Tree]] · [[Storage Structure]]

@@ -6,3 +6,5 @@
 
 ---
 ## **Related**
+
+[[Sorting and Priority Queue]] · [[Binary Tree]]

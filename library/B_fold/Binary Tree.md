@@ -23,4 +23,4 @@
 
 [[Raw Index of Data Structure]] — 登记主干
 
-[[ADT Tree]] · [[Complete Binary Tree]] · [[Index of Binary Tree]]
+[[ADT Tree]] · [[Complete Binary Tree]] · [[Index of Binary Tree]] · [[Storage Structure]]

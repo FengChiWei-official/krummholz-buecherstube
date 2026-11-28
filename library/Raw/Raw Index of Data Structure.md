@@ -75,3 +75,6 @@
 [[Threaded Binary Tree]]
 [[Radix Sort]]
 [[Articulation Point]]
+
+<!-- L0 2026-11-28: 归队登记 (D22) — 排序与优先队列枢纽（原为空壳，已并入比较/分配两族） -->
+[[Sorting and Priority Queue]]
