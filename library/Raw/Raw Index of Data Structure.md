@@ -69,3 +69,9 @@
 [[Counting Sort]]
 [[B Tree]]
 [[Replacement Selection]]
+
+<!-- L0 2026-11-28: 钩子建卡登记 (D22) — 树的重建/线索化、基数排序、割点 -->
+[[Tree Reconstruction from Traversals]]
+[[Threaded Binary Tree]]
+[[Radix Sort]]
+[[Articulation Point]]
